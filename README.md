@@ -2,7 +2,7 @@
 
 ViLek is a digital expense and claim management application designed for flight crew.
 
-![ViLek Logo](Branding/logo.png)
+![ViLek Logo](public/Branding/favicon.png)
 
 ## Overview
 
@@ -18,13 +18,13 @@ ViLek helps crew members:
 
 ## Product
 
-![ViLek](Branding/banner.png)
+![ViLek](public/Branding/Banner.png)
 
 ## Dashboard
 
 The dashboard provides an overview of flights, expenses, claims, approvals, recent activity, and expense summaries.
 
-![ViLek Dashboard](docs/images/vilek-dashboard.png)
+![ViLek Dashboard](public/Branding/Dashboard.png)
 
 ## Technology Stack
 
