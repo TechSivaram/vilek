@@ -1,9 +1,8 @@
-import { AdminPlaceholder } from "@/components/admin/admin-placeholder";
+import { AdminDataManager } from "@/components/admin/admin-data-manager";
+import { resourceConfigs } from "@/lib/admin/resources";
 
+export const dynamic = "force-dynamic";
 export default function Page() {
-  return <AdminPlaceholder
-    title="Crew Designations"
-    description="Maintain the designations used for flight crew assignments."
-    planned={["View designation codes and names", "Create and update designation reference records", "Activate or deactivate designations"]}
-  />;
+  const config = resourceConfigs["crew-designations"];
+  return <AdminDataManager resource="crew-designations" title="Crew Designations" description="Maintain designations available for flight crew assignments." fields={config.fields} canCreate={config.canCreate} canEdit={config.canEdit} canDeactivate={config.canDeactivate} syncUsers={false} />;
 }

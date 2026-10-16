@@ -1,9 +1,8 @@
-import { AdminPlaceholder } from "@/components/admin/admin-placeholder";
+import { AdminDataManager } from "@/components/admin/admin-data-manager";
+import { resourceConfigs } from "@/lib/admin/resources";
 
+export const dynamic = "force-dynamic";
 export default function Page() {
-  return <AdminPlaceholder
-    title="Crew Members"
-    description="Maintain crew records linked to ViLek users."
-    planned={["Search and filter crew members", "View crew profile and badge details", "Manage crew record status"]}
-  />;
+  const config = resourceConfigs["crew-members"];
+  return <AdminDataManager resource="crew-members" title="Crew Members" description="Manage crew profiles linked to existing ViLek user accounts." fields={config.fields} canCreate={config.canCreate} canEdit={config.canEdit} canDeactivate={config.canDeactivate} syncUsers={false} />;
 }

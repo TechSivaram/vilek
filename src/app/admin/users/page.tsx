@@ -1,9 +1,8 @@
-import { AdminPlaceholder } from "@/components/admin/admin-placeholder";
+import { AdminDataManager } from "@/components/admin/admin-data-manager";
+import { resourceConfigs } from "@/lib/admin/resources";
 
+export const dynamic = "force-dynamic";
 export default function Page() {
-  return <AdminPlaceholder
-    title="Users"
-    description="Manage ViLek user accounts and their application access."
-    planned={["Search and filter provisioned ViLek users", "Review account status and identity linkage", "Sync users from TSCloak using the server-side SCIM integration", "Preserve local role assignments during identity synchronization"]} notice="User synchronization is not enabled from this placeholder yet. No TSCloak API is called from this page."
-  />;
+  const config = resourceConfigs["users"];
+  return <AdminDataManager resource="users" title="Users" description="Manage local ViLek user records and their TSCloak identity linkage." fields={config.fields} canCreate={config.canCreate} canEdit={config.canEdit} canDeactivate={config.canDeactivate} syncUsers={true} />;
 }

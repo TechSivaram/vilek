@@ -1,9 +1,19 @@
-import { AdminPlaceholder } from "@/components/admin/admin-placeholder";
+import { AdminDataManager } from "@/components/admin/admin-data-manager";
+import { resourceConfigs } from "@/lib/admin/resources";
 
+export const dynamic = "force-dynamic";
 export default function Page() {
-  return <AdminPlaceholder
-    title="Flights"
-    description="Maintain flight reference records and operational details."
-    planned={["Search flights by airline and flight number", "Review scheduled and actual departure and arrival times", "Maintain origin, destination, and active status"]} notice="Flight scheduling and crew assignment workflows may be implemented separately from this master-data page."
-  />;
+  const config = resourceConfigs["flights"];
+  return (
+    <AdminDataManager
+      resource="flights"
+      title="Flights"
+      description="Maintain scheduled flight records and operational details."
+      fields={config.fields}
+      canCreate={config.canCreate}
+      canEdit={config.canEdit}
+      canDeactivate={config.canDeactivate}
+      syncUsers={false}
+    />
+  );
 }

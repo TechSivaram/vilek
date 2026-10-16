@@ -1,9 +1,8 @@
-import { AdminPlaceholder } from "@/components/admin/admin-placeholder";
+import { AdminDataManager } from "@/components/admin/admin-data-manager";
+import { resourceConfigs } from "@/lib/admin/resources";
 
+export const dynamic = "force-dynamic";
 export default function Page() {
-  return <AdminPlaceholder
-    title="Role Management"
-    description="Review the roles that govern access within ViLek."
-    planned={["View application roles and descriptions", "Review which capabilities each role grants", "Manage role activation and role definitions"]} notice="TSCloak identity roles are separate from ViLek application roles."
-  />;
+  const config = resourceConfigs["roles"];
+  return <AdminDataManager resource="roles" title="Role Management" description="Manage predefined local ViLek roles. Permission grants remain code-defined; TSCloak roles are separate." fields={config.fields} canCreate={config.canCreate} canEdit={config.canEdit} canDeactivate={config.canDeactivate} syncUsers={false} />;
 }

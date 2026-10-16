@@ -1,9 +1,8 @@
-import { AdminPlaceholder } from "@/components/admin/admin-placeholder";
+import { AdminDataManager } from "@/components/admin/admin-data-manager";
+import { resourceConfigs } from "@/lib/admin/resources";
 
+export const dynamic = "force-dynamic";
 export default function Page() {
-  return <AdminPlaceholder
-    title="Currencies"
-    description="Maintain supported currencies and their minor-unit precision."
-    planned={["Search by currency code or name", "Maintain currency code and display name", "Configure supported minor units from zero to four"]}
-  />;
+  const config = resourceConfigs["currencies"];
+  return <AdminDataManager resource="currencies" title="Currencies" description="Maintain supported currencies and minor-unit precision." fields={config.fields} canCreate={config.canCreate} canEdit={config.canEdit} canDeactivate={config.canDeactivate} syncUsers={false} />;
 }

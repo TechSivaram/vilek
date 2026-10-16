@@ -1,0 +1,283 @@
+import {
+  users,
+  roles,
+  crewMembers,
+  airlines,
+  airports,
+  flights,
+  crewDesignations,
+  currencies,
+  expenseCategories,
+} from "@/lib/db/schema";
+
+export type FieldKind =
+  | "text"
+  | "email"
+  | "number"
+  | "datetime-local"
+  | "date"
+  | "boolean"
+  | "select";
+export type AdminField = {
+  name: string;
+  label: string;
+  kind: FieldKind;
+  required?: boolean;
+  readOnly?: boolean;
+  options?: { value: string; label: string }[];
+  help?: string;
+};
+export type ResourceConfig = {
+  title: string;
+  description: string;
+  table: unknown;
+  fields: AdminField[];
+  search: string[];
+  canCreate?: boolean;
+  canEdit?: boolean;
+  canDeactivate?: boolean;
+  listOnly?: boolean;
+};
+
+export const resourceConfigs: Record<string, ResourceConfig> = {
+  users: {
+    title: "Users",
+    description:
+      "Local ViLek identities linked to TSCloak. Identity synchronization never changes local role assignments.",
+    table: users,
+    search: ["email", "firstName", "lastName", "oidcSubject"],
+    canCreate: false,
+    canEdit: true,
+    canDeactivate: true,
+    listOnly: true,
+    fields: [
+      { name: "email", label: "Email", kind: "email", readOnly: true },
+      { name: "firstName", label: "First name", kind: "text", readOnly: true },
+      { name: "lastName", label: "Last name", kind: "text", readOnly: true },
+      {
+        name: "oidcSubject",
+        label: "TSCloak subject",
+        kind: "text",
+        readOnly: true,
+      },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  roles: {
+    title: "Role Management",
+    description:
+      "Manage the predefined local ViLek roles. Permission grants remain defined by application policy code; TSCloak roles are separate.",
+    table: roles,
+    search: ["code", "name", "description"],
+    canCreate: false,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      {
+        name: "code",
+        label: "Role code",
+        kind: "text",
+        required: true,
+        readOnly: true,
+      },
+      { name: "name", label: "Name", kind: "text", required: true },
+      { name: "description", label: "Description", kind: "text" },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  "crew-members": {
+    title: "Crew Members",
+    description: "Crew records linked to local user accounts.",
+    table: crewMembers,
+    search: ["badgeNumber", "userId"],
+    canCreate: true,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      {
+        name: "userId",
+        label: "Local user ID",
+        kind: "select",
+        required: true,
+        help: "Select the existing ViLek user to link.",
+      },
+      {
+        name: "badgeNumber",
+        label: "Badge number",
+        kind: "text",
+        required: true,
+      },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  airlines: {
+    title: "Airlines",
+    description: "Maintain airline reference data used by flight records.",
+    table: airlines,
+    search: ["iataCode", "icaoCode", "name"],
+    canCreate: true,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      {
+        name: "iataCode",
+        label: "IATA code (2 letters)",
+        kind: "text",
+        required: true,
+      },
+      {
+        name: "icaoCode",
+        label: "ICAO code (3 letters)",
+        kind: "text",
+        required: true,
+      },
+      { name: "name", label: "Airline name", kind: "text", required: true },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  airports: {
+    title: "Airports",
+    description: "Maintain airport codes, locations and time zones.",
+    table: airports,
+    search: ["iataCode", "icaoCode", "name", "city", "country"],
+    canCreate: true,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      {
+        name: "iataCode",
+        label: "IATA code (3 letters)",
+        kind: "text",
+        required: true,
+      },
+      {
+        name: "icaoCode",
+        label: "ICAO code (4 letters)",
+        kind: "text",
+        required: true,
+      },
+      { name: "name", label: "Airport name", kind: "text", required: true },
+      { name: "city", label: "City", kind: "text", required: true },
+      { name: "country", label: "Country", kind: "text", required: true },
+      {
+        name: "timeZone",
+        label: "IANA time zone",
+        kind: "text",
+        required: true,
+        help: "Example: Asia/Kolkata",
+      },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  "crew-designations": {
+    title: "Crew Designations",
+    description: "Manage designations available for flight crew assignments.",
+    table: crewDesignations,
+    search: ["code", "name"],
+    canCreate: true,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      { name: "code", label: "Code", kind: "text", required: true },
+      { name: "name", label: "Name", kind: "text", required: true },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  currencies: {
+    title: "Currencies",
+    description: "Manage supported currencies and minor-unit precision.",
+    table: currencies,
+    search: ["code", "name"],
+    canCreate: true,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      {
+        name: "code",
+        label: "ISO currency code",
+        kind: "text",
+        required: true,
+      },
+      { name: "name", label: "Currency name", kind: "text", required: true },
+      {
+        name: "minorUnits",
+        label: "Minor units (0–4)",
+        kind: "number",
+        required: true,
+      },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  "expense-categories": {
+    title: "Expense Categories",
+    description: "Manage categories used when recording crew expenses.",
+    table: expenseCategories,
+    search: ["code", "name"],
+    canCreate: true,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      { name: "code", label: "Code", kind: "text", required: true },
+      { name: "name", label: "Name", kind: "text", required: true },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+  flights: {
+    title: "Flights",
+    description: "Maintain scheduled flight records and operational details.",
+    table: flights,
+    search: ["flightNumber"],
+    canCreate: true,
+    canEdit: true,
+    canDeactivate: true,
+    fields: [
+      {
+        name: "airlineId",
+        label: "Airline ID",
+        kind: "number",
+        required: true,
+      },
+      {
+        name: "flightNumber",
+        label: "Flight number",
+        kind: "text",
+        required: true,
+      },
+      {
+        name: "originAirportId",
+        label: "Origin airport ID",
+        kind: "number",
+        required: true,
+      },
+      {
+        name: "destinationAirportId",
+        label: "Destination airport ID",
+        kind: "number",
+        required: true,
+      },
+      {
+        name: "scheduledDeparture",
+        label: "Scheduled departure (ISO date/time)",
+        kind: "datetime-local",
+        required: true,
+      },
+      {
+        name: "scheduledArrival",
+        label: "Scheduled arrival (ISO date/time)",
+        kind: "datetime-local",
+        required: true,
+      },
+      {
+        name: "actualDeparture",
+        label: "Actual departure (optional)",
+        kind: "datetime-local",
+      },
+      {
+        name: "actualArrival",
+        label: "Actual arrival (optional)",
+        kind: "datetime-local",
+      },
+      { name: "isActive", label: "Active", kind: "boolean" },
+    ],
+  },
+};
