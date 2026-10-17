@@ -8,13 +8,20 @@ export async function GET(request: NextRequest) {
   const state = request.nextUrl.searchParams.get("state");
   const providerError = request.nextUrl.searchParams.get("error");
   if (providerError || !code || !state) {
-    return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(providerError ?? "Missing authorization code or state")}`, request.url));
+    return NextResponse.redirect(
+      new URL(
+        `/login?error=${encodeURIComponent(providerError ?? "Missing authorization code or state")}`,
+        request.url,
+      ),
+    );
   }
   try {
     await completeLogin(code, state);
     return NextResponse.redirect(new URL("/", request.url));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sign-in failed";
-    return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(message)}`, request.url));
+    return NextResponse.redirect(
+      new URL(`/login?error=${encodeURIComponent(message)}`, request.url),
+    );
   }
 }

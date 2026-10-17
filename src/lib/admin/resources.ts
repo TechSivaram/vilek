@@ -46,10 +46,10 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       "Local ViLek identities linked to TSCloak. Identity synchronization never changes local role assignments.",
     table: users,
     search: ["email", "firstName", "lastName", "oidcSubject"],
-    canCreate: false,
+    canCreate: true,
     canEdit: true,
     canDeactivate: true,
-    listOnly: true,
+    listOnly: false,
     fields: [
       { name: "email", label: "Email", kind: "email", readOnly: true },
       { name: "firstName", label: "First name", kind: "text", readOnly: true },
@@ -231,12 +231,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
     canEdit: true,
     canDeactivate: true,
     fields: [
-      {
-        name: "airlineId",
-        label: "Airline ID",
-        kind: "number",
-        required: true,
-      },
+      { name: "airlineId", label: "Airline", kind: "number", required: true },
       {
         name: "flightNumber",
         label: "Flight number",
@@ -245,13 +240,13 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       },
       {
         name: "originAirportId",
-        label: "Origin airport ID",
+        label: "Origin airport",
         kind: "number",
         required: true,
       },
       {
         name: "destinationAirportId",
-        label: "Destination airport ID",
+        label: "Destination airport",
         kind: "number",
         required: true,
       },

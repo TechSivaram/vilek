@@ -7,7 +7,11 @@ export async function GET(request: Request) {
   const authorization = request.headers.get("authorization");
   const bearer = authorization?.match(/^Bearer\s+(.+)$/i)?.[1];
   const result = await getLocalAuthenticatedUser(bearer);
-  if (!result) return NextResponse.json({ error: "Unauthorized or not provisioned in ViLek" }, { status: 401 });
+  if (!result)
+    return NextResponse.json(
+      { error: "Unauthorized or not provisioned in ViLek" },
+      { status: 401 },
+    );
   return NextResponse.json({
     id: result.user.id,
     email: result.user.email,

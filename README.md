@@ -124,11 +124,9 @@ The schema is defined in Drizzle; no Prisma package or configuration is used. To
 
 `npm run db:seed` inserts local demo/reference data. It is intended for a fresh development database only. The claim/expense same-assignment rule must also be validated in the service layer because the provided ER diagram's `Claim_Expense` table does not include a `flight_crew_id` column for a composite foreign key.
 
-
 ## TSCloak SCIM demo users
 
 See [SCIM-SEEDING.md](./SCIM-SEEDING.md) for configuring and running the SCIM-backed demo seed. The seed provisions fictional TSCloak users before seeding local ViLek data. SCIM provisioning does not necessarily create passwords; configure credentials using TSCloak's supported admin workflow.
-
 
 ### Logout behavior
 

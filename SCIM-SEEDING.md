@@ -42,11 +42,9 @@ The six accounts use the reserved `.test` email domain and are fictional. They m
 - Existing non-demo `oidcSubject` mappings are not overwritten.
 - The script stops before local DB seeding if SCIM authentication/provisioning fails.
 
-
 **OpenAPI alignment:** The supplied TSCloak OpenAPI defines `POST /scim/v2/Users` with content type `application/scim+json` and a `ScimUserDto` whose only required field is `userName`; supported optional fields are `name.givenName`, `name.familyName`, `displayName`, `emails[].value`, `emails[].type`, `emails[].primary`, and `active`. The script sends only those fields and deliberately omits `schemas`, because this TSCloak endpoint rejects it. The script uses `GET /scim/v2/Users` to find existing resources and `POST /scim/v2/Users` to create missing ones. The supplied OpenAPI does not define the response schema in detail, so the script requires the list response to contain `Resources` and the create response to contain an `id` before mapping identities.
 
 **Credential limitation from the supplied API contract:** `ScimUserDto` has no `password` property. SCIM seeding can create the identity/profile but cannot set a password through this endpoint. The OpenAPI also documents `POST /api/client/users` with required `username`, `email`, and `password`, but that is a separate client-user API—not a SCIM endpoint. This bundle continues to use SCIM as requested and does not silently switch APIs or invent passwords.
-
 
 ### Logout behavior
 

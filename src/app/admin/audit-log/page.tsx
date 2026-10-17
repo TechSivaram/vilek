@@ -1,4 +1,6 @@
 import { AuditLogPanel } from "@/components/admin/admin-special-panels";
 
 export const dynamic = "force-dynamic";
-export default function Page() { return <AuditLogPanel />; }
+export default function Page() {
+  return <AuditLogPanel />;
+}

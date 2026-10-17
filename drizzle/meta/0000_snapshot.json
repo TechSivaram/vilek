@@ -47,16 +47,12 @@
       "indexes": {
         "Airline_iata_code_unique": {
           "name": "Airline_iata_code_unique",
-          "columns": [
-            "iata_code"
-          ],
+          "columns": ["iata_code"],
           "isUnique": true
         },
         "Airline_icao_code_unique": {
           "name": "Airline_icao_code_unique",
-          "columns": [
-            "icao_code"
-          ],
+          "columns": ["icao_code"],
           "isUnique": true
         }
       },
@@ -138,16 +134,12 @@
       "indexes": {
         "Airport_iata_code_unique": {
           "name": "Airport_iata_code_unique",
-          "columns": [
-            "iata_code"
-          ],
+          "columns": ["iata_code"],
           "isUnique": true
         },
         "Airport_icao_code_unique": {
           "name": "Airport_icao_code_unique",
-          "columns": [
-            "icao_code"
-          ],
+          "columns": ["icao_code"],
           "isUnique": true
         }
       },
@@ -193,10 +185,7 @@
       "indexes": {
         "allowed_file_type_setting_type_uq": {
           "name": "allowed_file_type_setting_type_uq",
-          "columns": [
-            "system_setting_id",
-            "file_type"
-          ],
+          "columns": ["system_setting_id", "file_type"],
           "isUnique": true
         }
       },
@@ -205,12 +194,8 @@
           "name": "Allowed_File_Type_system_setting_id_System_Setting_id_fk",
           "tableFrom": "Allowed_File_Type",
           "tableTo": "System_Setting",
-          "columnsFrom": [
-            "system_setting_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["system_setting_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -312,18 +297,12 @@
       "indexes": {
         "audit_outbox_pending_idx": {
           "name": "audit_outbox_pending_idx",
-          "columns": [
-            "processed_at",
-            "next_attempt_at"
-          ],
+          "columns": ["processed_at", "next_attempt_at"],
           "isUnique": false
         },
         "audit_outbox_entity_idx": {
           "name": "audit_outbox_entity_idx",
-          "columns": [
-            "entity_type",
-            "entity_id"
-          ],
+          "columns": ["entity_type", "entity_id"],
           "isUnique": false
         }
       },
@@ -332,12 +311,8 @@
           "name": "Audit_Outbox_actor_user_id_User_id_fk",
           "tableFrom": "Audit_Outbox",
           "tableTo": "User",
-          "columnsFrom": [
-            "actor_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -389,9 +364,7 @@
       "indexes": {
         "claim_comment_claim_idx": {
           "name": "claim_comment_claim_idx",
-          "columns": [
-            "claim_id"
-          ],
+          "columns": ["claim_id"],
           "isUnique": false
         }
       },
@@ -400,12 +373,8 @@
           "name": "Claim_Comment_claim_id_Claim_id_fk",
           "tableFrom": "Claim_Comment",
           "tableTo": "Claim",
-          "columnsFrom": [
-            "claim_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["claim_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -413,12 +382,8 @@
           "name": "Claim_Comment_user_id_User_id_fk",
           "tableFrom": "Claim_Comment",
           "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -463,17 +428,12 @@
       "indexes": {
         "Claim_Expense_expense_id_unique": {
           "name": "Claim_Expense_expense_id_unique",
-          "columns": [
-            "expense_id"
-          ],
+          "columns": ["expense_id"],
           "isUnique": true
         },
         "claim_expense_claim_expense_uq": {
           "name": "claim_expense_claim_expense_uq",
-          "columns": [
-            "claim_id",
-            "expense_id"
-          ],
+          "columns": ["claim_id", "expense_id"],
           "isUnique": true
         }
       },
@@ -482,12 +442,8 @@
           "name": "Claim_Expense_claim_id_Claim_id_fk",
           "tableFrom": "Claim_Expense",
           "tableTo": "Claim",
-          "columnsFrom": [
-            "claim_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["claim_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -495,12 +451,8 @@
           "name": "Claim_Expense_expense_id_Expense_id_fk",
           "tableFrom": "Claim_Expense",
           "tableTo": "Expense",
-          "columnsFrom": [
-            "expense_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["expense_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -554,24 +506,17 @@
       "indexes": {
         "Claim_flight_crew_id_unique": {
           "name": "Claim_flight_crew_id_unique",
-          "columns": [
-            "flight_crew_id"
-          ],
+          "columns": ["flight_crew_id"],
           "isUnique": true
         },
         "claim_status_idx": {
           "name": "claim_status_idx",
-          "columns": [
-            "status"
-          ],
+          "columns": ["status"],
           "isUnique": false
         },
         "claim_id_assignment_uq": {
           "name": "claim_id_assignment_uq",
-          "columns": [
-            "id",
-            "flight_crew_id"
-          ],
+          "columns": ["id", "flight_crew_id"],
           "isUnique": true
         }
       },
@@ -580,12 +525,8 @@
           "name": "Claim_flight_crew_id_Flight_Crew_id_fk",
           "tableFrom": "Claim",
           "tableTo": "Flight_Crew",
-          "columnsFrom": [
-            "flight_crew_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["flight_crew_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -630,9 +571,7 @@
       "indexes": {
         "Crew_Designation_code_unique": {
           "name": "Crew_Designation_code_unique",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "isUnique": true
         }
       },
@@ -693,16 +632,12 @@
       "indexes": {
         "Crew_Member_user_id_unique": {
           "name": "Crew_Member_user_id_unique",
-          "columns": [
-            "user_id"
-          ],
+          "columns": ["user_id"],
           "isUnique": true
         },
         "Crew_Member_badge_number_unique": {
           "name": "Crew_Member_badge_number_unique",
-          "columns": [
-            "badge_number"
-          ],
+          "columns": ["badge_number"],
           "isUnique": true
         }
       },
@@ -711,12 +646,8 @@
           "name": "Crew_Member_user_id_User_id_fk",
           "tableFrom": "Crew_Member",
           "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -769,9 +700,7 @@
       "indexes": {
         "Currency_code_unique": {
           "name": "Currency_code_unique",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "isUnique": true
         }
       },
@@ -866,9 +795,7 @@
       "indexes": {
         "Expense_Category_code_unique": {
           "name": "Expense_Category_code_unique",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "isUnique": true
         }
       },
@@ -941,9 +868,7 @@
       "indexes": {
         "expense_document_expense_idx": {
           "name": "expense_document_expense_idx",
-          "columns": [
-            "expense_id"
-          ],
+          "columns": ["expense_id"],
           "isUnique": false
         }
       },
@@ -952,12 +877,8 @@
           "name": "Expense_Document_expense_id_Expense_id_fk",
           "tableFrom": "Expense_Document",
           "tableTo": "Expense",
-          "columnsFrom": [
-            "expense_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["expense_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1050,10 +971,7 @@
       "indexes": {
         "expense_assignment_date_idx": {
           "name": "expense_assignment_date_idx",
-          "columns": [
-            "flight_crew_id",
-            "expense_date"
-          ],
+          "columns": ["flight_crew_id", "expense_date"],
           "isUnique": false
         }
       },
@@ -1062,12 +980,8 @@
           "name": "Expense_flight_crew_id_Flight_Crew_id_fk",
           "tableFrom": "Expense",
           "tableTo": "Flight_Crew",
-          "columnsFrom": [
-            "flight_crew_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["flight_crew_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1075,12 +989,8 @@
           "name": "Expense_original_currency_id_Currency_id_fk",
           "tableFrom": "Expense",
           "tableTo": "Currency",
-          "columnsFrom": [
-            "original_currency_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["original_currency_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1088,12 +998,8 @@
           "name": "Expense_category_id_Expense_Category_id_fk",
           "tableFrom": "Expense",
           "tableTo": "Expense_Category",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["category_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1150,19 +1056,12 @@
       "indexes": {
         "flight_crew_flight_member_uq": {
           "name": "flight_crew_flight_member_uq",
-          "columns": [
-            "flight_id",
-            "crew_member_id"
-          ],
+          "columns": ["flight_id", "crew_member_id"],
           "isUnique": true
         },
         "flight_crew_id_assignment_uq": {
           "name": "flight_crew_id_assignment_uq",
-          "columns": [
-            "id",
-            "flight_id",
-            "crew_member_id"
-          ],
+          "columns": ["id", "flight_id", "crew_member_id"],
           "isUnique": true
         }
       },
@@ -1171,12 +1070,8 @@
           "name": "Flight_Crew_flight_id_Flight_id_fk",
           "tableFrom": "Flight_Crew",
           "tableTo": "Flight",
-          "columnsFrom": [
-            "flight_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["flight_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1184,12 +1079,8 @@
           "name": "Flight_Crew_crew_member_id_Crew_Member_id_fk",
           "tableFrom": "Flight_Crew",
           "tableTo": "Crew_Member",
-          "columnsFrom": [
-            "crew_member_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["crew_member_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1197,12 +1088,8 @@
           "name": "Flight_Crew_designation_id_Crew_Designation_id_fk",
           "tableFrom": "Flight_Crew",
           "tableTo": "Crew_Designation",
-          "columnsFrom": [
-            "designation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["designation_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1289,17 +1176,12 @@
       "indexes": {
         "flight_departure_idx": {
           "name": "flight_departure_idx",
-          "columns": [
-            "scheduled_departure"
-          ],
+          "columns": ["scheduled_departure"],
           "isUnique": false
         },
         "flight_number_idx": {
           "name": "flight_number_idx",
-          "columns": [
-            "airline_id",
-            "flight_number"
-          ],
+          "columns": ["airline_id", "flight_number"],
           "isUnique": false
         }
       },
@@ -1308,12 +1190,8 @@
           "name": "Flight_airline_id_Airline_id_fk",
           "tableFrom": "Flight",
           "tableTo": "Airline",
-          "columnsFrom": [
-            "airline_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["airline_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1321,12 +1199,8 @@
           "name": "Flight_origin_airport_id_Airport_id_fk",
           "tableFrom": "Flight",
           "tableTo": "Airport",
-          "columnsFrom": [
-            "origin_airport_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["origin_airport_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1334,12 +1208,8 @@
           "name": "Flight_destination_airport_id_Airport_id_fk",
           "tableFrom": "Flight",
           "tableTo": "Airport",
-          "columnsFrom": [
-            "destination_airport_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["destination_airport_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1384,9 +1254,7 @@
       "indexes": {
         "Gender_code_unique": {
           "name": "Gender_code_unique",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "isUnique": true
         }
       },
@@ -1466,10 +1334,7 @@
       "indexes": {
         "notification_user_unread_idx": {
           "name": "notification_user_unread_idx",
-          "columns": [
-            "user_id",
-            "read_at"
-          ],
+          "columns": ["user_id", "read_at"],
           "isUnique": false
         }
       },
@@ -1478,12 +1343,8 @@
           "name": "Notification_user_id_User_id_fk",
           "tableFrom": "Notification",
           "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1535,9 +1396,7 @@
       "indexes": {
         "Role_code_unique": {
           "name": "Role_code_unique",
-          "columns": [
-            "code"
-          ],
+          "columns": ["code"],
           "isUnique": true
         }
       },
@@ -1586,12 +1445,8 @@
           "name": "System_Setting_default_currency_id_Currency_id_fk",
           "tableFrom": "System_Setting",
           "tableTo": "Currency",
-          "columnsFrom": [
-            "default_currency_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["default_currency_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1645,10 +1500,7 @@
       "indexes": {
         "user_role_user_role_uq": {
           "name": "user_role_user_role_uq",
-          "columns": [
-            "user_id",
-            "role_id"
-          ],
+          "columns": ["user_id", "role_id"],
           "isUnique": true
         }
       },
@@ -1657,12 +1509,8 @@
           "name": "User_Role_user_id_User_id_fk",
           "tableFrom": "User_Role",
           "tableTo": "User",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1670,12 +1518,8 @@
           "name": "User_Role_role_id_Role_id_fk",
           "tableFrom": "User_Role",
           "tableTo": "Role",
-          "columnsFrom": [
-            "role_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["role_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1764,24 +1608,17 @@
       "indexes": {
         "User_oidc_subject_unique": {
           "name": "User_oidc_subject_unique",
-          "columns": [
-            "oidc_subject"
-          ],
+          "columns": ["oidc_subject"],
           "isUnique": true
         },
         "User_email_unique": {
           "name": "User_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         },
         "user_name_idx": {
           "name": "user_name_idx",
-          "columns": [
-            "last_name",
-            "first_name"
-          ],
+          "columns": ["last_name", "first_name"],
           "isUnique": false
         }
       },
@@ -1790,12 +1627,8 @@
           "name": "User_gender_id_Gender_id_fk",
           "tableFrom": "User",
           "tableTo": "Gender",
-          "columnsFrom": [
-            "gender_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["gender_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
