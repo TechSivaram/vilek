@@ -43,17 +43,20 @@ export function withRouteGuard<C extends RouteContext = RouteContext>(
 
     if (!bearer && MUTATING_METHODS.has(request.method.toUpperCase())) {
       const origin = request.headers.get("origin");
-      let requestOrigin: string;
-      try {
-        requestOrigin = new URL(request.url).origin;
-      } catch {
-        return NextResponse.json(
-          { error: "Invalid request URL" },
-          { status: 400 },
-        );
-      }
-      if (!origin || origin !== requestOrigin) {
+
+      if (!origin) {
         return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+      }
+
+      const expectedOrigin = process.env.VILEK_BASE_URL
+        ? new URL(process.env.VILEK_BASE_URL).origin
+        : new URL(request.url).origin;
+
+      if (origin !== expectedOrigin) {
+        return NextResponse.json(
+          { error: "Invalid expected origin" },
+          { status: 403 },
+        );
       }
     }
 
