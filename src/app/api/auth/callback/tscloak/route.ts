@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   }
   try {
     await completeLogin(code, state);
-    return NextResponse.redirect(new URL("https://vilek.onrender.com"));
+    return NextResponse.redirect(new URL("/", request.url));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sign-in failed";
     return NextResponse.redirect(
