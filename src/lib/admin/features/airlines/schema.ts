@@ -3,6 +3,7 @@ import type {
   AirlinesCreateInput,
   AirlinesUpdateInput,
   ListQueryParams,
+  AirlinesFormDto,
 } from "./dto";
 
 export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
@@ -29,7 +30,7 @@ export const updateInputSchema: z.ZodType<AirlinesUpdateInput> = z
   .strict();
 
 /** Runtime validator explicitly checked against the feature DTO. */
-export const formSchema: z.ZodType<AirlinesFormDto> = z
+export const formSchema: z.ZodType<AirlinesFormDto, AirlinesFormDto> = z
   .object({
     iataCode: z.string().trim().length(2),
     icaoCode: z.string().trim().length(3),

@@ -3,6 +3,7 @@ import type {
   RolesCreateInput,
   RolesUpdateInput,
   ListQueryParams,
+  RolesFormDto,
 } from "./dto";
 
 export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
@@ -29,7 +30,7 @@ export const updateInputSchema: z.ZodType<RolesUpdateInput> = z
   .strict();
 
 /** Runtime validator explicitly checked against the feature DTO. */
-export const formSchema: z.ZodType<RolesFormDto> = z
+export const formSchema: z.ZodType<RolesFormDto, RolesFormDto> = z
   .object({
     name: z.string().trim().min(1),
     description: z.string(),

@@ -40,15 +40,8 @@ export const PATCH = withRouteGuard(
 );
 export const DELETE = withRouteGuard(
   { roles: ["ADMIN"] },
-  async (_request: Request, context: Ctx, auth) => {
+  async (_request: Request, context: Ctx) => {
     const { id } = await context.params;
-    const config = resourceConfigs["flights"];
-    if (!config?.canDeactivate)
-      return NextResponse.json(
-        { error: "Delete/deactivation is not available for this resource." },
-        { status: 405 },
-      );
-
     try {
       const result = await flightsService.deactivate(id);
       return result.changes

@@ -3,6 +3,7 @@ import type {
   ExpenseCategoriesCreateInput,
   ExpenseCategoriesUpdateInput,
   ListQueryParams,
+  ExpenseCategoriesFormDto,
 } from "./dto";
 
 export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
@@ -28,7 +29,10 @@ export const updateInputSchema: z.ZodType<ExpenseCategoriesUpdateInput> = z
   .strict();
 
 /** Runtime validator explicitly checked against the feature DTO. */
-export const formSchema: z.ZodType<ExpenseCategoriesFormDto> = z
+export const formSchema: z.ZodType<
+  ExpenseCategoriesFormDto,
+  ExpenseCategoriesFormDto
+> = z
   .object({
     code: z.string().trim().min(1),
     name: z.string().trim().min(1),

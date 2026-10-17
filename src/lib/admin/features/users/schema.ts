@@ -29,13 +29,14 @@ export const updateInputSchema: z.ZodType<UsersUpdateInput> = z
   .partial()
   .strict();
 
-export const userFormSchema: z.ZodType<UsersFormDto> = z
+export const userFormSchema: z.ZodType<UsersFormDto, UsersFormDto> = z
   .object({
     email: z.string().trim().email(),
     firstName: z.string().trim().min(1),
     lastName: z.string().trim().min(1),
   })
   .strict();
-export const userStatusFormSchema: z.ZodType<UsersStatusFormDto> = z
-  .object({ isActive: z.boolean() })
-  .strict();
+export const userStatusFormSchema: z.ZodType<
+  UsersStatusFormDto,
+  UsersStatusFormDto
+> = z.object({ isActive: z.boolean() }).strict();

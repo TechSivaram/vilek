@@ -3,6 +3,7 @@ import type {
   CurrenciesCreateInput,
   CurrenciesUpdateInput,
   ListQueryParams,
+  CurrenciesFormDto,
 } from "./dto";
 
 export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
@@ -29,11 +30,11 @@ export const updateInputSchema: z.ZodType<CurrenciesUpdateInput> = z
   .strict();
 
 /** Runtime validator explicitly checked against the feature DTO. */
-export const formSchema: z.ZodType<CurrenciesFormDto> = z
+export const formSchema: z.ZodType<CurrenciesFormDto, CurrenciesFormDto> = z
   .object({
     code: z.string().trim().length(3),
     name: z.string().trim().min(1),
-    minorUnits: z.coerce.number().int().min(0).max(4),
+    minorUnits: z.number().int().min(0).max(4),
     isActive: z.boolean(),
   })
   .strict();

@@ -50,7 +50,7 @@ export function AirlinesAdminPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const form = useForm<AirlinesFormDto>({
-    resolver: zodResolver(formSchema) as never,
+    resolver: zodResolver(formSchema),
     defaultValues: { iataCode: "", icaoCode: "", name: "", isActive: true },
     mode: "onBlur",
     reValidateMode: "onChange",

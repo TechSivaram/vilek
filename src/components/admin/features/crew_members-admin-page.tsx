@@ -50,8 +50,8 @@ export function CrewMembersAdminPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const form = useForm<CrewMembersFormDto>({
-    resolver: zodResolver(formSchema) as never,
-    defaultValues: { userId: "", badgeNumber: "", isActive: true },
+    resolver: zodResolver(formSchema),
+    defaultValues: { userId: 0, badgeNumber: "", isActive: true },
     mode: "onBlur",
     reValidateMode: "onChange",
   });
@@ -112,7 +112,7 @@ export function CrewMembersAdminPage() {
     setCreating(true);
     setMessage("");
     setError("");
-    form.reset({ userId: "", badgeNumber: "", isActive: true });
+    form.reset({ userId: 0, badgeNumber: "", isActive: true });
   };
   const beginEdit = (row: CrewMembersListRow) => {
     setEditing(row);

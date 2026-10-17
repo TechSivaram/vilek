@@ -3,6 +3,7 @@ import type {
   CrewMembersCreateInput,
   CrewMembersUpdateInput,
   ListQueryParams,
+  CrewMembersFormDto,
 } from "./dto";
 
 export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
@@ -14,7 +15,7 @@ export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
 });
 
 const createShape = {
-  userId: z.coerce.number().int().positive(),
+  userId: z.number().int().positive(),
   badgeNumber: z.string().trim().min(1).max(80),
   isActive: z.boolean(),
 };
@@ -28,9 +29,9 @@ export const updateInputSchema: z.ZodType<CrewMembersUpdateInput> = z
   .strict();
 
 /** Runtime validator explicitly checked against the feature DTO. */
-export const formSchema: z.ZodType<CrewMembersFormDto> = z
+export const formSchema: z.ZodType<CrewMembersFormDto, CrewMembersFormDto> = z
   .object({
-    userId: z.coerce.number().int().positive(),
+    userId: z.number().int().positive(),
     badgeNumber: z.string().trim().min(1),
     isActive: z.boolean(),
   })

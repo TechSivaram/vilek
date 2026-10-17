@@ -18,12 +18,12 @@ export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
 });
 
 /** Runtime validator explicitly checked against the feature DTO. */
-export const formSchema: z.ZodType<FlightFormDto> = z
+export const formSchema: z.ZodType<FlightFormDto, FlightFormDto> = z
   .object({
-    airlineId: z.coerce.number().int().positive(),
+    airlineId: z.number().int().positive(),
     flightNumber: z.string().trim().min(1),
-    originAirportId: z.coerce.number().int().positive(),
-    destinationAirportId: z.coerce.number().int().positive(),
+    originAirportId: z.number().int().positive(),
+    destinationAirportId: z.number().int().positive(),
     scheduledDeparture: z.string().min(1),
     scheduledArrival: z.string().min(1),
     actualDeparture: z.string().nullable().optional(),

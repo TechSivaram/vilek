@@ -50,7 +50,7 @@ export function ExpenseCategoriesAdminPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const form = useForm<ExpenseCategoriesFormDto>({
-    resolver: zodResolver(formSchema) as never,
+    resolver: zodResolver(formSchema),
     defaultValues: { code: "", name: "", isActive: true },
     mode: "onBlur",
     reValidateMode: "onChange",

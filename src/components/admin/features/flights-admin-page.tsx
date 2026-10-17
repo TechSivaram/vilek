@@ -68,12 +68,12 @@ export function FlightsAdminPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const form = useForm<FlightFormDto>({
-    resolver: zodResolver(formSchema) as never,
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      airlineId: "",
+      airlineId: 0,
       flightNumber: "",
-      originAirportId: "",
-      destinationAirportId: "",
+      originAirportId: 0,
+      destinationAirportId: 0,
       scheduledDeparture: "",
       scheduledArrival: "",
       actualDeparture: "",
@@ -154,10 +154,10 @@ export function FlightsAdminPage() {
     setMessage("");
     setError("");
     form.reset({
-      airlineId: "",
+      airlineId: 0,
       flightNumber: "",
-      originAirportId: "",
-      destinationAirportId: "",
+      originAirportId: 0,
+      destinationAirportId: 0,
       scheduledDeparture: "",
       scheduledArrival: "",
       actualDeparture: "",

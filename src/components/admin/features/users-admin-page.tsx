@@ -52,9 +52,15 @@ export function UsersAdminPage() {
   const [creating, setCreating] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const form = useForm<UsersFormDto | UsersStatusFormDto>({
-    resolver: zodResolver(creating ? formSchema : statusSchema) as never,
+  const createForm = useForm<UsersFormDto>({
+    resolver: zodResolver(formSchema),
     defaultValues: { email: "", firstName: "", lastName: "" },
+    mode: "onBlur",
+    reValidateMode: "onChange",
+  });
+  const statusForm = useForm<UsersStatusFormDto>({
+    resolver: zodResolver(statusSchema),
+    defaultValues: { isActive: true },
     mode: "onBlur",
     reValidateMode: "onChange",
   });
@@ -84,7 +90,8 @@ export function UsersAdminPage() {
       setError("");
       setCreating(false);
       setEditing(null);
-      form.reset({});
+      createForm.reset({ email: "", firstName: "", lastName: "" });
+      statusForm.reset({ isActive: true });
       await qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
   });
@@ -140,37 +147,40 @@ export function UsersAdminPage() {
     setCreating(true);
     setMessage("");
     setError("");
-    form.reset({ email: "", firstName: "", lastName: "" });
+    createForm.reset({ email: "", firstName: "", lastName: "" });
+    statusForm.reset({ isActive: true });
   };
   const beginEdit = (row: UsersListRow) => {
     setEditing(row);
     setCreating(false);
     setMessage("");
     setError("");
-    form.reset({ isActive: row.isActive });
+    statusForm.reset({ isActive: row.isActive });
   };
   const cancel = () => {
     setCreating(false);
     setEditing(null);
-    form.reset({});
+    createForm.reset({ email: "", firstName: "", lastName: "" });
+    statusForm.reset({ isActive: true });
   };
-  const submit = form.handleSubmit(async (values) => {
-    try {
-      const payload = creating
-        ? {
-            email: values.email,
-            firstName: values.firstName,
-            lastName: values.lastName,
-          }
-        : { isActive: values.isActive };
-      await save.mutateAsync({
-        id: editing?.id,
-        values: formSchema.parse(payload),
+  const submit = creating
+    ? createForm.handleSubmit(async (values) => {
+        try {
+          await save.mutateAsync({ values: formSchema.parse(values) });
+        } catch (cause) {
+          setError(cause instanceof Error ? cause.message : "Save failed");
+        }
+      })
+    : statusForm.handleSubmit(async (values) => {
+        try {
+          await save.mutateAsync({
+            id: editing?.id,
+            values: statusSchema.parse(values),
+          });
+        } catch (cause) {
+          setError(cause instanceof Error ? cause.message : "Save failed");
+        }
       });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed");
-    }
-  });
   return (
     <>
       <section className="admin-page-heading">
@@ -236,15 +246,15 @@ export function UsersAdminPage() {
               <>
                 <label className="admin-field">
                   <span>Email address *</span>
-                  <input type="email" {...form.register("email")} />
+                  <input type="email" {...createForm.register("email")} />
                 </label>
                 <label className="admin-field">
                   <span>First name *</span>
-                  <input {...form.register("firstName")} />
+                  <input {...createForm.register("firstName")} />
                 </label>
                 <label className="admin-field">
                   <span>Last name *</span>
-                  <input {...form.register("lastName")} />
+                  <input {...createForm.register("lastName")} />
                   <small>
                     The configured identity provider will send the password
                     setup email.
@@ -273,7 +283,7 @@ export function UsersAdminPage() {
                   />
                 </label>
                 <label className="admin-field admin-field-checkbox">
-                  <input type="checkbox" {...form.register("isActive")} />
+                  <input type="checkbox" {...statusForm.register("isActive")} />
                   <span>Active</span>
                 </label>
               </>

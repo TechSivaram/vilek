@@ -50,7 +50,7 @@ export function CurrenciesAdminPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const form = useForm<CurrenciesFormDto>({
-    resolver: zodResolver(formSchema) as never,
+    resolver: zodResolver(formSchema),
     defaultValues: { code: "", name: "", minorUnits: 2, isActive: true },
     mode: "onBlur",
     reValidateMode: "onChange",

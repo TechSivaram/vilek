@@ -50,7 +50,7 @@ export function RolesAdminPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const form = useForm<RolesFormDto>({
-    resolver: zodResolver(formSchema) as never,
+    resolver: zodResolver(formSchema),
     defaultValues: { name: "", description: "", isActive: true },
     mode: "onBlur",
     reValidateMode: "onChange",
