@@ -17,7 +17,12 @@ export async function GET(request: NextRequest) {
   }
   try {
     await completeLogin(code, state);
-    return NextResponse.redirect(new URL("https://vilek.onrender.com"));
+    const baseUrl = process.env.VILEK_BASE_URL;
+
+    if (!baseUrl) {
+      throw new Error("VILEK_BASE_URL is not configured");
+    }
+    return NextResponse.redirect(new URL("/", baseUrl));
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sign-in failed";
     return NextResponse.redirect(
