@@ -2298,3 +2298,35 @@
     padding-inline: 14px;
   }
 }
+
+/* Keep Administration's header and sidebar stationary; scroll only page content. */
+.admin-app {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.admin-sidebar {
+  height: 100vh;
+  height: 100dvh;
+}
+.admin-main {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.admin-topbar {
+  position: relative;
+  top: auto;
+  flex: 0 0 auto;
+}
+.admin-content {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+.admin-footer {
+  flex: 0 0 auto;
+}

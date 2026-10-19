@@ -907,3 +907,13 @@ td.amount-cell {
     gap: 9px;
   }
 }
+
+/* Global readability pass: avoid pale, undersized secondary text. */
+:root { --muted: #526579; }
+body { color: #172b42; font-size: 14px; }
+.workspace-label { color: #526579; font-size: 10px; }
+.nav-link { color: #43596d; }
+.help-card p { color: #526579; font-size: 12px; }
+.profile-copy span { color: #526579; font-size: 11px; }
+.breadcrumb { color: #526579; }
+.today { color: #526579; }

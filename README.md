@@ -369,3 +369,9 @@ Do not treat the presence of a schema table, dashboard navigation label, permiss
 ## 📄 License
 
 License information will be added when the project license is finalized.
+
+## Role-specific workspaces
+
+ViLek supports multiple active local roles per user through the existing `User_Role` relationship. After authentication, the root route sends users with one recognized workspace role directly to that workspace; users with multiple recognized roles are sent to `/dashboard` to choose a workspace. Accounts with no active recognized roles see an access-configuration message on the selector.
+
+Workspace routes are `/crew`, `/approver`, `/finance`, `/operations`, and `/admin`. The non-admin workspace dashboards currently provide the shared responsive shell and role-specific navigation placeholders; live role workflows and metrics are intentionally not represented as implemented. Every workspace route checks the required local ViLek role server-side. The workspace switcher only lists recognized active role assignments and links back to `/dashboard` to view all available workspaces. No default dashboard preference is stored.

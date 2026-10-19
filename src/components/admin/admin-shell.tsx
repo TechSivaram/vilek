@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { WorkspaceSwitcher } from "@/components/workspaces/workspace-switcher";
+import { ProfileMenu } from "@/components/workspaces/profile-menu";
 
 type AdminUser = { firstName: string; lastName: string; email: string };
 
@@ -60,9 +62,11 @@ const groups = [
 export function AdminShell({
   children,
   user,
+  roleCodes,
 }: {
   children: ReactNode;
   user: AdminUser;
+  roleCodes: string[];
 }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -79,9 +83,6 @@ export function AdminShell({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [drawerOpen]);
 
-  const initials =
-    `${user.firstName.slice(0, 1)}${user.lastName.slice(0, 1)}`.toUpperCase();
-
   return (
     <div className={`admin-app ${collapsed ? "admin-app--collapsed" : ""}`}>
       <button
@@ -95,7 +96,7 @@ export function AdminShell({
         aria-label="Administration navigation"
       >
         <div className="admin-brand-row">
-          <Link href="/" className="admin-brand" aria-label="ViLek workspace">
+          <Link href="/dashboard" className="admin-brand" aria-label="ViLek workspaces">
             <Image
               src="/Branding/logo.png"
               alt="ViLek"
@@ -150,29 +151,11 @@ export function AdminShell({
         </nav>
 
         <div className="admin-sidebar-footer">
-          <Link href="/" className="admin-back-workspace">
+          <Link href="/dashboard" className="admin-back-workspace">
             <span className="admin-nav-icon">←</span>
-            <span className="admin-nav-label">Back to workspace</span>
+            <span className="admin-nav-label">All workspaces</span>
           </Link>
-          <div className="admin-profile">
-            <span className="admin-avatar">{initials}</span>
-            <span className="admin-profile-copy">
-              <strong>
-                {user.firstName} {user.lastName}
-              </strong>
-              <small>{user.email}</small>
-            </span>
-            <form action="/api/auth/logout" method="post">
-              <button
-                type="submit"
-                className="admin-signout"
-                aria-label="Sign out"
-                title="Sign out"
-              >
-                ↗
-              </button>
-            </form>
-          </div>
+
         </div>
       </aside>
 
@@ -189,14 +172,14 @@ export function AdminShell({
               ☰
             </button>
             <div className="admin-breadcrumb">
-              <Link href="/">Workspace</Link>
+              <Link href="/dashboard">Workspace</Link>
               <span>/</span>
               <strong>Administration</strong>
             </div>
           </div>
           <div className="admin-topbar-right">
-            <span className="admin-topbar-context">System administration</span>
-            <span className="admin-top-avatar">{initials}</span>
+            <WorkspaceSwitcher roleCodes={roleCodes} currentRole="ADMIN" />
+            <ProfileMenu firstName={user.firstName} lastName={user.lastName} email={user.email} />
           </div>
         </header>
         <main className="admin-content">{children}</main>

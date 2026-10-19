@@ -1,0 +1,319 @@
+.workspace-switcher { position: relative; z-index: 60; }
+.workspace-switcher__trigger { display: flex; align-items: center; gap: 10px; min-width: 190px; padding: 7px 10px; border: 1px solid #e0e8ed; border-radius: 10px; color: #1e3446; background: #fff; cursor: pointer; text-align: left; }
+.workspace-switcher__trigger:hover, .workspace-switcher__trigger[aria-expanded="true"] { border-color: #a8d8d2; background: #fbfefd; }
+.workspace-switcher__trigger-icon { display: grid; place-items: center; width: 33px; height: 33px; flex: 0 0 33px; border-radius: 9px; color: #087f78; background: #e5f7f4; font-size: 17px; }
+.workspace-switcher__trigger-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.workspace-switcher__trigger-copy small { color: #8996a3; font-size: 8px; font-weight: 800; letter-spacing: 1.1px; }
+.workspace-switcher__trigger-copy strong { color: #243b4e; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.workspace-switcher__chevron { margin-left: auto; color: #82919e; font-size: 17px; }
+.workspace-switcher__menu { position: absolute; top: calc(100% + 9px); right: 0; width: min(390px, calc(100vw - 28px)); padding: 12px; border: 1px solid #e1e8ed; border-radius: 16px; background: #fff; box-shadow: 0 20px 56px rgba(18, 42, 59, .18); }
+.workspace-switcher__menu-heading { padding: 9px 12px 12px; color: #718292; font-size: 11px; font-weight: 800; letter-spacing: 1.15px; }
+.workspace-switcher__item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 11px; color: #263c4d; }
+.workspace-switcher__item:hover { background: #f4f8fa; }
+.workspace-switcher__item.is-current { background: #edf8f6; }
+.workspace-switcher__item-icon { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 11px; color: #087f78; background: #e3f5f2; font-size: 19px; }
+.workspace-switcher__item-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.workspace-switcher__item-copy strong { font-size: 14px; line-height: 1.35; font-weight: 750; }
+.workspace-switcher__item-copy small { display: block; color: #6f8090; font-size: 12px; line-height: 1.4; white-space: normal; overflow-wrap: anywhere; }
+.workspace-switcher__check { margin-left: auto; color: #07877f; font-size: 15px; font-weight: 800; }
+.workspace-switcher__menu-footer { margin-top: 6px; padding-top: 7px; border-top: 1px solid #e9eef1; }
+.workspace-switcher__menu-footer a { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 9px; color: #087f78; font-size: 13px; font-weight: 750; }
+.workspace-switcher__menu-footer a:hover { background: #f2f8f7; }
+
+.role-dashboard { --rd-ink: #192d40; --rd-muted: #718192; --rd-line: #e4ebf0; display: flex; min-height: 100vh; color: var(--rd-ink); background: #f5f8fb; font-family: var(--font-geist-sans), Arial, sans-serif; font-size: 14px; }
+.role-dashboard-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 20; display: flex; flex-direction: column; width: 252px; padding: 20px 15px 14px; border-right: 1px solid var(--rd-line); background: #fff; }
+.role-dashboard-brand { display: flex; align-items: center; min-height: 53px; margin: 0 8px 35px; }
+.role-dashboard-brand img { width: 118px; height: auto; object-fit: contain; }
+.role-dashboard-sidebar-label { padding: 0 12px; margin-bottom: 12px; color: #9aa6b1; font-size: 9px; font-weight: 800; letter-spacing: 1.4px; }
+.role-dashboard-current { display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 22px; border: 1px solid #dcefeb; border-radius: 10px; color: #087f78; background: #f0faf8; }
+.role-dashboard-current span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #dff4f0; font-size: 16px; }
+.role-dashboard-current strong { font-size: 12px; font-weight: 750; }
+.role-dashboard-nav { display: flex; flex-direction: column; gap: 5px; }
+.role-dashboard-nav a { display: flex; align-items: center; gap: 12px; min-height: 41px; padding: 9px 12px; border-radius: 8px; color: #66798a; font-size: 12px; font-weight: 650; }
+.role-dashboard-nav a:hover { color: #1d374b; background: #f4f8fa; }
+.role-dashboard-nav a.is-active { color: #087f78; background: #eaf8f6; }
+.role-dashboard-nav a span { display: inline-flex; justify-content: center; width: 17px; font-size: 16px; }
+.role-dashboard-sidebar-bottom { margin-top: auto; }
+.role-dashboard-help { padding: 14px; margin: 0 2px 18px; border: 1px solid #e4ecef; border-radius: 11px; background: #fbfdfd; }
+.role-dashboard-help strong { font-size: 11px; }
+.role-dashboard-help p { margin: 7px 0 0; color: #82909c; font-size: 10px; line-height: 1.65; }
+.role-dashboard-profile { display: flex; align-items: center; gap: 9px; padding: 15px 4px 0; border-top: 1px solid var(--rd-line); }
+.role-dashboard-avatar, .role-dashboard-top-avatar { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; color: #087f78; background: #dff4f0; font-size: 10px; font-weight: 800; }
+.role-dashboard-profile > span:nth-child(2) { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.role-dashboard-profile strong { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.role-dashboard-profile small { overflow: hidden; color: #8a97a3; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.role-dashboard-profile form { margin-left: auto; }
+.role-dashboard-profile button { border: 0; color: #7d8c99; background: transparent; cursor: pointer; }
+.role-dashboard-main { display: flex; flex-direction: column; min-width: 0; min-height: 100vh; width: calc(100% - 252px); margin-left: 252px; }
+.role-dashboard-topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 76px; padding: 12px clamp(20px, 3vw, 42px); border-bottom: 1px solid var(--rd-line); background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
+.role-dashboard-breadcrumb { display: flex; align-items: center; gap: 10px; color: #8a98a5; font-size: 11px; }
+.role-dashboard-breadcrumb strong { color: #33495c; font-weight: 750; }
+.role-dashboard-topbar-actions { display: flex; align-items: center; gap: 13px; }
+.role-dashboard-top-avatar { width: 32px; height: 32px; flex-basis: 32px; }
+.role-dashboard-content { width: 100%; max-width: 1450px; flex: 1; padding: 36px clamp(20px, 3vw, 42px) 28px; margin: 0 auto; }
+.role-dashboard-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.role-dashboard-eyebrow { color: #0b928a; font-size: 9px; font-weight: 800; letter-spacing: 1.6px; }
+.role-dashboard-heading h1 { margin: 10px 0 10px; color: #1b3043; font-size: clamp(27px, 3vw, 34px); font-weight: 750; letter-spacing: -1.1px; line-height: 1.2; }
+.role-dashboard-heading p { max-width: 680px; margin: 0; color: #748494; font-size: 13px; line-height: 1.7; }
+.role-dashboard-heading-icon { display: grid; place-items: center; width: 62px; height: 62px; flex: 0 0 62px; border: 1px solid #dcefeb; border-radius: 17px; color: #087f78; background: #eaf8f6; font-size: 27px; }
+.role-dashboard-note { display: flex; align-items: flex-start; gap: 11px; padding: 14px 16px; margin-bottom: 22px; border: 1px solid #dce9f4; border-radius: 10px; color: #456579; background: #f1f8fd; }
+.role-dashboard-note > span { color: #3680a8; font-size: 16px; }
+.role-dashboard-note p { margin: 0; font-size: 11px; line-height: 1.7; }
+.role-dashboard-capabilities { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.role-dashboard-capability { display: flex; flex-direction: column; min-height: 195px; padding: 20px; border: 1px solid #e3eaef; border-radius: 13px; background: #fff; box-shadow: 0 3px 10px rgba(20,45,62,.025); scroll-margin-top: 95px; }
+.role-dashboard-capability-icon { display: grid; place-items: center; width: 37px; height: 37px; border-radius: 10px; color: #087f78; background: #e7f7f4; font-size: 17px; }
+.role-dashboard-capability h2 { margin: 16px 0 7px; color: #20384b; font-size: 14px; font-weight: 750; }
+.role-dashboard-capability p { margin: 0; color: #7a8996; font-size: 11px; line-height: 1.65; }
+.role-dashboard-capability-link { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 18px; color: #087f78; font-size: 11px; font-weight: 750; }
+.role-dashboard-footer { display: flex; justify-content: space-between; gap: 12px; padding: 17px clamp(20px, 3vw, 42px) 20px; border-top: 1px solid var(--rd-line); color: #8a98a4; font-size: 10px; }
+@media (max-width: 1100px) { .role-dashboard-capabilities { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .role-dashboard-sidebar { position: static; display: none; } .role-dashboard-main { width: 100%; margin-left: 0; } .role-dashboard-topbar { align-items: flex-start; flex-direction: column; } .role-dashboard-topbar-actions { width: 100%; justify-content: space-between; } .workspace-switcher__trigger { min-width: 180px; } .role-dashboard-content { padding-top: 28px; } }
+@media (max-width: 520px) {
+  .role-dashboard-capabilities { grid-template-columns: 1fr; }
+  .role-dashboard-heading-icon { display: none; }
+  .role-dashboard-footer { flex-direction: column; }
+  .workspace-switcher__trigger { min-width: 0; }
+  .workspace-switcher__trigger-copy small { display: none; }
+  /* On narrow screens, open the menu from the trigger's left edge instead of
+     aligning its right edge, which pushed most of the menu off-screen. */
+  .workspace-switcher__menu {
+    left: 0;
+    right: auto;
+    width: min(390px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
+  }
+}
+
+/* Role themes apply only to the non-admin shared workspace dashboard component. */
+.role-dashboard { --rd-accent: #1677ff; --rd-accent-strong: #125fc7; --rd-accent-soft: #eaf3ff; --rd-accent-line: #c6ddff; --rd-accent-glow: #f2f7ff; }
+.role-dashboard--crew { --rd-accent: #1677ff; --rd-accent-strong: #125fc7; --rd-accent-soft: #eaf3ff; --rd-accent-line: #c6ddff; --rd-accent-glow: #f2f7ff; }
+.role-dashboard--approver { --rd-accent: #ff6d00; --rd-accent-strong: #c45100; --rd-accent-soft: #fff0df; --rd-accent-line: #ffbd80; --rd-accent-glow: #fff8f0; }
+.role-dashboard--finance { --rd-accent: #138808; --rd-accent-strong: #0c6805; --rd-accent-soft: #eaf5e8; --rd-accent-line: #c6e4c1; --rd-accent-glow: #f5fbf3; }
+.role-dashboard--flight_operations_manager { --rd-accent: #1565c0; --rd-accent-strong: #104d91; --rd-accent-soft: #e8f1fc; --rd-accent-line: #c5dbf8; --rd-accent-glow: #f3f8ff; }
+.role-dashboard--crew .role-dashboard-heading-icon,
+.role-dashboard--approver .role-dashboard-heading-icon,
+.role-dashboard--finance .role-dashboard-heading-icon,
+.role-dashboard--flight_operations_manager .role-dashboard-heading-icon { color: var(--rd-accent-strong); background: var(--rd-accent-soft); border-color: var(--rd-accent-line); }
+.role-dashboard--crew .role-dashboard-current,
+.role-dashboard--approver .role-dashboard-current,
+.role-dashboard--finance .role-dashboard-current,
+.role-dashboard--flight_operations_manager .role-dashboard-current { color: var(--rd-accent-strong); background: var(--rd-accent-glow); border-color: var(--rd-accent-line); }
+.role-dashboard--crew .role-dashboard-current span,
+.role-dashboard--approver .role-dashboard-current span,
+.role-dashboard--finance .role-dashboard-current span,
+.role-dashboard--flight_operations_manager .role-dashboard-current span { color: var(--rd-accent-strong); background: var(--rd-accent-soft); }
+.role-dashboard--crew .role-dashboard-nav a.is-active,
+.role-dashboard--approver .role-dashboard-nav a.is-active,
+.role-dashboard--finance .role-dashboard-nav a.is-active,
+.role-dashboard--flight_operations_manager .role-dashboard-nav a.is-active { color: var(--rd-accent-strong); background: var(--rd-accent-soft); }
+.role-dashboard--crew .role-dashboard-eyebrow,
+.role-dashboard--approver .role-dashboard-eyebrow,
+.role-dashboard--finance .role-dashboard-eyebrow,
+.role-dashboard--flight_operations_manager .role-dashboard-eyebrow { color: var(--rd-accent-strong); }
+.role-dashboard--crew .role-dashboard-capability-icon,
+.role-dashboard--approver .role-dashboard-capability-icon,
+.role-dashboard--finance .role-dashboard-capability-icon,
+.role-dashboard--flight_operations_manager .role-dashboard-capability-icon { color: var(--rd-accent-strong); background: var(--rd-accent-soft); }
+.role-dashboard--crew .role-dashboard-capability-link,
+.role-dashboard--approver .role-dashboard-capability-link,
+.role-dashboard--finance .role-dashboard-capability-link,
+.role-dashboard--flight_operations_manager .role-dashboard-capability-link { color: var(--rd-accent-strong); }
+.role-dashboard--crew .role-dashboard-capability:hover,
+.role-dashboard--approver .role-dashboard-capability:hover,
+.role-dashboard--finance .role-dashboard-capability:hover,
+.role-dashboard--flight_operations_manager .role-dashboard-capability:hover { border-color: var(--rd-accent-line); box-shadow: 0 10px 26px color-mix(in srgb, var(--rd-accent) 12%, transparent); }
+.role-dashboard--crew .role-dashboard-avatar,
+.role-dashboard--crew .role-dashboard-top-avatar,
+.role-dashboard--approver .role-dashboard-avatar,
+.role-dashboard--approver .role-dashboard-top-avatar,
+.role-dashboard--finance .role-dashboard-avatar,
+.role-dashboard--finance .role-dashboard-top-avatar,
+.role-dashboard--flight_operations_manager .role-dashboard-avatar,
+.role-dashboard--flight_operations_manager .role-dashboard-top-avatar { color: var(--rd-accent-strong); background: var(--rd-accent-soft); }
+.role-dashboard--crew .workspace-switcher__trigger-icon,
+.role-dashboard--approver .workspace-switcher__trigger-icon,
+.role-dashboard--finance .workspace-switcher__trigger-icon,
+.role-dashboard--flight_operations_manager .workspace-switcher__trigger-icon { color: var(--rd-accent-strong); background: var(--rd-accent-soft); }
+.role-dashboard--crew .workspace-switcher__trigger:hover,
+.role-dashboard--crew .workspace-switcher__trigger[aria-expanded="true"],
+.role-dashboard--approver .workspace-switcher__trigger:hover,
+.role-dashboard--approver .workspace-switcher__trigger[aria-expanded="true"],
+.role-dashboard--finance .workspace-switcher__trigger:hover,
+.role-dashboard--finance .workspace-switcher__trigger[aria-expanded="true"],
+.role-dashboard--flight_operations_manager .workspace-switcher__trigger:hover,
+.role-dashboard--flight_operations_manager .workspace-switcher__trigger[aria-expanded="true"] { border-color: var(--rd-accent-line); }
+.workspace-switcher__item-icon[data-theme="crew"] { color: #125fc7; background: #eaf3ff; }
+.workspace-switcher__item-icon[data-theme="approver"] { color: #c45100; background: #fff0df; }
+.workspace-switcher__item-icon[data-theme="finance"] { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
+.workspace-switcher__item-icon[data-theme="flight_operations_manager"] { color: #104d91; background: #e8f1fc; }
+.workspace-switcher__item-icon[data-theme="admin"] { color: #dc2626; background: #fee2e2; }
+.workspace-switcher__item.is-current { background: var(--rd-accent-glow, #f3f8fb); }
+.workspace-switcher__item.is-current .workspace-switcher__check { color: var(--rd-accent-strong, #087f78); }
+
+/* Rendered in document.body so Admin/mobile layout containers cannot clip it. */
+.workspace-switcher__menu--portal {
+  position: fixed;
+  z-index: 10000;
+  max-width: calc(100vw - 24px);
+  max-height: min(500px, calc(100dvh - 24px));
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-sizing: border-box;
+}
+.workspace-switcher__menu--portal::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fixed workspace chrome with scrolling confined to the page content. */
+.role-dashboard {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.role-dashboard-main {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.role-dashboard-topbar {
+  position: relative;
+  top: auto;
+  flex: 0 0 auto;
+}
+.role-dashboard-content {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+.role-dashboard-footer {
+  flex: 0 0 auto;
+}
+@media (max-width: 760px) {
+  .role-dashboard-main {
+    height: 100dvh;
+  }
+  .role-dashboard-topbar {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+@media (max-width: 520px) {
+  .role-dashboard-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* Keep Administration switcher icon aligned with its red workspace theme. */
+.workspace-switcher__item-icon[data-theme="admin"] {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+/* Administration workspace uses the red theme in the switcher trigger too. */
+.role-dashboard--admin .workspace-switcher__trigger-icon,
+.role-dashboard--administration .workspace-switcher__trigger-icon { color: #dc2626; background: #fee2e2; }
+
+/* Shared account menu: profile and sign-out live in the top-right header on every workspace. */
+.profile-menu { position: relative; z-index: 80; flex: 0 0 auto; }
+.profile-menu__trigger { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; cursor: pointer; }
+.profile-menu__trigger:hover, .profile-menu__trigger[aria-expanded="true"] { border-color: #cbdcf0; background: #f4f8fc; }
+.profile-menu__avatar { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; color: #087f78; background: #dff4f0; font-size: 10px; font-weight: 800; }
+.profile-menu__panel { position: absolute; top: calc(100% + 10px); right: 0; width: min(310px, calc(100vw - 28px)); padding: 14px; border: 1px solid #e1e8ed; border-radius: 14px; background: #fff; box-shadow: 0 18px 48px rgba(18, 42, 59, .18); color: #243b4e; }
+.profile-menu__identity { display: flex; align-items: center; gap: 11px; padding: 5px 4px 13px; }
+.profile-menu__avatar--large { width: 42px; height: 42px; flex: 0 0 42px; font-size: 12px; }
+.profile-menu__copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.profile-menu__copy strong { font-size: 13px; font-weight: 750; }
+.profile-menu__copy small { overflow-wrap: anywhere; color: #748494; font-size: 11px; line-height: 1.45; }
+.profile-menu__status { padding: 10px 4px; border-top: 1px solid #edf1f4; color: #748494; font-size: 11px; }
+.profile-menu__signout { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 11px; border: 0; border-radius: 9px; color: #b42318; background: #fff5f4; font: inherit; font-size: 12px; font-weight: 750; text-align: left; cursor: pointer; }
+.profile-menu__signout:hover { background: #fee9e7; }
+.profile-menu__signout span { font-size: 17px; }
+
+/* Readability pass: stronger text contrast and more comfortable type sizes. */
+.role-dashboard { --rd-muted: #526579; }
+.role-dashboard-sidebar-label { color: #526579; font-size: 10px; }
+.role-dashboard-nav a { color: #43596d; font-size: 13px; }
+.role-dashboard-help p { color: #526579; font-size: 11px; }
+.role-dashboard-profile strong { font-size: 11px; }
+.role-dashboard-profile small { color: #526579; font-size: 10px; }
+.role-dashboard-breadcrumb { color: #526579; font-size: 12px; }
+.role-dashboard-heading p { color: #526579; font-size: 14px; }
+.role-dashboard-note p { color: #3e5b70; font-size: 12px; }
+.role-dashboard-capability p { color: #526579; font-size: 12px; }
+.role-dashboard-capability-link { font-size: 12px; }
+.role-dashboard-footer { color: #526579; font-size: 11px; }
+.workspace-switcher__trigger-copy small { color: #526579; font-size: 9px; }
+.workspace-switcher__chevron { color: #526579; }
+.workspace-switcher__menu-heading { color: #526579; }
+.workspace-switcher__item-copy small { color: #43596d; }
+.workspace-picker-user small { color: #526579; }
+.workspace-picker-intro p, .workspace-card-description, .workspace-empty-state p { color: #43596d; }
+.workspace-picker-footer { color: #526579; font-size: 11px; }
+
+/* Readability refinement: slightly larger, stronger text across every workspace. */
+.role-dashboard-sidebar-label { color: #657789; font-size: 10px; }
+.role-dashboard-nav a { color: #4b6073; font-size: 13px; font-weight: 700; }
+.role-dashboard-help strong { font-size: 12px; font-weight: 750; }
+.role-dashboard-help p { color: #586d7f; font-size: 11px; font-weight: 550; }
+.role-dashboard-profile strong { font-size: 11px; font-weight: 750; }
+.role-dashboard-profile small { color: #586d7f; font-size: 10px; font-weight: 550; }
+.role-dashboard-breadcrumb { color: #5e7183; font-size: 12px; font-weight: 550; }
+.role-dashboard-eyebrow { font-size: 10px; }
+.role-dashboard-heading p { color: #53697d; font-size: 14px; font-weight: 550; }
+.role-dashboard-note { color: #344f64; }
+.role-dashboard-note p { font-size: 12px; font-weight: 550; }
+.role-dashboard-capability h2 { font-size: 15px; font-weight: 800; }
+.role-dashboard-capability p { color: #53697b; font-size: 12px; font-weight: 550; }
+.role-dashboard-capability-link { font-size: 12px; font-weight: 800; }
+.role-dashboard-footer { color: #53697b; font-size: 11px; font-weight: 600; }
+.workspace-switcher__trigger-copy small { color: #5f7182; font-size: 9px; }
+.workspace-switcher__trigger-copy strong { font-size: 13px; font-weight: 800; }
+.workspace-switcher__menu-heading { color: #586d7f; }
+.workspace-switcher__item-copy strong { font-size: 14px; font-weight: 800; }
+.workspace-switcher__item-copy small { color: #4e6376; font-size: 13px; font-weight: 550; }
+.workspace-switcher__menu-footer a { font-size: 14px; font-weight: 800; }
+
+
+/* Workspace trigger themes are explicit so Administration stays red even on its own layout. */
+.workspace-switcher__trigger-icon[data-theme="admin"] { color: #dc2626; background: #fee2e2; border: 1px solid #fecaca; }
+.workspace-switcher__trigger-icon[data-theme="finance"] {
+  color: #087f3e;
+  background: linear-gradient(180deg, #ffead5 0%, #ffffff 48%, #e1f5e5 100%);
+  border: 1px solid #b9dfc2;
+  box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808;
+}
+
+/* Finance uses a brighter Tiranga-inspired saffron, white and green palette. */
+.role-dashboard--finance {
+  --rd-accent: #138808;
+  --rd-accent-strong: #087f3e;
+  --rd-accent-soft: #e5f5e8;
+  --rd-accent-line: #b9dfc2;
+  --rd-accent-glow: #fffaf3;
+}
+.role-dashboard--finance .role-dashboard-nav a.is-active {
+  border-left: 3px solid #ff9933;
+  box-shadow: inset 0 0 0 1px #c5e6cb;
+}
+.role-dashboard--finance .role-dashboard-heading-icon,
+.role-dashboard--finance .role-dashboard-capability-icon {
+  background: linear-gradient(145deg, #ffead5 0%, #ffffff 48%, #e1f5e5 100%);
+  border-color: #b9dfc2;
+  box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808;
+}
+.workspace-switcher__item-icon[data-theme="finance"] {
+  color: #087f3e;
+  background: linear-gradient(180deg, #ffead5 0%, #ffffff 48%, #e1f5e5 100%);
+  box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808;
+}
+
+/* Finance Tiranga icon treatment across workspace headers and switchers. */
+.workspace-switcher__trigger-icon[data-theme="finance"] { color: #087f3e !important; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%) !important; border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
+.workspace-switcher__item-icon[data-theme="finance"] { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
+.role-dashboard--finance .role-dashboard-current span { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }

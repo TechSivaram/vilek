@@ -19,6 +19,7 @@ export default async function AdminLayout({
         lastName: authenticated.user.lastName,
         email: authenticated.user.email,
       }}
+      roleCodes={authenticated.roleCodes}
     >
       {children}
     </AdminShell>
