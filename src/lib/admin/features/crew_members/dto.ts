@@ -7,11 +7,13 @@ export type CrewMembersListQuery = {
   direction?: "asc" | "desc";
 };
 export type CrewMembersListRow = {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   badgeNumber: string;
   isActive: boolean;
   userName?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
 };
 export type CrewMembersCreateInput = Omit<CrewMembersListRow, "id">;
@@ -22,7 +24,7 @@ export type CrewMembersListResult = {
     airlines?: Array<{ id: number; name: string; iataCode?: string }>;
     airports?: Array<{ id: number; name: string; iataCode?: string }>;
     users?: Array<{
-      id: number;
+      id: string;
       name?: string;
       firstName?: string;
       lastName?: string;
@@ -48,7 +50,7 @@ export type ListQueryParams = {
 
 /** Validated form submission contract; this DTO is the source of truth. */
 export type CrewMembersFormDto = {
-  userId: number;
+  userId: string;
   badgeNumber: string;
   isActive: boolean;
 };

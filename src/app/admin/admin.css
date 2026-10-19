@@ -2330,3 +2330,539 @@
 .admin-footer {
   flex: 0 0 auto;
 }
+
+/* Flight Crew grouping toolbar and collapsible hierarchy */
+.flight-crew-record-tools {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.flight-crew-record-tools .flight-crew-group-select {
+  min-width: 205px;
+  margin: 0;
+}
+.flight-crew-record-tools > input {
+  min-width: 220px;
+  max-width: 100%;
+}
+.flight-crew-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.flight-crew-group-toggle > span:first-child {
+  flex: 0 0 14px;
+  width: 14px;
+  text-align: center;
+  color: var(--admin-text-muted, #52677a);
+}
+.flight-crew-group-toggle > small {
+  color: var(--admin-text-muted, #52677a);
+  white-space: nowrap;
+}
+.flight-crew-group-toggle:focus-visible {
+  outline: 2px solid var(--admin-accent, #0d9488);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+@media (max-width: 760px) {
+  .flight-crew-record-tools { justify-content: stretch; align-items: stretch; }
+  .flight-crew-record-tools .flight-crew-group-select,
+  .flight-crew-record-tools > input { min-width: 100%; width: 100%; }
+  .flight-crew-group-toggle { align-items: flex-start; flex-wrap: wrap; }
+}
+
+
+/* Flight Crew uses a hierarchical table, so don't apply generic mobile record-card
+   transformations to its date/flight/designation group rows. Keep the table intact
+   and allow horizontal scrolling on narrow screens. */
+@media (max-width: 700px) {
+  .flight-crew-table-wrap {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    border: 1px solid #d5e0e7;
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .flight-crew-table {
+    display: table !important;
+    width: 100%;
+    min-width: 580px !important;
+    table-layout: auto !important;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .flight-crew-table thead {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+    border: 0 !important;
+  }
+  .flight-crew-table tbody {
+    display: table-row-group !important;
+    width: auto !important;
+  }
+  .flight-crew-table tbody tr {
+    display: table-row !important;
+    min-width: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff;
+  }
+  .flight-crew-table tbody td,
+  .flight-crew-table thead th {
+    display: table-cell !important;
+    position: static !important;
+    width: auto;
+    padding: 9px 10px !important;
+    border-bottom: 1px solid #e1e8ed;
+    vertical-align: middle;
+    font-size: 13px !important;
+  }
+  .flight-crew-table tbody td[data-label]::before {
+    content: none !important;
+    display: none !important;
+  }
+  .flight-crew-table .flight-crew-group-heading > td {
+    display: table-cell !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  .flight-crew-table .flight-crew-group-toggle {
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .flight-crew-table .flight-crew-tree-icon,
+  .flight-crew-table .flight-crew-tree-marker {
+    flex: 0 0 20px;
+  }
+  .flight-crew-table .flight-crew-group-heading > td[style*="padding: 5px 48px"] {
+    padding-left: 30px !important;
+  }
+  .flight-crew-table .flight-crew-group-heading > td[style*="padding: 5px 78px"] {
+    padding-left: 48px !important;
+  }
+  .flight-crew-table tbody td[data-label="Flight / route"] {
+    display: none !important;
+  }
+  .flight-crew-table tbody td[data-label="Crew member"] {
+    min-width: 210px;
+  }
+  .flight-crew-table .admin-row-actions {
+    flex-wrap: wrap;
+  }
+}
+
+
+/* Flight Crew mobile-first card hierarchy: no compressed desktop table on phones. */
+.flight-crew-mobile-view {
+  display: none;
+}
+@media (max-width: 700px) {
+  .flight-crew-table-wrap {
+    display: none !important;
+  }
+  .flight-crew-mobile-view {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+  }
+  .flight-crew-mobile-date {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #d5e0e7;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(28, 55, 72, 0.05);
+  }
+  .flight-crew-mobile-date-toggle,
+  .flight-crew-mobile-flight-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+  }
+  .flight-crew-mobile-date-toggle {
+    flex-direction: row;
+    align-items: center;
+    padding: 13px 12px;
+    background: #eaf1f5;
+    color: #213d50;
+    font-weight: 700;
+  }
+  .flight-crew-mobile-date-toggle > span:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.35;
+  }
+  .flight-crew-mobile-date-toggle small {
+    flex-shrink: 0;
+    color: #61788a;
+    font-weight: 500;
+  }
+  .flight-crew-mobile-date-content {
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+    background: #f7f9fb;
+  }
+  .flight-crew-mobile-flight {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #dbe5eb;
+    border-radius: 10px;
+    background: #fff;
+  }
+  .flight-crew-mobile-flight-toggle {
+    padding: 12px;
+    background: #fff;
+    color: #243f52;
+  }
+  .flight-crew-mobile-flight-toggle .flight-crew-tree-icon {
+    align-self: flex-start;
+  }
+  .flight-crew-mobile-flight-title {
+    display: block;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .flight-crew-mobile-route {
+    min-width: 0;
+    color: #536c7d;
+    font-size: 13px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+  .flight-crew-mobile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    color: #647b8b;
+    font-size: 12px;
+  }
+  .flight-crew-mobile-manifest {
+    display: grid;
+    gap: 10px;
+    padding: 0 10px 10px;
+    background: #fff;
+  }
+  .flight-crew-mobile-designation {
+    min-width: 0;
+    border-left: 3px solid #91a9b8;
+    border-radius: 0 8px 8px 0;
+    background: #f5f8fa;
+  }
+  .flight-crew-mobile-designation-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px;
+    color: #2b485b;
+  }
+  .flight-crew-mobile-designation-heading > span {
+    color: #71899a;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .flight-crew-mobile-designation-heading strong {
+    overflow-wrap: anywhere;
+  }
+  .flight-crew-mobile-designation-heading small {
+    color: #687f8f;
+    font-size: 11px;
+  }
+  .flight-crew-mobile-members {
+    display: grid;
+    gap: 8px;
+    padding: 0 8px 8px;
+  }
+  .flight-crew-mobile-member {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #e0e8ed;
+    border-radius: 8px;
+    background: #fff;
+  }
+  .flight-crew-mobile-member-info {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+    flex: 1 1 140px;
+  }
+  .flight-crew-mobile-member-info strong {
+    color: #263f50;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+  .flight-crew-mobile-member-info span {
+    color: #657c8b;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .flight-crew-mobile-member .admin-table-action {
+    flex: 0 0 auto;
+    min-height: 36px;
+  }
+  .flight-crew-mobile-message,
+  .flight-crew-mobile-empty {
+    margin: 0;
+    padding: 12px;
+    color: #607487;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .flight-crew-mobile-message.is-error {
+    color: #b42318;
+  }
+  .flight-crew-mobile-view .flight-crew-tree-icon {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+    border-radius: 6px;
+    font-size: 16px;
+  }
+  .admin-pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .admin-pagination > span {
+    order: 3;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Keep the assignment action available directly from each flight group header. */
+.flight-crew-inline-assign {
+  float: right;
+  margin: 2px 8px 2px 16px;
+  white-space: nowrap;
+}
+.flight-crew-mobile-flight-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 12px 12px;
+}
+@media (min-width: 701px) {
+  .flight-crew-inline-assign { font-size: 12px; padding: 6px 10px; }
+}
+@media (max-width: 700px) {
+  .flight-crew-mobile-flight-actions { justify-content: stretch; }
+  .flight-crew-mobile-flight-actions .admin-secondary-button { width: 100%; }
+}
+
+/* Flight Crew assignment is a dialog so it does not push the manifest down the page. */
+.flight-crew-assignment-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+  background: rgba(15, 35, 49, 0.48);
+  backdrop-filter: blur(2px);
+}
+.flight-crew-assignment-modal {
+  width: min(640px, 100%);
+  max-height: calc(100vh - 48px);
+  margin: auto;
+  overflow-y: auto;
+  box-shadow: 0 24px 70px rgba(16, 37, 52, 0.28);
+}
+.flight-crew-flight-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.flight-crew-flight-row .flight-crew-group-toggle {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+.flight-crew-inline-assign {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 7px 10px;
+  position: relative;
+  z-index: 1;
+}
+.flight-crew-mobile-flight-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 12px 12px;
+}
+.flight-crew-mobile-assign {
+  width: auto !important;
+  min-height: 36px;
+  padding: 7px 11px;
+  font-size: 12px;
+}
+@media (max-width: 700px) {
+  .flight-crew-assignment-backdrop { align-items: flex-end; padding: 10px; }
+  .flight-crew-assignment-modal {
+    width: 100%;
+    max-height: calc(100dvh - 20px);
+    border-radius: 16px 16px 12px 12px;
+  }
+  .flight-crew-flight-row { align-items: center; gap: 8px; }
+  .flight-crew-flight-row .flight-crew-group-toggle { width: auto; flex: 1 1 0; gap: 6px; }
+  .flight-crew-inline-assign { margin-top: 2px; flex-shrink: 0; }
+  .flight-crew-mobile-flight-actions { justify-content: flex-end; }
+}
+
+
+/* Flight-level action uses its own table cell so it stays visible and aligned right. */
+.flight-crew-flight-heading > td { vertical-align: middle; }
+.flight-crew-flight-heading .flight-crew-flight-toggle {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  width: 100%; min-width: 0; text-align: left;
+}
+.flight-crew-flight-heading .flight-crew-flight-toggle > span { min-width: 0; }
+.flight-crew-flight-action-cell { width: 1%; }
+.flight-crew-flight-action-cell .flight-crew-inline-assign {
+  display: inline-flex !important; visibility: visible !important; opacity: 1 !important;
+  position: static; float: none; white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .flight-crew-flight-heading > td:first-child { padding-left: 12px !important; }
+  .flight-crew-flight-heading .flight-crew-flight-toggle { gap: 5px; }
+  .flight-crew-flight-action-cell { padding: 5px 6px !important; }
+  .flight-crew-flight-action-cell .flight-crew-inline-assign { font-size: 11px; padding: 6px 7px; }
+}
+
+
+/* Flight Crew actions: keep per-flight Assign and per-member Remove visible. */
+.flight-crew-table {
+  width: 100% !important;
+  table-layout: auto !important;
+}
+.flight-crew-table thead th.flight-crew-actions-heading,
+.flight-crew-table tbody td.flight-crew-flight-action-cell,
+.flight-crew-table tbody td[data-label="Actions"] {
+  display: table-cell !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.flight-crew-table thead th.flight-crew-actions-heading {
+  min-width: 112px;
+  width: 112px;
+  text-align: right;
+}
+.flight-crew-table tbody td.flight-crew-flight-action-cell {
+  min-width: 112px;
+  width: 112px;
+  text-align: right !important;
+  white-space: nowrap !important;
+}
+.flight-crew-table tbody td[data-label="Actions"] .admin-row-actions {
+  display: flex !important;
+  justify-content: flex-end;
+  align-items: center;
+}
+.flight-crew-table .flight-crew-inline-assign {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: static !important;
+  float: none !important;
+  white-space: nowrap !important;
+}
+@media (min-width: 701px) {
+  .flight-crew-mobile-view { display: none !important; }
+  .flight-crew-table-wrap { display: block !important; }
+}
+@media (max-width: 700px) {
+  .flight-crew-table-wrap { display: none !important; }
+  .flight-crew-mobile-view { display: grid !important; }
+  .flight-crew-mobile-flight-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    padding: 8px 12px 12px;
+  }
+  .flight-crew-mobile-flight-actions .flight-crew-mobile-assign {
+    width: auto !important;
+    max-width: 100%;
+  }
+  .flight-crew-mobile-member .admin-table-action.is-danger {
+    flex: 0 0 auto;
+  }
+}
+
+
+/* Flight Crew desktop table must retain its action column even when the shared
+   admin responsive-table rules are active at intermediate viewport widths. */
+@media (min-width: 701px) {
+  .admin-table-wrap.flight-crew-table-wrap { display: block !important; overflow-x: auto !important; overflow-y: visible !important; }
+  .flight-crew-table { display: table !important; width: 100% !important; min-width: 760px !important; table-layout: auto !important; }
+  .flight-crew-table thead { display: table-header-group !important; position: static !important; width: auto !important; height: auto !important; margin: 0 !important; overflow: visible !important; clip: auto !important; white-space: normal !important; }
+  .flight-crew-table tbody { display: table-row-group !important; width: auto !important; }
+  .flight-crew-table tr { display: table-row !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+  .flight-crew-table th, .flight-crew-table td { display: table-cell !important; width: auto; max-width: none !important; }
+  .flight-crew-table th.flight-crew-actions-heading { width: 130px !important; min-width: 130px !important; text-align: right !important; }
+  .flight-crew-table td.flight-crew-flight-action-cell { width: 130px !important; min-width: 130px !important; text-align: right !important; white-space: nowrap !important; }
+  .flight-crew-table td[data-label="Actions"] { width: 130px !important; min-width: 130px !important; text-align: right !important; }
+  .flight-crew-table td[data-label="Actions"] .admin-row-actions { display: flex !important; justify-content: flex-end !important; }
+  .flight-crew-table .flight-crew-inline-assign, .flight-crew-table .admin-table-action { display: inline-flex !important; visibility: visible !important; opacity: 1 !important; }
+}
+
+/* The flight is chosen from its row; show its details as a fixed label in the assignment dialog. */
+.flight-crew-selected-flight {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid #d5e0e8;
+  border-radius: 9px;
+  background: #f4f7f9;
+  color: #334b5f;
+  line-height: 1.4;
+}
+.flight-crew-selected-flight strong { color: #203747; }
+.flight-crew-selected-flight small { color: #607487; }

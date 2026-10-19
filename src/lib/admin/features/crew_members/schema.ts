@@ -15,7 +15,7 @@ export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
 });
 
 const createShape = {
-  userId: z.number().int().positive(),
+  userId: z.string().min(1),
   badgeNumber: z.string().trim().min(1).max(80),
   isActive: z.boolean(),
 };
@@ -31,7 +31,7 @@ export const updateInputSchema: z.ZodType<CrewMembersUpdateInput> = z
 /** Runtime validator explicitly checked against the feature DTO. */
 export const formSchema: z.ZodType<CrewMembersFormDto, CrewMembersFormDto> = z
   .object({
-    userId: z.number().int().positive(),
+    userId: z.string().min(1),
     badgeNumber: z.string().trim().min(1),
     isActive: z.boolean(),
   })

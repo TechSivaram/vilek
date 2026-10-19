@@ -51,7 +51,7 @@ export function CrewMembersAdminPage() {
   const [error, setError] = useState("");
   const form = useForm<CrewMembersFormDto>({
     resolver: zodResolver(formSchema),
-    defaultValues: { userId: 0, badgeNumber: "", isActive: true },
+    defaultValues: { userId: "", badgeNumber: "", isActive: true },
     mode: "onBlur",
     reValidateMode: "onChange",
   });
@@ -112,7 +112,7 @@ export function CrewMembersAdminPage() {
     setCreating(true);
     setMessage("");
     setError("");
-    form.reset({ userId: 0, badgeNumber: "", isActive: true });
+    form.reset({ userId: "", badgeNumber: "", isActive: true });
   };
   const beginEdit = (row: CrewMembersListRow) => {
     setEditing(row);
@@ -189,7 +189,7 @@ export function CrewMembersAdminPage() {
               <span>Local user *</span>
               <select
                 {...form.register("userId", {
-                  setValueAs: (v: string) => (v === "" ? undefined : Number(v)),
+                  setValueAs: (v: string) => (v === "" ? undefined : v),
                 })}
               >
                 <option value="">Select…</option>
@@ -271,7 +271,7 @@ export function CrewMembersAdminPage() {
           <table className="admin-data-table">
             <thead>
               <tr>
-                <th key="userId">User ID</th>
+                <th key="userName">Crew member</th>
                 <th key="badgeNumber">Badge number</th>
                 <th key="isActive">Status</th>
                 <th>Actions</th>
@@ -280,8 +280,9 @@ export function CrewMembersAdminPage() {
             <tbody>
               {(list.data?.rows ?? []).map((row: CrewMembersListRow) => (
                 <tr key={String(row.id)}>
-                  <td key="userId" data-label="User ID">
-                    {row.userId ?? "—"}
+                  <td key="userName" data-label="Crew member">
+                    <div>{row.userName || `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim() || "—"}</div>
+                    {row.email && <small>{row.email}</small>}
                   </td>
                   <td key="badgeNumber" data-label="Badge number">
                     {row.badgeNumber ?? "—"}
