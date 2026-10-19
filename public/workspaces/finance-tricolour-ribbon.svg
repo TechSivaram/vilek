@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 413 132" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="saffron" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff9933"/><stop offset=".52" stop-color="#ffb04f"/><stop offset="1" stop-color="#ff9933"/></linearGradient>
+    <linearGradient id="white" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fffaf4"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#f5fff8"/></linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#138808"/><stop offset=".5" stop-color="#36a64a"/><stop offset="1" stop-color="#138808"/></linearGradient>
+  </defs>
+  <path d="M0 0H413V23C350 34 315 10 254 17S132 39 74 25 22 19 0 28Z" fill="url(#saffron)" opacity=".96"/>
+  <path d="M0 28C42 18 47 36 97 37S192 21 251 28 352 45 413 30V45C347 59 310 39 251 42S133 56 74 44 22 37 0 45Z" fill="url(#white)" opacity=".97"/>
+  <path d="M0 45C38 35 49 51 98 53S193 38 253 43 354 62 413 45V61C351 76 310 54 251 58S133 73 74 60 22 53 0 62Z" fill="url(#green)" opacity=".94"/>
+</svg>

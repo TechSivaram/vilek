@@ -35,7 +35,7 @@
 .workspace-card-icon { display: grid; place-items: center; width: 43px; height: 43px; margin-bottom: 18px; border-radius: 12px; color: #087f78; background: #e5f7f4; font-size: 21px; font-weight: 650; }
 .workspace-card-icon--approver { color: #ffffff; background: #ff6d00; }
 .workspace-card-icon--finance { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
-.workspace-card-icon--flight_operations_manager { color: #6d58a5; background: #f2edff; }
+.workspace-card-icon--flight_operations_manager { color: #fff; background: #138808; }
 .workspace-card-icon--admin { color: #36566c; background: #eaf0f5; }
 .workspace-card-title-row { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .workspace-card-title-row strong { color: #1c3347; font-size: 17px; font-weight: 750; }
@@ -60,7 +60,7 @@
 .workspace-card--crew { --card-accent: #1677ff; --card-glow: #cce4ff; --card-tint: #eaf3ff; }
 .workspace-card--approver { --card-accent: #ff6d00; --card-glow: #ffd1a3; --card-tint: #fff0df; }
 .workspace-card--finance { --card-accent: #138808; --card-glow: #cce8c7; --card-tint: #fff8ef; }
-.workspace-card--flight_operations_manager { --card-accent: #1565c0; --card-glow: #c8ddfb; --card-tint: #e8f1fc; }
+.workspace-card--flight_operations_manager { --card-accent: #138808; --card-glow: #cce8c7; --card-tint: #eaf5e8; }
 .workspace-card--admin { --card-accent: #526579; --card-glow: #edf1f5; --card-tint: #f3f6f8; }
 .workspace-card .workspace-card-icon { color: #fff; background: var(--card-accent); box-shadow: 0 5px 12px color-mix(in srgb, var(--card-accent) 25%, transparent); }
 .workspace-card--finance .workspace-card-icon { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }

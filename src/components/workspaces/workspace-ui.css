@@ -146,7 +146,7 @@
 .workspace-switcher__item-icon[data-theme="crew"] { color: #125fc7; background: #eaf3ff; }
 .workspace-switcher__item-icon[data-theme="approver"] { color: #c45100; background: #fff0df; }
 .workspace-switcher__item-icon[data-theme="finance"] { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
-.workspace-switcher__item-icon[data-theme="flight_operations_manager"] { color: #104d91; background: #e8f1fc; }
+.workspace-switcher__item-icon[data-theme="flight_operations_manager"] { color: #087f3e; background: #e5f5e8; border: 1px solid #b9dfc2; }
 .workspace-switcher__item-icon[data-theme="admin"] { color: #dc2626; background: #fee2e2; }
 .workspace-switcher__item.is-current { background: var(--rd-accent-glow, #f3f8fb); }
 .workspace-switcher__item.is-current .workspace-switcher__check { color: var(--rd-accent-strong, #087f78); }
@@ -317,3 +317,42 @@
 .workspace-switcher__trigger-icon[data-theme="finance"] { color: #087f3e !important; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%) !important; border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
 .workspace-switcher__item-icon[data-theme="finance"] { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
 .role-dashboard--finance .role-dashboard-current span { color: #087f3e; background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%); border: 1px solid #b9dfc2; box-shadow: inset 0 3px 0 #ff9933, inset 0 -3px 0 #138808; }
+
+
+/* Flight Operations uses a consistent solid green theme (not the Tiranga treatment). */
+.role-dashboard--flight_operations_manager {
+  --rd-accent: #138808;
+  --rd-accent-strong: #087f3e;
+  --rd-accent-soft: #e5f5e8;
+  --rd-accent-line: #b9dfc2;
+  --rd-accent-glow: #f5fbf3;
+}
+.workspace-switcher__trigger-icon[data-theme="flight_operations_manager"],
+.workspace-switcher__item-icon[data-theme="flight_operations_manager"] {
+  color: #087f3e !important;
+  background: #e5f5e8 !important;
+  border: 1px solid #b9dfc2;
+  box-shadow: none;
+}
+.role-dashboard--flight_operations_manager .role-dashboard-heading-icon,
+.role-dashboard--flight_operations_manager .role-dashboard-capability-icon,
+.role-dashboard--flight_operations_manager .role-dashboard-current span {
+  color: #087f3e;
+  background: #e5f5e8;
+  border-color: #b9dfc2;
+  box-shadow: none;
+}
+.role-dashboard--flight_operations_manager .role-dashboard-nav a.is-active {
+  color: #087f3e;
+  background: #e5f5e8;
+  border-color: #b9dfc2;
+}
+.role-dashboard--flight_operations_manager .role-dashboard-eyebrow,
+.role-dashboard--flight_operations_manager .role-dashboard-capability-link { color: #087f3e; }
+.role-dashboard--flight_operations_manager .role-dashboard-current {
+  color: #087f3e;
+  background: #f5fbf3;
+  border-color: #b9dfc2;
+}
+.role-dashboard--flight_operations_manager .workspace-switcher__trigger:hover,
+.role-dashboard--flight_operations_manager .workspace-switcher__trigger[aria-expanded="true"] { border-color: #b9dfc2; }
