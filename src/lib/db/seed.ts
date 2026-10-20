@@ -24,6 +24,15 @@ import {
   allowedFileTypes,
   notifications,
   auditOutbox,
+  crewMemberDesignations,
+  qualificationTypes,
+  crewQualifications,
+  designationQualificationRequirements,
+  flightCrewComplementDefaults,
+  flightCrewRequirements,
+  flightOperationsSettings,
+  qualificationAlerts,
+  auditRetentionPolicy,
 } from "./schema";
 
 /**
@@ -285,6 +294,236 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
     `TSCloak SCIM ready: ${ids.size} demo identities found or provisioned.`,
   );
   return ids;
+}
+
+/**
+ * Seed additive Flight Operations reference/demo data only after migration 0003
+ * exists. This runs independently of the legacy demo-data guard so an existing
+ * ViLek database can receive the new sample data on a later `db:seed` run.
+ * Rows are looked up by stable business keys before insert; existing operational
+ * data and audit history are never overwritten or fabricated.
+ */
+function seedFlightOperationsDemoData() {
+  try {
+    // A direct SQLite metadata check avoids attempting Drizzle queries against
+    // tables that do not exist when migration 0003 has not been applied yet.
+    const sqlite = (db as unknown as { $client?: { prepare: (sql: string) => { get: (...args: unknown[]) => unknown } } }).$client;
+    const hasTable = (name: string) => Boolean(
+      sqlite?.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?").get(name),
+    );
+    if (!hasTable("Flight_Operations_Setting") || !hasTable("Crew_Member_Designation")) {
+      console.log("Flight Operations sample data skipped: migration 0003 is not applied. Run `npm run db:migrate`, then `npm run db:seed`.");
+      return;
+    }
+  } catch {
+    console.log("Flight Operations sample data skipped: unable to verify migration 0003. Run `npm run db:migrate`, then `npm run db:seed`.");
+    return;
+  }
+
+  db.transaction((tx) => {
+    const findCrew = (badge: string) => tx.select().from(crewMembers).where(eq(crewMembers.badgeNumber, badge)).get();
+    const findUser = (email: string) => tx.select().from(users).where(eq(users.email, email)).get();
+    const findDesignation = (code: string) => tx.select().from(crewDesignations).where(eq(crewDesignations.code, code)).get()!;
+    const findAirline = (code: string) => tx.select().from(airlines).where(eq(airlines.iataCode, code)).get()!;
+    const findAirport = (code: string) => tx.select().from(airports).where(eq(airports.iataCode, code)).get()!;
+
+    const crewByBadge = new Map<string, NonNullable<ReturnType<typeof findCrew>>>();
+    for (const person of people) {
+      const crew = findCrew(person.badge);
+      if (crew) crewByBadge.set(person.badge, crew);
+    }
+    const manager = findUser("dev.menon.approver@vilek.test");
+    if (crewByBadge.size < 5 || !manager) {
+      console.log("Flight Operations sample data skipped: the existing ViLek demo crew/users were not found. Run the normal demo seed first.");
+      return;
+    }
+
+    const qualificationTypeSpecs = [
+      { code: "PILOT_LICENSE", name: "Pilot Licence", expiryRequired: true },
+      { code: "CABIN_SAFETY", name: "Cabin Safety Training", expiryRequired: true },
+      { code: "FIRST_AID", name: "First Aid Certification", expiryRequired: true },
+      { code: "DANGEROUS_GOODS", name: "Dangerous Goods Awareness", expiryRequired: true },
+    ] as const;
+    for (const spec of qualificationTypeSpecs) {
+      if (!tx.select().from(qualificationTypes).where(eq(qualificationTypes.code, spec.code)).get()) {
+        tx.insert(qualificationTypes).values(spec).run();
+      }
+    }
+    const qualificationType = (code: string) => tx.select().from(qualificationTypes).where(eq(qualificationTypes.code, code)).get()!;
+
+    const designationPairs: Array<{ badge: string; designation: string; active?: boolean }> = [
+      { badge: "VL-DEMO-101", designation: "SENIOR_CABIN_CREW" },
+      { badge: "VL-DEMO-101", designation: "FLIGHT_ATTENDANT" },
+      { badge: "VL-DEMO-102", designation: "CAPTAIN" },
+      { badge: "VL-DEMO-103", designation: "FIRST_OFFICER" },
+      { badge: "VL-DEMO-104", designation: "FLIGHT_ATTENDANT" },
+      { badge: "VL-DEMO-105", designation: "SENIOR_CABIN_CREW" },
+    ];
+    for (const pair of designationPairs) {
+      const crew = crewByBadge.get(pair.badge)!;
+      const designation = findDesignation(pair.designation);
+      const existing = tx.select().from(crewMemberDesignations).all().find((row) => row.crewMemberId === crew.id && row.designationId === designation.id);
+      if (!existing) {
+        tx.insert(crewMemberDesignations).values({
+          crewMemberId: crew.id,
+          designationId: designation.id,
+          validFrom: "2025-01-01",
+          validUntil: null,
+          isActive: pair.active ?? true,
+        }).run();
+      }
+    }
+
+    const requirementPairs = [
+      { designation: "CAPTAIN", qualification: "PILOT_LICENSE" },
+      { designation: "FIRST_OFFICER", qualification: "PILOT_LICENSE" },
+      { designation: "SENIOR_CABIN_CREW", qualification: "CABIN_SAFETY" },
+      { designation: "SENIOR_CABIN_CREW", qualification: "FIRST_AID" },
+      { designation: "FLIGHT_ATTENDANT", qualification: "CABIN_SAFETY" },
+      { designation: "FLIGHT_ATTENDANT", qualification: "FIRST_AID" },
+    ];
+    for (const pair of requirementPairs) {
+      const designation = findDesignation(pair.designation);
+      const type = qualificationType(pair.qualification);
+      const existing = tx.select().from(designationQualificationRequirements).all().some((row) => row.designationId === designation.id && row.qualificationTypeId === type.id);
+      if (!existing) tx.insert(designationQualificationRequirements).values({ designationId: designation.id, qualificationTypeId: type.id, isRequired: true }).run();
+    }
+
+    const qualificationSpecs = [
+      { badge: "VL-DEMO-101", type: "CABIN_SAFETY", from: "2025-01-01", until: "2027-01-15", status: "ACTIVE", notes: "Demo record: current" },
+      { badge: "VL-DEMO-101", type: "FIRST_AID", from: "2025-01-01", until: "2026-10-28", status: "ACTIVE", notes: "Demo record: expiring soon" },
+      { badge: "VL-DEMO-102", type: "PILOT_LICENSE", from: "2025-01-01", until: "2027-06-30", status: "ACTIVE", notes: "Demo record: current" },
+      { badge: "VL-DEMO-103", type: "PILOT_LICENSE", from: "2024-01-01", until: "2026-09-30", status: "ACTIVE", notes: "Demo record: expired by date" },
+      { badge: "VL-DEMO-104", type: "CABIN_SAFETY", from: "2025-01-01", until: "2027-02-01", status: "SUSPENDED", notes: "Demo record: administratively suspended" },
+      { badge: "VL-DEMO-105", type: "CABIN_SAFETY", from: "2025-01-01", until: "2027-02-01", status: "REVOKED", notes: "Demo record: administratively revoked" },
+      { badge: "VL-DEMO-105", type: "FIRST_AID", from: "2025-01-01", until: "2027-02-01", status: "ACTIVE", notes: "Demo record: current" },
+    ] as const;
+    const qualificationRows = new Map<string, { id: string; crewMemberId: string; qualificationTypeId: number; validFrom: string; validUntil: string | null; status: string }>();
+    for (const spec of qualificationSpecs) {
+      const crew = crewByBadge.get(spec.badge)!;
+      const type = qualificationType(spec.type);
+      let row = tx.select().from(crewQualifications).all().find((item) => item.crewMemberId === crew.id && item.qualificationTypeId === type.id && item.validFrom === spec.from && item.notes === spec.notes);
+      if (!row) {
+        row = tx.insert(crewQualifications).values({
+          crewMemberId: crew.id,
+          qualificationTypeId: type.id,
+          validFrom: spec.from,
+          validUntil: spec.until,
+          status: spec.status,
+          notes: spec.notes,
+          createdByUserId: manager.id,
+          updatedByUserId: manager.id,
+        }).returning().get()!;
+      }
+      qualificationRows.set(`${spec.badge}:${spec.type}`, row);
+    }
+
+    // Illustrative policy defaults only; these values are demo configuration,
+    // not a statement of regulatory compliance.
+    const complementDefaults = [
+      { designation: "CAPTAIN", count: 1 },
+      { designation: "FIRST_OFFICER", count: 1 },
+      { designation: "SENIOR_CABIN_CREW", count: 1 },
+      { designation: "FLIGHT_ATTENDANT", count: 2 },
+    ];
+    for (const spec of complementDefaults) {
+      const designation = findDesignation(spec.designation);
+      const existing = tx.select().from(flightCrewComplementDefaults).all().find((row) => row.designationId === designation.id);
+      if (!existing) tx.insert(flightCrewComplementDefaults).values({ designationId: designation.id, requiredCount: spec.count, updatedByUserId: manager.id }).run();
+    }
+
+    const settingSpecs = [
+      { key: "reporting_buffer_minutes", value: 60, description: "Demo reporting buffer before scheduled departure" },
+      { key: "release_buffer_minutes", value: 30, description: "Demo release buffer after scheduled arrival" },
+      { key: "minimum_rest_minutes", value: 720, description: "Illustrative demo minimum rest between duties" },
+      { key: "minimum_turnaround_minutes", value: 60, description: "Illustrative demo minimum connection turnaround" },
+      { key: "qualification_alert_intervals_days", value: [30, 14, 7, 0], description: "Demo qualification-expiry alert intervals" },
+    ];
+    for (const spec of settingSpecs) {
+      if (!tx.select().from(flightOperationsSettings).where(eq(flightOperationsSettings.settingKey, spec.key)).get()) {
+        tx.insert(flightOperationsSettings).values({ settingKey: spec.key, valueJson: JSON.stringify(spec.value), description: spec.description, updatedByUserId: manager.id }).run();
+      }
+    }
+
+    const flightSpecs = [
+      { number: "AI 701", from: "HYD", to: "DEL", dep: "2026-10-21T04:00:00.000Z", arr: "2026-10-21T06:20:00.000Z", status: "SCHEDULED" },
+      { number: "AI 702", from: "DEL", to: "BOM", dep: "2026-10-21T09:00:00.000Z", arr: "2026-10-21T11:10:00.000Z", status: "SCHEDULED" },
+      { number: "6E 8101", from: "BOM", to: "BLR", dep: "2026-10-22T03:30:00.000Z", arr: "2026-10-22T05:10:00.000Z", status: "BOARDING" },
+      { number: "AI 798", from: "HYD", to: "BOM", dep: "2026-10-18T04:00:00.000Z", arr: "2026-10-18T06:00:00.000Z", status: "DEPARTED" },
+      { number: "6E 8102", from: "BLR", to: "HYD", dep: "2026-10-19T07:00:00.000Z", arr: "2026-10-19T08:20:00.000Z", status: "COMPLETED" },
+      { number: "AI 799", from: "BLR", to: "COK", dep: "2026-10-23T06:00:00.000Z", arr: "2026-10-23T07:10:00.000Z", status: "CANCELLED" },
+    ] as const;
+    const flightRows = new Map<string, { id: string; flightNumber: string }>();
+    for (const spec of flightSpecs) {
+      let flight = tx.select().from(flights).all().find((row) => row.flightNumber === spec.number);
+      if (!flight) {
+        flight = tx.insert(flights).values({
+          airlineId: findAirline(spec.number.startsWith("AI") ? "AI" : "6E").id,
+          flightNumber: spec.number,
+          originAirportId: findAirport(spec.from).id,
+          destinationAirportId: findAirport(spec.to).id,
+          scheduledDeparture: spec.dep,
+          scheduledArrival: spec.arr,
+          status: spec.status,
+          actualDeparture: null,
+          actualArrival: null,
+        }).returning().get()!;
+      }
+      flightRows.set(spec.number, flight);
+    }
+
+    const flightRequirementSpecs = [
+      { flight: "AI 701", designation: "CAPTAIN", count: 1 },
+      { flight: "AI 701", designation: "FIRST_OFFICER", count: 1 },
+      { flight: "AI 701", designation: "SENIOR_CABIN_CREW", count: 1 },
+      { flight: "AI 701", designation: "FLIGHT_ATTENDANT", count: 2 },
+      { flight: "AI 702", designation: "CAPTAIN", count: 1 },
+      { flight: "AI 702", designation: "FIRST_OFFICER", count: 1 },
+      { flight: "AI 702", designation: "SENIOR_CABIN_CREW", count: 1 },
+      { flight: "AI 702", designation: "FLIGHT_ATTENDANT", count: 1 },
+    ];
+    for (const spec of flightRequirementSpecs) {
+      const flight = flightRows.get(spec.flight)!;
+      const designation = findDesignation(spec.designation);
+      const existing = tx.select().from(flightCrewRequirements).all().some((row) => row.flightId === flight.id && row.designationId === designation.id);
+      if (!existing) tx.insert(flightCrewRequirements).values({ flightId: flight.id, designationId: designation.id, requiredCount: spec.count, reason: "Demo flight-specific complement override", createdByUserId: manager.id, updatedByUserId: manager.id }).run();
+    }
+
+    // Add only a few safe, eligible assignments to demonstrate readiness. Do not
+    // create fake operational audit events or intentionally invalid assignments.
+    const demoAssignments = [
+      { flight: "AI 701", badge: "VL-DEMO-102", designation: "CAPTAIN" },
+      { flight: "AI 701", badge: "VL-DEMO-101", designation: "SENIOR_CABIN_CREW" },
+      { flight: "AI 702", badge: "VL-DEMO-102", designation: "CAPTAIN" },
+    ];
+    for (const spec of demoAssignments) {
+      const flight = flightRows.get(spec.flight)!;
+      const crew = crewByBadge.get(spec.badge)!;
+      const designation = findDesignation(spec.designation);
+      const existing = tx.select().from(flightCrew).all().some((row) => row.flightId === flight.id && row.crewMemberId === crew.id);
+      if (!existing) tx.insert(flightCrew).values({ flightId: flight.id, crewMemberId: crew.id, designationId: designation.id }).run();
+    }
+
+    // Deduplicated expiry alert examples; no alert is created for suspended or
+    // revoked qualifications, and alerts do not themselves assert eligibility.
+    const expiring = qualificationRows.get("VL-DEMO-101:FIRST_AID");
+    if (expiring) {
+      for (const interval of [30, 14, 7, 0]) {
+        const exists = tx.select().from(qualificationAlerts).all().some((row) => row.crewQualificationId === expiring.id && row.alertIntervalDays === interval);
+        if (!exists) tx.insert(qualificationAlerts).values({
+          crewQualificationId: expiring.id,
+          alertIntervalDays: interval,
+          dueAt: "2026-10-28T00:00:00.000Z",
+          state: "PENDING",
+        }).run();
+      }
+    }
+
+    if (!tx.select().from(auditRetentionPolicy).where(eq(auditRetentionPolicy.id, 1)).get()) {
+      tx.insert(auditRetentionPolicy).values({ id: 1, retentionDays: null, updatedByUserId: manager.id }).run();
+    }
+  });
+  console.log("Flight Operations sample data is ready (idempotent seed; no fabricated audit events created).");
 }
 
 async function main() {
@@ -941,6 +1180,7 @@ async function main() {
       }),
     );
   });
+  seedFlightOperationsDemoData();
   console.log("ViLek realistic demo data seeded successfully.");
   console.log(
     "TSCloak SCIM identities were provisioned/matched; SCIM IDs are stored separately from OIDC subjects.",

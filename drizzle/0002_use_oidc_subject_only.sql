@@ -1,7 +1,3 @@
--- ViLek stores provider identity identifiers only in User.oidc_subject.
--- Migrate values from the temporary scim_id column, remove synthetic prefixes,
--- and then drop scim_id. Existing account and role rows remain intact.
---> statement-breakpoint
 UPDATE `User`
 SET `oidc_subject` = `scim_id`
 WHERE (`oidc_subject` IS NULL OR `oidc_subject` = '')
