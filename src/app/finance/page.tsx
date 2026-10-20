@@ -5,5 +5,13 @@ export const dynamic = "force-dynamic";
 
 export default async function FinanceDashboardPage() {
   const authenticated = await requireRole("FINANCE", "/dashboard");
-  return <WorkspaceDashboard roleCode="FINANCE" roleCodes={authenticated.roleCodes} firstName={authenticated.user.firstName} lastName={authenticated.user.lastName} email={authenticated.user.email} />;
+  return (
+    <WorkspaceDashboard
+      roleCode="FINANCE"
+      roleCodes={authenticated.roleCodes}
+      firstName={authenticated.user.firstName}
+      lastName={authenticated.user.lastName}
+      email={authenticated.user.email}
+    />
+  );
 }

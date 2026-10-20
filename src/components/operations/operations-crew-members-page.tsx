@@ -281,7 +281,11 @@ export function OperationsCrewMembersPage() {
               {(list.data?.rows ?? []).map((row: CrewMembersListRow) => (
                 <tr key={String(row.id)}>
                   <td key="userName" data-label="Crew member">
-                    <div>{row.userName || `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim() || "—"}</div>
+                    <div>
+                      {row.userName ||
+                        `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim() ||
+                        "—"}
+                    </div>
                     {row.email && <small>{row.email}</small>}
                   </td>
                   <td key="badgeNumber" data-label="Badge number">

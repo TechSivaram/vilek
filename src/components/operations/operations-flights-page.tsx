@@ -94,7 +94,10 @@ export function OperationsFlightsPage() {
   const flightOptions = useQuery<FlightOptionsResponseDto>({
     queryKey: ["flight-options"],
     queryFn: () =>
-      requestJson("/api/operations/flights/options", flightOptionsResponseSchema),
+      requestJson(
+        "/api/operations/flights/options",
+        flightOptionsResponseSchema,
+      ),
     enabled: creating || Boolean(editing),
   });
   const save = useMutation({

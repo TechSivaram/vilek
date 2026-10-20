@@ -145,7 +145,10 @@ export const flights = sqliteTable(
   (t) => [
     index("flight_departure_idx").on(t.scheduledDeparture),
     index("flight_number_idx").on(t.airlineId, t.flightNumber),
-    check("flight_status_ck", sql`${t.status} IN ('SCHEDULED', 'BOARDING', 'DEPARTED', 'COMPLETED', 'CANCELLED')`),
+    check(
+      "flight_status_ck",
+      sql`${t.status} IN ('SCHEDULED', 'BOARDING', 'DEPARTED', 'COMPLETED', 'CANCELLED')`,
+    ),
   ],
 );
 
@@ -183,7 +186,6 @@ export const flightCrew = sqliteTable(
   ],
 );
 
-
 // Flight Operations extensions. These tables are additive: the existing
 // Flight_Crew identity and its Expense/Claim foreign-key relationships remain
 // unchanged in this migration.
@@ -191,8 +193,12 @@ export const crewMemberDesignations = sqliteTable(
   "Crew_Member_Designation",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    crewMemberId: text("crew_member_id").notNull().references(() => crewMembers.id, { onDelete: "restrict" }),
-    designationId: integer("designation_id").notNull().references(() => crewDesignations.id, { onDelete: "restrict" }),
+    crewMemberId: text("crew_member_id")
+      .notNull()
+      .references(() => crewMembers.id, { onDelete: "restrict" }),
+    designationId: integer("designation_id")
+      .notNull()
+      .references(() => crewDesignations.id, { onDelete: "restrict" }),
     validFrom: text("valid_from"),
     validUntil: text("valid_until"),
     isActive: active(),
@@ -200,9 +206,19 @@ export const crewMemberDesignations = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("crew_member_designation_pair_uq").on(t.crewMemberId, t.designationId),
-    index("crew_member_designation_eligibility_idx").on(t.designationId, t.isActive, t.crewMemberId),
-    check("crew_member_designation_dates_ck", sql`${t.validUntil} IS NULL OR ${t.validFrom} IS NULL OR ${t.validUntil} >= ${t.validFrom}`),
+    uniqueIndex("crew_member_designation_pair_uq").on(
+      t.crewMemberId,
+      t.designationId,
+    ),
+    index("crew_member_designation_eligibility_idx").on(
+      t.designationId,
+      t.isActive,
+      t.crewMemberId,
+    ),
+    check(
+      "crew_member_designation_dates_ck",
+      sql`${t.validUntil} IS NULL OR ${t.validFrom} IS NULL OR ${t.validUntil} >= ${t.validFrom}`,
+    ),
   ],
 );
 
@@ -210,7 +226,9 @@ export const qualificationTypes = sqliteTable("Qualification_Type", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
-  expiryRequired: integer("expiry_required", { mode: "boolean" }).notNull().default(true),
+  expiryRequired: integer("expiry_required", { mode: "boolean" })
+    .notNull()
+    .default(true),
   isActive: active(),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -219,24 +237,44 @@ export const qualificationTypes = sqliteTable("Qualification_Type", {
 export const crewQualifications = sqliteTable(
   "Crew_Qualification",
   {
-    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-    crewMemberId: text("crew_member_id").notNull().references(() => crewMembers.id, { onDelete: "restrict" }),
-    qualificationTypeId: integer("qualification_type_id").notNull().references(() => qualificationTypes.id, { onDelete: "restrict" }),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    crewMemberId: text("crew_member_id")
+      .notNull()
+      .references(() => crewMembers.id, { onDelete: "restrict" }),
+    qualificationTypeId: integer("qualification_type_id")
+      .notNull()
+      .references(() => qualificationTypes.id, { onDelete: "restrict" }),
     validFrom: text("valid_from").notNull(),
     validUntil: text("valid_until"),
     status: text("status").notNull().default("ACTIVE"),
     replacedById: text("replaced_by_id"),
     notes: text("notes"),
-    createdByUserId: text("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
-    updatedByUserId: text("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedByUserId: text("updated_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("crew_qualification_crew_type_idx").on(t.crewMemberId, t.qualificationTypeId, t.status),
+    index("crew_qualification_crew_type_idx").on(
+      t.crewMemberId,
+      t.qualificationTypeId,
+      t.status,
+    ),
     index("crew_qualification_valid_until_idx").on(t.validUntil, t.status),
-    check("crew_qualification_status_ck", sql`${t.status} IN ('ACTIVE', 'SUSPENDED', 'REVOKED')`),
-    check("crew_qualification_dates_ck", sql`${t.validUntil} IS NULL OR ${t.validUntil} >= ${t.validFrom}`),
+    check(
+      "crew_qualification_status_ck",
+      sql`${t.status} IN ('ACTIVE', 'SUSPENDED', 'REVOKED')`,
+    ),
+    check(
+      "crew_qualification_dates_ck",
+      sql`${t.validUntil} IS NULL OR ${t.validUntil} >= ${t.validFrom}`,
+    ),
   ],
 );
 
@@ -244,27 +282,47 @@ export const designationQualificationRequirements = sqliteTable(
   "Designation_Qualification_Requirement",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    designationId: integer("designation_id").notNull().references(() => crewDesignations.id, { onDelete: "restrict" }),
-    qualificationTypeId: integer("qualification_type_id").notNull().references(() => qualificationTypes.id, { onDelete: "restrict" }),
-    isRequired: integer("is_required", { mode: "boolean" }).notNull().default(true),
+    designationId: integer("designation_id")
+      .notNull()
+      .references(() => crewDesignations.id, { onDelete: "restrict" }),
+    qualificationTypeId: integer("qualification_type_id")
+      .notNull()
+      .references(() => qualificationTypes.id, { onDelete: "restrict" }),
+    isRequired: integer("is_required", { mode: "boolean" })
+      .notNull()
+      .default(true),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex("designation_qualification_requirement_uq").on(t.designationId, t.qualificationTypeId)],
+  (t) => [
+    uniqueIndex("designation_qualification_requirement_uq").on(
+      t.designationId,
+      t.qualificationTypeId,
+    ),
+  ],
 );
 
 export const flightCrewComplementDefaults = sqliteTable(
   "Flight_Crew_Complement_Default",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    designationId: integer("designation_id").notNull().references(() => crewDesignations.id, { onDelete: "restrict" }),
+    designationId: integer("designation_id")
+      .notNull()
+      .references(() => crewDesignations.id, { onDelete: "restrict" }),
     requiredCount: integer("required_count").notNull(),
-    updatedByUserId: text("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    updatedByUserId: text("updated_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("flight_crew_complement_default_designation_uq").on(t.designationId),
-    check("flight_crew_complement_default_count_ck", sql`${t.requiredCount} >= 0`),
+    uniqueIndex("flight_crew_complement_default_designation_uq").on(
+      t.designationId,
+    ),
+    check(
+      "flight_crew_complement_default_count_ck",
+      sql`${t.requiredCount} >= 0`,
+    ),
   ],
 );
 
@@ -272,17 +330,28 @@ export const flightCrewRequirements = sqliteTable(
   "Flight_Crew_Requirement",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    flightId: text("flight_id").notNull().references(() => flights.id, { onDelete: "restrict" }),
-    designationId: integer("designation_id").notNull().references(() => crewDesignations.id, { onDelete: "restrict" }),
+    flightId: text("flight_id")
+      .notNull()
+      .references(() => flights.id, { onDelete: "restrict" }),
+    designationId: integer("designation_id")
+      .notNull()
+      .references(() => crewDesignations.id, { onDelete: "restrict" }),
     requiredCount: integer("required_count").notNull(),
     reason: text("reason"),
-    createdByUserId: text("created_by_user_id").references(() => users.id, { onDelete: "set null" }),
-    updatedByUserId: text("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedByUserId: text("updated_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("flight_crew_requirement_flight_designation_uq").on(t.flightId, t.designationId),
+    uniqueIndex("flight_crew_requirement_flight_designation_uq").on(
+      t.flightId,
+      t.designationId,
+    ),
     index("flight_crew_requirement_flight_idx").on(t.flightId),
     check("flight_crew_requirement_count_ck", sql`${t.requiredCount} >= 0`),
   ],
@@ -295,7 +364,9 @@ export const flightOperationsSettings = sqliteTable(
     settingKey: text("setting_key").notNull().unique(),
     valueJson: text("value_json").notNull(),
     description: text("description"),
-    updatedByUserId: text("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    updatedByUserId: text("updated_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
@@ -306,7 +377,9 @@ export const flightOperationsSettings = sqliteTable(
 export const flightCrewAuditEvents = sqliteTable(
   "Flight_Crew_Audit_Event",
   {
-    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     flightId: text("flight_id").notNull(),
     flightNumberSnapshot: text("flight_number_snapshot"),
     crewMemberId: text("crew_member_id"),
@@ -318,7 +391,9 @@ export const flightCrewAuditEvents = sqliteTable(
     previousValueJson: text("previous_value_json"),
     newValueJson: text("new_value_json"),
     reason: text("reason"),
-    actorUserId: text("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    actorUserId: text("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     actorEmailSnapshot: text("actor_email_snapshot"),
     correlationId: text("correlation_id"),
     createdAt: createdAt(),
@@ -334,8 +409,12 @@ export const flightCrewAuditEvents = sqliteTable(
 export const qualificationAlerts = sqliteTable(
   "Qualification_Alert",
   {
-    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-    crewQualificationId: text("crew_qualification_id").notNull().references(() => crewQualifications.id, { onDelete: "restrict" }),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    crewQualificationId: text("crew_qualification_id")
+      .notNull()
+      .references(() => crewQualifications.id, { onDelete: "restrict" }),
     alertIntervalDays: integer("alert_interval_days").notNull(),
     dueAt: text("due_at").notNull(),
     state: text("state").notNull().default("PENDING"),
@@ -345,19 +424,29 @@ export const qualificationAlerts = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("qualification_alert_interval_uq").on(t.crewQualificationId, t.alertIntervalDays),
+    uniqueIndex("qualification_alert_interval_uq").on(
+      t.crewQualificationId,
+      t.alertIntervalDays,
+    ),
     index("qualification_alert_state_due_idx").on(t.state, t.dueAt),
     check("qualification_alert_interval_ck", sql`${t.alertIntervalDays} >= 0`),
-    check("qualification_alert_state_ck", sql`${t.state} IN ('PENDING', 'SENT', 'RESOLVED', 'CANCELLED')`),
+    check(
+      "qualification_alert_state_ck",
+      sql`${t.state} IN ('PENDING', 'SENT', 'RESOLVED', 'CANCELLED')`,
+    ),
   ],
 );
 
 export const flightCrewBatchRequests = sqliteTable(
   "Flight_Crew_Batch_Request",
   {
-    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     idempotencyKey: text("idempotency_key").notNull().unique(),
-    requestedByUserId: text("requested_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    requestedByUserId: text("requested_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     requestHash: text("request_hash").notNull(),
     state: text("state").notNull().default("PROCESSING"),
     resultJson: text("result_json"),
@@ -366,21 +455,31 @@ export const flightCrewBatchRequests = sqliteTable(
   },
   (t) => [
     index("flight_crew_batch_request_state_idx").on(t.state, t.createdAt),
-    check("flight_crew_batch_request_state_ck", sql`${t.state} IN ('PROCESSING', 'SUCCEEDED', 'FAILED')`),
+    check(
+      "flight_crew_batch_request_state_ck",
+      sql`${t.state} IN ('PROCESSING', 'SUCCEEDED', 'FAILED')`,
+    ),
   ],
 );
 
 export const auditExportEvents = sqliteTable(
   "Audit_Export_Event",
   {
-    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-    actorUserId: text("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    actorUserId: text("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     filtersJson: text("filters_json").notNull(),
     rowCount: integer("row_count").notNull().default(0),
     format: text("format").notNull().default("CSV"),
     createdAt: createdAt(),
   },
-  (t) => [index("audit_export_actor_date_idx").on(t.actorUserId, t.createdAt), check("audit_export_row_count_ck", sql`${t.rowCount} >= 0`)],
+  (t) => [
+    index("audit_export_actor_date_idx").on(t.actorUserId, t.createdAt),
+    check("audit_export_row_count_ck", sql`${t.rowCount} >= 0`),
+  ],
 );
 
 export const auditRetentionPolicy = sqliteTable(
@@ -388,29 +487,40 @@ export const auditRetentionPolicy = sqliteTable(
   {
     id: integer("id").primaryKey(),
     retentionDays: integer("retention_days"),
-    updatedByUserId: text("updated_by_user_id").references(() => users.id, { onDelete: "set null" }),
+    updatedByUserId: text("updated_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     updatedAt: updatedAt(),
   },
   (t) => [
     check("audit_retention_single_row_ck", sql`${t.id} = 1`),
-    check("audit_retention_days_ck", sql`${t.retentionDays} IS NULL OR ${t.retentionDays} > 0`),
+    check(
+      "audit_retention_days_ck",
+      sql`${t.retentionDays} IS NULL OR ${t.retentionDays} > 0`,
+    ),
   ],
 );
 
 export const auditRetentionActions = sqliteTable(
   "Audit_Retention_Action",
   {
-    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-    actorUserId: text("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    actorUserId: text("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     action: text("action").notNull(),
     cutoffAt: text("cutoff_at").notNull(),
     affectedCount: integer("affected_count").notNull().default(0),
     detailsJson: text("details_json"),
     createdAt: createdAt(),
   },
-  (t) => [index("audit_retention_action_date_idx").on(t.createdAt), check("audit_retention_affected_count_ck", sql`${t.affectedCount} >= 0`)],
+  (t) => [
+    index("audit_retention_action_date_idx").on(t.createdAt),
+    check("audit_retention_affected_count_ck", sql`${t.affectedCount} >= 0`),
+  ],
 );
-
 
 export const currencies = sqliteTable(
   "Currency",

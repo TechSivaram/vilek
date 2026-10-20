@@ -12,5 +12,10 @@ export function Providers({ children }: { children: ReactNode }) {
         },
       }),
   );
-  return <QueryClientProvider client={client}>{children}<GlobalLoadingOverlay /></QueryClientProvider>;
+  return (
+    <QueryClientProvider client={client}>
+      {children}
+      <GlobalLoadingOverlay />
+    </QueryClientProvider>
+  );
 }

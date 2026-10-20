@@ -78,7 +78,9 @@ export function OperationsCrewDesignationsPage() {
       setCreating(false);
       setEditing(null);
       form.reset({});
-      await qc.invalidateQueries({ queryKey: ["operations-crew_designations"] });
+      await qc.invalidateQueries({
+        queryKey: ["operations-crew_designations"],
+      });
     },
   });
   const deactivate = useMutation({
@@ -88,7 +90,9 @@ export function OperationsCrewDesignationsPage() {
       }),
     onSuccess: async () => {
       setMessage("Record deactivated.");
-      await qc.invalidateQueries({ queryKey: ["operations-crew_designations"] });
+      await qc.invalidateQueries({
+        queryKey: ["operations-crew_designations"],
+      });
     },
   });
 

@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import {
-  users,
-  roles,
-  expenseCategories,
-  currencies,
-} from "@/lib/db/schema";
+import { users, roles, expenseCategories, currencies } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +56,8 @@ export default function AdminDashboard() {
           <div className="admin-eyebrow">ADMINISTRATION</div>
           <h1>Dashboard</h1>
           <p>
-            Manage users, access, finance reference data, and system configuration.
+            Manage users, access, finance reference data, and system
+            configuration.
           </p>
         </div>
       </section>

@@ -1,9 +1,4 @@
-import {
-  users,
-  roles,
-  currencies,
-  expenseCategories,
-} from "@/lib/db/schema";
+import { users, roles, currencies, expenseCategories } from "@/lib/db/schema";
 
 export type FieldKind =
   | "text"

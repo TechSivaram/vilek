@@ -1,14 +1,38 @@
-import { crewMembers, airlines, airports, flights, crewDesignations } from "@/lib/db/schema";
+import {
+  crewMembers,
+  airlines,
+  airports,
+  flights,
+  crewDesignations,
+} from "@/lib/db/schema";
 
 export type FieldKind =
-  | "text" | "email" | "number" | "datetime-local" | "date" | "boolean" | "select";
+  | "text"
+  | "email"
+  | "number"
+  | "datetime-local"
+  | "date"
+  | "boolean"
+  | "select";
 export type OperationsField = {
-  name: string; label: string; kind: FieldKind; required?: boolean; readOnly?: boolean;
-  options?: { value: string; label: string }[]; help?: string;
+  name: string;
+  label: string;
+  kind: FieldKind;
+  required?: boolean;
+  readOnly?: boolean;
+  options?: { value: string; label: string }[];
+  help?: string;
 };
 export type OperationsResourceConfig = {
-  title: string; description: string; table: unknown; fields: OperationsField[]; search: string[];
-  canCreate?: boolean; canEdit?: boolean; canDeactivate?: boolean; listOnly?: boolean;
+  title: string;
+  description: string;
+  table: unknown;
+  fields: OperationsField[];
+  search: string[];
+  canCreate?: boolean;
+  canEdit?: boolean;
+  canDeactivate?: boolean;
+  listOnly?: boolean;
 };
 
 export const resourceConfigs: Record<string, OperationsResourceConfig> = {
@@ -162,5 +186,5 @@ export const resourceConfigs: Record<string, OperationsResourceConfig> = {
       },
       { name: "isActive", label: "Active", kind: "boolean" },
     ],
-  }
+  },
 };

@@ -5,7 +5,25 @@ import "../admin/admin.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function OperationsLayout({ children }: { children: ReactNode }) {
-  const authenticated = await requireRole("FLIGHT_OPERATIONS_MANAGER", "/dashboard");
-  return <OperationsShell user={{ firstName: authenticated.user.firstName, lastName: authenticated.user.lastName, email: authenticated.user.email }} roleCodes={authenticated.roleCodes}>{children}</OperationsShell>;
+export default async function OperationsLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const authenticated = await requireRole(
+    "FLIGHT_OPERATIONS_MANAGER",
+    "/dashboard",
+  );
+  return (
+    <OperationsShell
+      user={{
+        firstName: authenticated.user.firstName,
+        lastName: authenticated.user.lastName,
+        email: authenticated.user.email,
+      }}
+      roleCodes={authenticated.roleCodes}
+    >
+      {children}
+    </OperationsShell>
+  );
 }

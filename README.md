@@ -48,7 +48,7 @@
 </table>
 
 | [✨ Overview](#overview) | [🧭 UI & API](#ui-api) | [🏗️ Architecture](#architecture) | [🗃️ Database](#database) | [🚀 Setup](#setup) |
-|:---:|:---:|:---:|:---:|:---:|
+| :----------------------: | :--------------------: | :------------------------------: | :----------------------: | :----------------: |
 
 ## ✨ What ViLek is
 
@@ -80,24 +80,24 @@ The administrator shell has grouped navigation, a collapsible desktop sidebar, a
 
 All application endpoints are Next.js App Router Route Handlers under `src/app/api/`.
 
-| Endpoint | Methods | Purpose |
-|---|---|---|
-| `/api/auth/login` | `GET` | Start OIDC sign-in. |
-| `/api/auth/callback/tscloak` | `GET` | Complete the TSCloak callback and establish the local session cookie. |
-| `/api/auth/me` | `GET` | Return the current authenticated local identity. |
-| `/api/auth/logout` | `POST` | Clear ViLek authentication cookies and sign out locally. |
-| `/api/admin/{airlines,airports,crew-designations,crew-members,currencies,expense-categories,flights,roles,users}` | `GET`, `POST` | Protected resource collection handlers; supported writes depend on the resource and its validation rules. |
-| `/api/admin/{resource}/[id]` | `PATCH`, `DELETE` | Update or deactivate an individual managed record for supported resources. `DELETE` is used as deactivation where preserving history matters. |
-| `/api/admin/flights/options` | `GET` | Return options used by flight administration. |
-| `/api/admin/user-roles` | `GET`, `POST` | List and assign local roles. |
-| `/api/admin/user-roles/[id]` | `DELETE` | Remove a local role assignment, subject to administrator safeguards. |
-| `/api/admin/users/sync` | `POST` | Reconcile eligible existing local accounts with TSCloak SCIM identities. |
-| `/api/admin/system-settings` | `GET`, `PUT` | Read or update system settings. |
-| `/api/admin/file-types` | `GET`, `POST` | List or allow a file extension. |
-| `/api/admin/file-types/[id]` | `DELETE` | Remove an allowed file extension. |
-| `/api/admin/identity-provider` | `GET` | Return safe provider configuration metadata. |
-| `/api/admin/audit-log` | `GET` | Read recent `Audit_Outbox` records. |
-| `/api/admin/operations` | `GET` | Read outbox pending/error counts and delivery records. |
+| Endpoint                                                                                                          | Methods           | Purpose                                                                                                                                       |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/auth/login`                                                                                                 | `GET`             | Start OIDC sign-in.                                                                                                                           |
+| `/api/auth/callback/tscloak`                                                                                      | `GET`             | Complete the TSCloak callback and establish the local session cookie.                                                                         |
+| `/api/auth/me`                                                                                                    | `GET`             | Return the current authenticated local identity.                                                                                              |
+| `/api/auth/logout`                                                                                                | `POST`            | Clear ViLek authentication cookies and sign out locally.                                                                                      |
+| `/api/admin/{airlines,airports,crew-designations,crew-members,currencies,expense-categories,flights,roles,users}` | `GET`, `POST`     | Protected resource collection handlers; supported writes depend on the resource and its validation rules.                                     |
+| `/api/admin/{resource}/[id]`                                                                                      | `PATCH`, `DELETE` | Update or deactivate an individual managed record for supported resources. `DELETE` is used as deactivation where preserving history matters. |
+| `/api/admin/flights/options`                                                                                      | `GET`             | Return options used by flight administration.                                                                                                 |
+| `/api/admin/user-roles`                                                                                           | `GET`, `POST`     | List and assign local roles.                                                                                                                  |
+| `/api/admin/user-roles/[id]`                                                                                      | `DELETE`          | Remove a local role assignment, subject to administrator safeguards.                                                                          |
+| `/api/admin/users/sync`                                                                                           | `POST`            | Reconcile eligible existing local accounts with TSCloak SCIM identities.                                                                      |
+| `/api/admin/system-settings`                                                                                      | `GET`, `PUT`      | Read or update system settings.                                                                                                               |
+| `/api/admin/file-types`                                                                                           | `GET`, `POST`     | List or allow a file extension.                                                                                                               |
+| `/api/admin/file-types/[id]`                                                                                      | `DELETE`          | Remove an allowed file extension.                                                                                                             |
+| `/api/admin/identity-provider`                                                                                    | `GET`             | Return safe provider configuration metadata.                                                                                                  |
+| `/api/admin/audit-log`                                                                                            | `GET`             | Read recent `Audit_Outbox` records.                                                                                                           |
+| `/api/admin/operations`                                                                                           | `GET`             | Read outbox pending/error counts and delivery records.                                                                                        |
 
 The admin endpoint pattern above is not a promise that every resource supports every mutation. The UI/resource configuration and the handler's DTO/schema define the actual contract. There are currently no expense CRUD, claim workflow, or expense-document upload endpoints.
 
@@ -124,17 +124,17 @@ flowchart LR
     class DB,DATA storage
 ```
 
-| Concern | Implementation |
-|---|---|
-| Web framework | Next.js 16 App Router |
-| UI/runtime | React 19, TypeScript |
-| Styling | Tailwind CSS 4 plus application CSS |
-| Database | SQLite through `better-sqlite3` |
-| ORM and migrations | Drizzle ORM and Drizzle Kit |
-| Runtime validation | Zod |
-| Admin data access | Feature DTOs, schemas, services, repositories, and Route Handlers |
-| Identity | TSCloak using OIDC; optional SCIM for guarded account reconciliation/seeding |
-| UI data/forms | TanStack Query and React Hook Form on relevant admin pages |
+| Concern            | Implementation                                                               |
+| ------------------ | ---------------------------------------------------------------------------- |
+| Web framework      | Next.js 16 App Router                                                        |
+| UI/runtime         | React 19, TypeScript                                                         |
+| Styling            | Tailwind CSS 4 plus application CSS                                          |
+| Database           | SQLite through `better-sqlite3`                                              |
+| ORM and migrations | Drizzle ORM and Drizzle Kit                                                  |
+| Runtime validation | Zod                                                                          |
+| Admin data access  | Feature DTOs, schemas, services, repositories, and Route Handlers            |
+| Identity           | TSCloak using OIDC; optional SCIM for guarded account reconciliation/seeding |
+| UI data/forms      | TanStack Query and React Hook Form on relevant admin pages                   |
 
 Database access is server-only. `src/lib/db/client.ts` opens the SQLite connection, turns on foreign-key enforcement and WAL mode, and exports the typed Drizzle client. Feature code is organized under `src/lib/admin/features/`; UI and HTTP routes are under `src/components/` and `src/app/`.
 
@@ -146,30 +146,30 @@ The source schema is [`src/lib/db/schema.ts`](./src/lib/db/schema.ts); generated
 
 ### Tables and relationships
 
-| Table | Columns (SQLite types; `?` means nullable) |
-|---|---|
-| `Gender` | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`. |
-| `User` | `id TEXT PK`, `oidc_subject TEXT? UNIQUE`, `email TEXT UNIQUE`, `first_name TEXT`, `last_name TEXT`, `date_of_birth TEXT?`, `gender_id INTEGER? FK`, `is_active INTEGER`, `created_at TEXT`, `updated_at TEXT`. |
-| `Role` | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `description TEXT?`, `is_active INTEGER`. |
-| `User_Role` | `id INTEGER PK`, `user_id TEXT FK`, `role_id INTEGER FK`, `created_at TEXT`; unique `(user_id, role_id)`. |
-| `Crew_Member` | `id TEXT PK`, `user_id TEXT UNIQUE FK`, `badge_number TEXT UNIQUE`, `is_active INTEGER`, `created_at TEXT`, `updated_at TEXT`. |
-| `Airline` | `id INTEGER PK`, `iata_code TEXT UNIQUE`, `icao_code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`. |
-| `Airport` | `id INTEGER PK`, `iata_code TEXT UNIQUE`, `icao_code TEXT UNIQUE`, `name TEXT`, `city TEXT`, `country TEXT`, `time_zone TEXT`, `is_active INTEGER`. |
-| `Flight` | `id TEXT PK`, `airline_id INTEGER FK`, `flight_number TEXT`, `origin_airport_id INTEGER FK`, `destination_airport_id INTEGER FK`, `scheduled_departure TEXT`, `scheduled_arrival TEXT`, `actual_departure TEXT?`, `actual_arrival TEXT?`, `is_active INTEGER`. |
-| `Crew_Designation` | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`. |
-| `Flight_Crew` | `id TEXT PK`, `flight_id TEXT FK`, `crew_member_id TEXT FK`, `designation_id INTEGER FK`, `created_at TEXT`; unique `(flight_id, crew_member_id)`. |
-| `Currency` | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `minor_units INTEGER` (default `2`), `is_active INTEGER`. |
-| `Expense_Category` | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`. |
-| `Expense` | `id TEXT PK`, `flight_crew_id TEXT FK`, `amount TEXT`, `original_currency_id INTEGER FK`, `expense_date TEXT`, `location TEXT?`, `category_id INTEGER FK`, `description TEXT`, `created_at TEXT`, `updated_at TEXT`. |
-| `Expense_Document` | `id TEXT PK`, `expense_id TEXT FK`, `document_type TEXT`, `storage_key TEXT`, `file_name TEXT`, `content_type TEXT`, `file_size_bytes INTEGER`, `uploaded_at TEXT`. |
-| `Claim` | `id TEXT PK`, `flight_crew_id TEXT UNIQUE FK`, `status TEXT` (default `DRAFT`), `created_at TEXT`, `updated_at TEXT`. |
-| `Claim_Expense` | `id TEXT PK`, `claim_id TEXT FK`, `expense_id TEXT UNIQUE FK`, `created_at TEXT`; unique `(claim_id, expense_id)`. |
-| `Claim_Comment` | `id TEXT PK`, `claim_id TEXT FK`, `user_id TEXT FK`, `comment TEXT`, `created_at TEXT`. |
-| `Deployment_Setup` | `id INTEGER PK` (only `1` allowed), `setup_completed_at TEXT?`, `created_at TEXT`, `updated_at TEXT`. |
-| `System_Setting` | `id INTEGER PK` (only `1` allowed), `default_currency_id INTEGER FK`, `max_upload_size_bytes INTEGER` (default `10485760`), `updated_at TEXT`. |
-| `Allowed_File_Type` | `id INTEGER PK`, `system_setting_id INTEGER FK`, `file_type TEXT`; unique `(system_setting_id, file_type)`. |
-| `Notification` | `id TEXT PK`, `user_id TEXT FK`, `type TEXT`, `title TEXT`, `message TEXT`, `target_type TEXT?`, `target_id TEXT?`, `created_at TEXT`, `read_at TEXT?`. |
-| `Audit_Outbox` | `id TEXT PK`, `entity_type TEXT`, `entity_id TEXT`, `event_type TEXT`, `payload_json TEXT`, `correlation_id TEXT?`, `actor_user_id TEXT? FK`, `created_at TEXT`, `processed_at TEXT?`, `attempt_count INTEGER`, `next_attempt_at TEXT?`, `last_error TEXT?`. |
+| Table               | Columns (SQLite types; `?` means nullable)                                                                                                                                                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Gender`            | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`.                                                                                                                                                                                         |
+| `User`              | `id TEXT PK`, `oidc_subject TEXT? UNIQUE`, `email TEXT UNIQUE`, `first_name TEXT`, `last_name TEXT`, `date_of_birth TEXT?`, `gender_id INTEGER? FK`, `is_active INTEGER`, `created_at TEXT`, `updated_at TEXT`.                                                |
+| `Role`              | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `description TEXT?`, `is_active INTEGER`.                                                                                                                                                                    |
+| `User_Role`         | `id INTEGER PK`, `user_id TEXT FK`, `role_id INTEGER FK`, `created_at TEXT`; unique `(user_id, role_id)`.                                                                                                                                                      |
+| `Crew_Member`       | `id TEXT PK`, `user_id TEXT UNIQUE FK`, `badge_number TEXT UNIQUE`, `is_active INTEGER`, `created_at TEXT`, `updated_at TEXT`.                                                                                                                                 |
+| `Airline`           | `id INTEGER PK`, `iata_code TEXT UNIQUE`, `icao_code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`.                                                                                                                                                           |
+| `Airport`           | `id INTEGER PK`, `iata_code TEXT UNIQUE`, `icao_code TEXT UNIQUE`, `name TEXT`, `city TEXT`, `country TEXT`, `time_zone TEXT`, `is_active INTEGER`.                                                                                                            |
+| `Flight`            | `id TEXT PK`, `airline_id INTEGER FK`, `flight_number TEXT`, `origin_airport_id INTEGER FK`, `destination_airport_id INTEGER FK`, `scheduled_departure TEXT`, `scheduled_arrival TEXT`, `actual_departure TEXT?`, `actual_arrival TEXT?`, `is_active INTEGER`. |
+| `Crew_Designation`  | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`.                                                                                                                                                                                         |
+| `Flight_Crew`       | `id TEXT PK`, `flight_id TEXT FK`, `crew_member_id TEXT FK`, `designation_id INTEGER FK`, `created_at TEXT`; unique `(flight_id, crew_member_id)`.                                                                                                             |
+| `Currency`          | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `minor_units INTEGER` (default `2`), `is_active INTEGER`.                                                                                                                                                    |
+| `Expense_Category`  | `id INTEGER PK`, `code TEXT UNIQUE`, `name TEXT`, `is_active INTEGER`.                                                                                                                                                                                         |
+| `Expense`           | `id TEXT PK`, `flight_crew_id TEXT FK`, `amount TEXT`, `original_currency_id INTEGER FK`, `expense_date TEXT`, `location TEXT?`, `category_id INTEGER FK`, `description TEXT`, `created_at TEXT`, `updated_at TEXT`.                                           |
+| `Expense_Document`  | `id TEXT PK`, `expense_id TEXT FK`, `document_type TEXT`, `storage_key TEXT`, `file_name TEXT`, `content_type TEXT`, `file_size_bytes INTEGER`, `uploaded_at TEXT`.                                                                                            |
+| `Claim`             | `id TEXT PK`, `flight_crew_id TEXT UNIQUE FK`, `status TEXT` (default `DRAFT`), `created_at TEXT`, `updated_at TEXT`.                                                                                                                                          |
+| `Claim_Expense`     | `id TEXT PK`, `claim_id TEXT FK`, `expense_id TEXT UNIQUE FK`, `created_at TEXT`; unique `(claim_id, expense_id)`.                                                                                                                                             |
+| `Claim_Comment`     | `id TEXT PK`, `claim_id TEXT FK`, `user_id TEXT FK`, `comment TEXT`, `created_at TEXT`.                                                                                                                                                                        |
+| `Deployment_Setup`  | `id INTEGER PK` (only `1` allowed), `setup_completed_at TEXT?`, `created_at TEXT`, `updated_at TEXT`.                                                                                                                                                          |
+| `System_Setting`    | `id INTEGER PK` (only `1` allowed), `default_currency_id INTEGER FK`, `max_upload_size_bytes INTEGER` (default `10485760`), `updated_at TEXT`.                                                                                                                 |
+| `Allowed_File_Type` | `id INTEGER PK`, `system_setting_id INTEGER FK`, `file_type TEXT`; unique `(system_setting_id, file_type)`.                                                                                                                                                    |
+| `Notification`      | `id TEXT PK`, `user_id TEXT FK`, `type TEXT`, `title TEXT`, `message TEXT`, `target_type TEXT?`, `target_id TEXT?`, `created_at TEXT`, `read_at TEXT?`.                                                                                                        |
+| `Audit_Outbox`      | `id TEXT PK`, `entity_type TEXT`, `entity_id TEXT`, `event_type TEXT`, `payload_json TEXT`, `correlation_id TEXT?`, `actor_user_id TEXT? FK`, `created_at TEXT`, `processed_at TEXT?`, `attempt_count INTEGER`, `next_attempt_at TEXT?`, `last_error TEXT?`.   |
 
 #### ✈️ Core domain relationships
 
@@ -207,12 +207,12 @@ flowchart LR
 
 TSCloak authenticates the person; ViLek authorizes the person. The application resolves the OIDC subject to a local `User`, then obtains active local role assignments from `User_Role` and `Role`. TSCloak role claims are not used for ViLek authorization.
 
-| Local role | Current permission scope |
-|---|---|
-| `ADMIN` | All permissions declared by the application. |
-| `CREW` | Read and create claim permissions. |
-| `APPROVER` | Read and review claim permissions. |
-| `FINANCE` | Read claims and process finance permissions. |
+| Local role                  | Current permission scope                                                |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `ADMIN`                     | All permissions declared by the application.                            |
+| `CREW`                      | Read and create claim permissions.                                      |
+| `APPROVER`                  | Read and review claim permissions.                                      |
+| `FINANCE`                   | Read claims and process finance permissions.                            |
 | `FLIGHT_OPERATIONS_MANAGER` | Crew, designation, airline, airport, and flight operations permissions. |
 
 The administrator UI currently requires the local `ADMIN` role. Role codes and permission grants are application-policy decisions in `src/lib/auth/permissions.ts`; administrators can manage predefined role metadata and assign roles, but cannot edit the permission matrix in the UI.
@@ -264,20 +264,20 @@ VILEK_BASE_URL=http://localhost:3001
 
 `DATABASE_URL` defaults to `file:./data/vilek.db`. Relative file paths are resolved from the process working directory. Keep credentials private; `.env*` files are excluded by `.gitignore`.
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | SQLite file URL; non-`file:` URLs are rejected. |
-| `TSCLOAK_ISSUER` | OIDC issuer URL; defaults to `https://tscloak.onrender.com`. Must match the issuer in provider tokens. |
-| `TSCLOAK_CLIENT_ID`, `TSCLOAK_CLIENT_SECRET` | OIDC client credentials. |
-| `TSCLOAK_ACCESS_TOKEN_AUDIENCE` | Expected token audience; defaults to the client ID. |
-| `TSCLOAK_REDIRECT_URI` | Registered OIDC callback; defaults to the local port 3001 callback. |
-| `TSCLOAK_POST_LOGOUT_REDIRECT_URI` | Local post-logout redirect; defaults to `http://localhost:3001/login`. |
-| `TSCLOAK_SCOPES` | OIDC scopes; defaults to `openid profile email`. |
-| `TSCLOAK_TOKEN_AUTH_METHOD` | OIDC token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`. |
-| `VILEK_BASE_URL` | Public application base URL for login/callback and expected browser origin; set it to the deployed HTTPS origin in production. |
-| `TSCLOAK_SCIM_ENABLED` | Must be exactly `true` to enable the SCIM sync/seed operations. |
+| Variable                                               | Purpose                                                                                                                               |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                         | SQLite file URL; non-`file:` URLs are rejected.                                                                                       |
+| `TSCLOAK_ISSUER`                                       | OIDC issuer URL; defaults to `https://tscloak.onrender.com`. Must match the issuer in provider tokens.                                |
+| `TSCLOAK_CLIENT_ID`, `TSCLOAK_CLIENT_SECRET`           | OIDC client credentials.                                                                                                              |
+| `TSCLOAK_ACCESS_TOKEN_AUDIENCE`                        | Expected token audience; defaults to the client ID.                                                                                   |
+| `TSCLOAK_REDIRECT_URI`                                 | Registered OIDC callback; defaults to the local port 3001 callback.                                                                   |
+| `TSCLOAK_POST_LOGOUT_REDIRECT_URI`                     | Local post-logout redirect; defaults to `http://localhost:3001/login`.                                                                |
+| `TSCLOAK_SCOPES`                                       | OIDC scopes; defaults to `openid profile email`.                                                                                      |
+| `TSCLOAK_TOKEN_AUTH_METHOD`                            | OIDC token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`.                                             |
+| `VILEK_BASE_URL`                                       | Public application base URL for login/callback and expected browser origin; set it to the deployed HTTPS origin in production.        |
+| `TSCLOAK_SCIM_ENABLED`                                 | Must be exactly `true` to enable the SCIM sync/seed operations.                                                                       |
 | `TSCLOAK_SCIM_CLIENT_ID`, `TSCLOAK_SCIM_CLIENT_SECRET` | Credentials for the SCIM client-credentials flow. The documented seed setup requires the SCIM client ID to match `TSCLOAK_CLIENT_ID`. |
-| `TSCLOAK_SCIM_TOKEN_AUTH_METHOD` | SCIM token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`. |
+| `TSCLOAK_SCIM_TOKEN_AUTH_METHOD`                       | SCIM token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`.                                             |
 
 Register the callback URI and post-logout URI with the identity provider. In production, also configure the public base URL and HTTPS redirects; do not deploy with the local defaults.
 
@@ -290,17 +290,17 @@ npm run dev
 
 The development server listens at `http://localhost:3001`.
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Start the Next.js development server on port 3001. |
-| `npm run build` | Create a production build. |
-| `npm run start` | Start the production server on port 3001. |
-| `npm run lint` | Run ESLint. |
-| `npm run typecheck` | Run TypeScript without emitting output. |
-| `npm run db:generate` | Generate a Drizzle migration from the schema. Review the generated SQL before applying it. |
-| `npm run db:migrate` | Apply migrations in `drizzle/` to the configured SQLite database. |
-| `npm run db:studio` | Open Drizzle Studio for the configured database. |
-| `npm run db:seed` | Provision demo users through SCIM, then seed local demo data. Requires explicit SCIM configuration and changes the configured identity provider. |
+| Command               | What it does                                                                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run dev`         | Start the Next.js development server on port 3001.                                                                                               |
+| `npm run build`       | Create a production build.                                                                                                                       |
+| `npm run start`       | Start the production server on port 3001.                                                                                                        |
+| `npm run lint`        | Run ESLint.                                                                                                                                      |
+| `npm run typecheck`   | Run TypeScript without emitting output.                                                                                                          |
+| `npm run db:generate` | Generate a Drizzle migration from the schema. Review the generated SQL before applying it.                                                       |
+| `npm run db:migrate`  | Apply migrations in `drizzle/` to the configured SQLite database.                                                                                |
+| `npm run db:studio`   | Open Drizzle Studio for the configured database.                                                                                                 |
+| `npm run db:seed`     | Provision demo users through SCIM, then seed local demo data. Requires explicit SCIM configuration and changes the configured identity provider. |
 
 For a code change, run the focused checks as appropriate; the usual pre-deployment checks are:
 

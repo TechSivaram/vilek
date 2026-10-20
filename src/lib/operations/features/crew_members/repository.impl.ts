@@ -24,12 +24,13 @@ export const crew_membersRepository = {
 
     // Projection: return only the fields used by the table and edit form.
     // IDs remain available for internal edits, but the UI displays the name.
-    const total = db
-      .select({ value: count() })
-      .from(crewMembers)
-      .innerJoin(users, eq(crewMembers.userId, users.id))
-      .where(where)
-      .get()?.value ?? 0;
+    const total =
+      db
+        .select({ value: count() })
+        .from(crewMembers)
+        .innerJoin(users, eq(crewMembers.userId, users.id))
+        .where(where)
+        .get()?.value ?? 0;
 
     const sortKey = input.sort ?? "badgeNumber";
     const sortColumns: Record<string, any> = {
@@ -40,7 +41,8 @@ export const crew_membersRepository = {
       isActive: crewMembers.isActive,
     };
     const sortColumn = sortColumns[sortKey] ?? crewMembers.badgeNumber;
-    const ordering = input.direction === "desc" ? desc(sortColumn) : asc(sortColumn);
+    const ordering =
+      input.direction === "desc" ? desc(sortColumn) : asc(sortColumn);
     const rows = db
       .select({
         id: crewMembers.id,

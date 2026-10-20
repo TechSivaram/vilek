@@ -5,5 +5,13 @@ export const dynamic = "force-dynamic";
 
 export default async function ApproverDashboardPage() {
   const authenticated = await requireRole("APPROVER", "/dashboard");
-  return <WorkspaceDashboard roleCode="APPROVER" roleCodes={authenticated.roleCodes} firstName={authenticated.user.firstName} lastName={authenticated.user.lastName} email={authenticated.user.email} />;
+  return (
+    <WorkspaceDashboard
+      roleCode="APPROVER"
+      roleCodes={authenticated.roleCodes}
+      firstName={authenticated.user.firstName}
+      lastName={authenticated.user.lastName}
+      email={authenticated.user.email}
+    />
+  );
 }

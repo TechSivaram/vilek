@@ -82,7 +82,11 @@ export function AdminShell({
         aria-label="Administration navigation"
       >
         <div className="admin-brand-row">
-          <Link href="/dashboard" className="admin-brand" aria-label="ViLek workspaces">
+          <Link
+            href="/dashboard"
+            className="admin-brand"
+            aria-label="ViLek workspaces"
+          >
             <Image
               src="/Branding/logo.png"
               alt="ViLek"
@@ -141,7 +145,6 @@ export function AdminShell({
             <span className="admin-nav-icon">←</span>
             <span className="admin-nav-label">All workspaces</span>
           </Link>
-
         </div>
       </aside>
 
@@ -165,7 +168,11 @@ export function AdminShell({
           </div>
           <div className="admin-topbar-right">
             <WorkspaceSwitcher roleCodes={roleCodes} currentRole="ADMIN" />
-            <ProfileMenu firstName={user.firstName} lastName={user.lastName} email={user.email} />
+            <ProfileMenu
+              firstName={user.firstName}
+              lastName={user.lastName}
+              email={user.email}
+            />
           </div>
         </header>
         <main className="admin-content">{children}</main>
