@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { formSchema } from "@/lib/admin/features/airports/schema";
-import type { AirportsFormDto } from "@/lib/admin/features/airports/dto";
+import { formSchema } from "@/lib/operations/features/airports/schema";
+import type { AirportsFormDto } from "@/lib/operations/features/airports/dto";
 import type {
   AirportsListRow,
   AirportsListResult,
-} from "@/lib/admin/features/airports/dto";
+} from "@/lib/operations/features/airports/dto";
 
 async function requestJson<T = any>(
   url: string,

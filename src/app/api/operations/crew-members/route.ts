@@ -3,8 +3,8 @@ import { withRouteGuard } from "@/lib/auth/route-protection";
 import {
   listQuerySchema,
   createInputSchema,
-} from "@/lib/admin/features/crew_members/schema";
-import { crew_membersService } from "@/lib/admin/features/crew_members/service";
+} from "@/lib/operations/features/crew_members/schema";
+import { crew_membersService } from "@/lib/operations/features/crew_members/service";
 export const dynamic = "force-dynamic";
 export const GET = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
@@ -40,7 +40,7 @@ export const GET = withRouteGuard(
   },
 );
 
-import { resourceConfigs } from "@/lib/admin/resources";
+import { resourceConfigs } from "@/lib/operations/resources";
 export const POST = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (request: Request) => {

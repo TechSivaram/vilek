@@ -89,10 +89,9 @@ export const WORKSPACES: WorkspaceDefinition[] = [
     href: "/admin",
     eyebrow: "SYSTEM · ACCESS · CONFIGURATION",
     heading: "Administration workspace",
-    summary: "Manage ViLek access, reference data and system-wide configuration.",
+    summary: "Manage ViLek access, roles, finance reference data and system-wide configuration. Flight and crew data belong to Flight Operations.",
     capabilities: [
       { icon: "♙", title: "Users & access", description: "Manage users, roles and role assignments.", href: "/admin/users" },
-      { icon: "◇", title: "Reference data", description: "Maintain shared operational reference data.", href: "/admin/airlines" },
       { icon: "⚙", title: "System settings", description: "Review configuration and system operations.", href: "/admin/settings" },
     ],
   },

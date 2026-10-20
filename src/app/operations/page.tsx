@@ -9,6 +9,7 @@ const sections = [
   { href: "/operations/crew-designations", icon: "✳", title: "Crew designations", description: "Manage the designations used for crew planning." },
   { href: "/operations/airlines", icon: "⇢", title: "Airlines", description: "Maintain airline reference data for flight records." },
   { href: "/operations/airports", icon: "⌖", title: "Airports", description: "Maintain airport codes, locations, and time zones." },
+  { href: "/operations/maintenance", icon: "⚙", title: "Operational data & settings", description: "Maintain crew eligibility, qualifications, complement rules, operational settings, and review audit history." },
 ];
 
 export default function FlightOperationsDashboardPage() {

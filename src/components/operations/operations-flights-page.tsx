@@ -9,14 +9,14 @@ import {
   flightMutationResponseSchema,
   flightOptionsResponseSchema,
   flightsListResponseSchema,
-} from "@/lib/admin/features/flights/schema";
+} from "@/lib/operations/features/flights/schema";
 import type {
   FlightFormDto,
   FlightListRow,
   FlightMutationResponseDto,
   FlightOptionsResponseDto,
   FlightsListResponseDto,
-} from "@/lib/admin/features/flights/dto";
+} from "@/lib/operations/features/flights/dto";
 
 async function requestJson<T>(
   url: string,

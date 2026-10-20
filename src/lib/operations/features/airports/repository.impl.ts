@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
-import { resourceConfigs } from "@/lib/admin/resources";
+import { resourceConfigs } from "@/lib/operations/resources";
 import { count, like, or, asc, desc } from "drizzle-orm";
 import { makeCrudRepository } from "../repository-crud";
 import type { AirportsListQuery } from "./dto";

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { resourceConfigs } from "@/lib/admin/resources";
-import { updateInputSchema } from "@/lib/admin/features/crew_designations/schema";
-import { crew_designationsService } from "@/lib/admin/features/crew_designations/service";
+import { resourceConfigs } from "@/lib/operations/resources";
+import { updateInputSchema } from "@/lib/operations/features/crew_designations/schema";
+import { crew_designationsService } from "@/lib/operations/features/crew_designations/service";
 type Ctx = { params: Promise<{ id: string }> };
 export const PATCH = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },

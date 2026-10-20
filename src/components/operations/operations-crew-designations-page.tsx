@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { formSchema } from "@/lib/admin/features/crew_designations/schema";
-import type { CrewDesignationsFormDto } from "@/lib/admin/features/crew_designations/dto";
+import { formSchema } from "@/lib/operations/features/crew_designations/schema";
+import type { CrewDesignationsFormDto } from "@/lib/operations/features/crew_designations/dto";
 import type {
   CrewDesignationsListRow,
   CrewDesignationsListResult,
-} from "@/lib/admin/features/crew_designations/dto";
+} from "@/lib/operations/features/crew_designations/dto";
 
 async function requestJson<T = any>(
   url: string,

@@ -24,20 +24,6 @@ const groups = [
     ],
   },
   {
-    label: "Crew & operations",
-    items: [
-      { href: "/admin/crew-members", label: "Crew members", icon: "♧" },
-      {
-        href: "/admin/crew-designations",
-        label: "Crew designations",
-        icon: "✳",
-      },
-      { href: "/admin/airlines", label: "Airlines", icon: "✈" },
-      { href: "/admin/airports", label: "Airports", icon: "⌖" },
-      { href: "/admin/flights", label: "Flights", icon: "⇢" },
-    ],
-  },
-  {
     label: "Finance & expenses",
     items: [
       {

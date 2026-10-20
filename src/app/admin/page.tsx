@@ -4,10 +4,6 @@ import { db } from "@/lib/db";
 import {
   users,
   roles,
-  crewMembers,
-  flights,
-  airlines,
-  airports,
   expenseCategories,
   currencies,
 } from "@/lib/db/schema";
@@ -25,30 +21,6 @@ export default function AdminDashboard() {
       .select({ value: sql<number>`count(*)` })
       .from(roles)
       .where(sql`${roles.isActive} = 1`)
-      .get()?.value ?? 0;
-  const crewCount =
-    db
-      .select({ value: sql<number>`count(*)` })
-      .from(crewMembers)
-      .where(sql`${crewMembers.isActive} = 1`)
-      .get()?.value ?? 0;
-  const flightCount =
-    db
-      .select({ value: sql<number>`count(*)` })
-      .from(flights)
-      .where(sql`${flights.isActive} = 1`)
-      .get()?.value ?? 0;
-  const airlineCount =
-    db
-      .select({ value: sql<number>`count(*)` })
-      .from(airlines)
-      .where(sql`${airlines.isActive} = 1`)
-      .get()?.value ?? 0;
-  const airportCount =
-    db
-      .select({ value: sql<number>`count(*)` })
-      .from(airports)
-      .where(sql`${airports.isActive} = 1`)
       .get()?.value ?? 0;
   const categoryCount =
     db
@@ -80,22 +52,6 @@ export default function AdminDashboard() {
       href: "/admin/roles",
       tone: "blue",
     },
-    {
-      label: "Crew members",
-      value: crewCount,
-      note: "Active crew records",
-      icon: "♧",
-      href: "/admin/crew-members",
-      tone: "violet",
-    },
-    {
-      label: "Flights",
-      value: flightCount,
-      note: "Active flight records",
-      icon: "✈",
-      href: "/admin/flights",
-      tone: "amber",
-    },
   ];
 
   return (
@@ -105,7 +61,7 @@ export default function AdminDashboard() {
           <div className="admin-eyebrow">ADMINISTRATION</div>
           <h1>Dashboard</h1>
           <p>
-            Manage users, access, reference data, and application configuration.
+            Manage users, access, finance reference data, and system configuration.
           </p>
         </div>
       </section>
@@ -182,20 +138,10 @@ export default function AdminDashboard() {
           <div className="admin-panel-heading">
             <div>
               <h2>Reference data</h2>
-              <p>Current active records</p>
+              <p>Current active finance reference records</p>
             </div>
           </div>
           <div className="admin-reference-list">
-            <Link href="/admin/airlines">
-              <span>Airlines</span>
-              <strong>{airlineCount}</strong>
-              <b>→</b>
-            </Link>
-            <Link href="/admin/airports">
-              <span>Airports</span>
-              <strong>{airportCount}</strong>
-              <b>→</b>
-            </Link>
             <Link href="/admin/expense-categories">
               <span>Expense categories</span>
               <strong>{categoryCount}</strong>
@@ -210,10 +156,19 @@ export default function AdminDashboard() {
           <div className="admin-info-note">
             <span>i</span>
             <p>
-              Counts reflect records currently stored in the ViLek database.
-              Integration health checks will be added when their endpoints are
-              implemented.
+              Flight records, crew members, designations, airlines, and airports
+              are maintained in the Flight Operations workspace.
             </p>
+          </div>
+          <div className="admin-quick-actions">
+            <Link href="/operations">
+              <span className="admin-action-icon">✈</span>
+              <span>
+                <strong>Open Flight Operations</strong>
+                <small>Manage flights, crew, airlines, and airports</small>
+              </span>
+              <b>→</b>
+            </Link>
           </div>
         </section>
       </div>

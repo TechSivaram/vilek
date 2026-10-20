@@ -7,7 +7,12 @@ import {
   airports,
   crewDesignations,
   crewMembers,
+  crewMemberDesignations,
+  crewQualifications,
+  designationQualificationRequirements,
+  qualificationTypes,
   flightCrew,
+  flightCrewAuditEvents,
   flights,
   users,
 } from "@/lib/db/schema";
@@ -242,17 +247,103 @@ export const flightCrewRepository = {
     return { flights: flightOptions, crewMembers: crewOptions, designations: designationOptions };
   },
 
-  create(input: { flightId: string; crewMemberId: string; designationId: number }) {
-    const flight = db.select({ id: flights.id }).from(flights).where(and(eq(flights.id, input.flightId), eq(flights.isActive, true))).get();
-    if (!flight) throw new Error("FLIGHT_NOT_AVAILABLE");
-    const crew = db.select({ id: crewMembers.id }).from(crewMembers).innerJoin(users, eq(crewMembers.userId, users.id)).where(and(eq(crewMembers.id, input.crewMemberId), eq(crewMembers.isActive, true), eq(users.isActive, true))).get();
-    if (!crew) throw new Error("CREW_NOT_AVAILABLE");
-    const designation = db.select({ id: crewDesignations.id }).from(crewDesignations).where(and(eq(crewDesignations.id, input.designationId), eq(crewDesignations.isActive, true))).get();
-    if (!designation) throw new Error("DESIGNATION_NOT_AVAILABLE");
-    return db.insert(flightCrew).values(input).run();
+  create(input: { flightId: string; crewMemberId: string; designationId: number }, actor: { id: string; email: string }) {
+    // Run validation and the insert/audit write in one SQLite transaction so concurrent
+    // requests cannot bypass the eligibility and duplicate checks.
+    return db.transaction((tx) => {
+      const flight = tx.select({
+        id: flights.id,
+        flightNumber: flights.flightNumber,
+        scheduledDeparture: flights.scheduledDeparture,
+      }).from(flights).where(and(eq(flights.id, input.flightId), eq(flights.isActive, true))).get();
+      if (!flight) throw new Error("FLIGHT_NOT_AVAILABLE");
+      const crew = tx.select({
+        id: crewMembers.id,
+        name: sql<string>`trim(${users.firstName} || ' ' || ${users.lastName})`,
+        badgeNumber: crewMembers.badgeNumber,
+      }).from(crewMembers).innerJoin(users, eq(crewMembers.userId, users.id)).where(and(eq(crewMembers.id, input.crewMemberId), eq(crewMembers.isActive, true), eq(users.isActive, true))).get();
+      if (!crew) throw new Error("CREW_NOT_AVAILABLE");
+      const designation = tx.select({ id: crewDesignations.id, name: crewDesignations.name }).from(crewDesignations).where(and(eq(crewDesignations.id, input.designationId), eq(crewDesignations.isActive, true))).get();
+      if (!designation) throw new Error("DESIGNATION_NOT_AVAILABLE");
+
+      const departureDate = flight.scheduledDeparture.slice(0, 10);
+      const eligibility = tx.select({ validFrom: crewMemberDesignations.validFrom, validUntil: crewMemberDesignations.validUntil })
+        .from(crewMemberDesignations)
+        .where(and(eq(crewMemberDesignations.crewMemberId, input.crewMemberId), eq(crewMemberDesignations.designationId, input.designationId), eq(crewMemberDesignations.isActive, true)))
+        .get();
+      if (!eligibility || (eligibility.validFrom && eligibility.validFrom > departureDate) || (eligibility.validUntil && eligibility.validUntil < departureDate)) {
+        throw new Error("CREW_NOT_QUALIFIED_FOR_DESIGNATION");
+      }
+
+      const required = tx.select({ qualificationTypeId: designationQualificationRequirements.qualificationTypeId, typeName: qualificationTypes.name })
+        .from(designationQualificationRequirements)
+        .innerJoin(qualificationTypes, eq(designationQualificationRequirements.qualificationTypeId, qualificationTypes.id))
+        .where(and(eq(designationQualificationRequirements.designationId, input.designationId), eq(designationQualificationRequirements.isRequired, true), eq(qualificationTypes.isActive, true)))
+        .all();
+      for (const requirement of required) {
+        const valid = tx.select({ id: crewQualifications.id }).from(crewQualifications)
+          .where(and(
+            eq(crewQualifications.crewMemberId, input.crewMemberId),
+            eq(crewQualifications.qualificationTypeId, requirement.qualificationTypeId),
+            eq(crewQualifications.status, "ACTIVE"),
+            sql`${crewQualifications.validFrom} <= ${departureDate}`,
+            sql`(${crewQualifications.validUntil} IS NULL OR ${crewQualifications.validUntil} >= ${departureDate})`,
+          )).get();
+        if (!valid) throw new Error(`QUALIFICATION_MISSING:${requirement.typeName}`);
+      }
+
+      const assignment = tx.insert(flightCrew).values(input).returning().get();
+      tx.insert(flightCrewAuditEvents).values({
+        flightId: flight.id,
+        flightNumberSnapshot: flight.flightNumber,
+        crewMemberId: crew.id,
+        crewNameSnapshot: `${crew.name} (${crew.badgeNumber})`,
+        designationId: designation.id,
+        designationSnapshot: designation.name,
+        assignmentId: assignment.id,
+        action: "ASSIGNED",
+        newValueJson: JSON.stringify({ flightId: flight.id, crewMemberId: crew.id, designationId: designation.id }),
+        actorUserId: actor.id,
+        actorEmailSnapshot: actor.email,
+      }).run();
+      return assignment;
+    });
   },
 
-  remove(id: string) {
-    return db.delete(flightCrew).where(eq(flightCrew.id, id)).run();
+  remove(id: string, reason: string, actor: { id: string; email: string }) {
+    return db.transaction((tx) => {
+      const assignment = tx.select({
+        id: flightCrew.id,
+        flightId: flights.id,
+        flightNumber: flights.flightNumber,
+        crewMemberId: crewMembers.id,
+        crewName: sql<string>`trim(${users.firstName} || ' ' || ${users.lastName})`,
+        badgeNumber: crewMembers.badgeNumber,
+        designationId: crewDesignations.id,
+        designationName: crewDesignations.name,
+      }).from(flightCrew)
+        .innerJoin(flights, eq(flightCrew.flightId, flights.id))
+        .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
+        .innerJoin(users, eq(crewMembers.userId, users.id))
+        .innerJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
+        .where(eq(flightCrew.id, id)).get();
+      if (!assignment) return { changes: 0 };
+      const result = tx.delete(flightCrew).where(eq(flightCrew.id, id)).run();
+      tx.insert(flightCrewAuditEvents).values({
+        flightId: assignment.flightId,
+        flightNumberSnapshot: assignment.flightNumber,
+        crewMemberId: assignment.crewMemberId,
+        crewNameSnapshot: `${assignment.crewName} (${assignment.badgeNumber})`,
+        designationId: assignment.designationId,
+        designationSnapshot: assignment.designationName,
+        assignmentId: assignment.id,
+        action: "REMOVED",
+        previousValueJson: JSON.stringify({ flightId: assignment.flightId, crewMemberId: assignment.crewMemberId, designationId: assignment.designationId }),
+        reason,
+        actorUserId: actor.id,
+        actorEmailSnapshot: actor.email,
+      }).run();
+      return result;
+    });
   },
 };

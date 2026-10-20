@@ -120,10 +120,17 @@ export function OperationsFlightCrewPage() {
     onError: (e) => { setError(e.message); setNotice(""); },
   });
   const remove = useMutation({
-    mutationFn: (row: AssignmentRow) => requestJson(`/api/operations/flight-crew/${encodeURIComponent(row.id)}`, mutationResponseSchema, { method: "DELETE" }),
-    onSuccess: async () => { setNotice("Crew assignment removed."); setError(""); await queryClient.invalidateQueries({ queryKey: ["operations-flight-crew"] }); },
+    mutationFn: (input: { row: AssignmentRow; reason: string }) => requestJson(`/api/operations/flight-crew/${encodeURIComponent(input.row.id)}`, mutationResponseSchema, { method: "DELETE", body: JSON.stringify({ reason: input.reason }) }),
+    onSuccess: async () => { setNotice("Crew assignment removed and recorded in audit history."); setError(""); await queryClient.invalidateQueries({ queryKey: ["operations-flight-crew"] }); },
     onError: (e) => { setError(e.message); setNotice(""); },
   });
+  const removeAssignment = (row: AssignmentRow) => {
+    if (!window.confirm(`Remove ${row.crewMemberName} from this flight?`)) return;
+    const reason = window.prompt("Enter the reason for removing this crew assignment (required):", "");
+    if (reason === null) return;
+    if (reason.trim().length < 5) { setError("Enter a removal reason of at least 5 characters."); setNotice(""); return; }
+    setError(""); setNotice(""); remove.mutate({ row, reason: reason.trim() });
+  };
 
   useEffect(() => { setPage(1); }, [search]);
   useEffect(() => { if (list.error) setError(list.error.message); }, [list.error]);
@@ -200,12 +207,12 @@ export function OperationsFlightCrewPage() {
                 const members = rows.filter((row) => row.designationId === designationId);
                 return <Fragment key={designationId}>
                   <tr className="flight-crew-group-heading"><td colSpan={3} style={{ background: "#fafbfd", borderLeft: "3px solid #e7edf2", padding: "5px 78px", whiteSpace: "normal" }}><span aria-hidden="true" className="flight-crew-tree-marker">•</span><strong>{members[0].designationName}</strong><small style={{ marginLeft: 8 }}>{members.length} member{members.length === 1 ? "" : "s"}</small></td></tr>
-                  {members.map((row) => <tr key={row.id}><td data-label="Flight / route" /><td data-label="Crew member"><div>{row.crewMemberName}</div><small>Badge: {row.badgeNumber}</small></td><td data-label="Actions"><div className="admin-row-actions"><button type="button" className="admin-table-action is-danger" disabled={busy} onClick={() => { if (window.confirm(`Remove ${row.crewMemberName} from ${row.airlineCode} ${row.flightNumber}?`)) remove.mutate(row); }}>Remove</button></div></td></tr>)}
+                  {members.map((row) => <tr key={row.id}><td data-label="Flight / route" /><td data-label="Crew member"><div>{row.crewMemberName}</div><small>Badge: {row.badgeNumber}</small></td><td data-label="Actions"><div className="admin-row-actions"><button type="button" className="admin-table-action is-danger" disabled={busy} onClick={() => { removeAssignment(row) }}>Remove</button></div></td></tr>)}
                 </Fragment>;
               });
             })())}
           </Fragment>)}
-        </Fragment>) : displayedFlights.map((flight) => <Fragment key={flight.id}><tr><td><strong>{flight.airlineName} — {flight.flightNumber}</strong><small style={{ display: "block" }}>{flight.originCode} → {flight.destinationCode}</small></td><td>{flight.crewCount} crew members</td><td><button type="button" className="admin-secondary-button" onClick={() => void toggleFlight(flight.id)}>{expandedFlights.has(flight.id) ? "Hide crew" : "Load crew"}</button></td></tr>{expandedFlights.has(flight.id) && (manifests[flight.id] ?? []).map((row) => <tr key={row.id}><td /><td>{row.crewMemberName} <small>Badge: {row.badgeNumber}</small></td><td><button type="button" className="admin-table-action is-danger" onClick={() => remove.mutate(row)}>Remove</button></td></tr>)}</Fragment>)}
+        </Fragment>) : displayedFlights.map((flight) => <Fragment key={flight.id}><tr><td><strong>{flight.airlineName} — {flight.flightNumber}</strong><small style={{ display: "block" }}>{flight.originCode} → {flight.destinationCode}</small></td><td>{flight.crewCount} crew members</td><td><button type="button" className="admin-secondary-button" onClick={() => void toggleFlight(flight.id)}>{expandedFlights.has(flight.id) ? "Hide crew" : "Load crew"}</button></td></tr>{expandedFlights.has(flight.id) && (manifests[flight.id] ?? []).map((row) => <tr key={row.id}><td /><td>{row.crewMemberName} <small>Badge: {row.badgeNumber}</small></td><td><button type="button" className="admin-table-action is-danger" onClick={() => removeAssignment(row)}>Remove</button></td></tr>)}</Fragment>)}
         {!list.isFetching && (list.data?.rows.length ?? 0) === 0 && <tr><td colSpan={3} className="admin-table-empty">{search ? "No flights match your search." : "No crew assignments exist for these flights yet. Select Assign crew to create an assignment."}</td></tr>}
       </tbody></table></div>
       <div className="flight-crew-mobile-view">
@@ -237,7 +244,7 @@ export function OperationsFlightCrewPage() {
                         <div className="flight-crew-mobile-members">
                           {members.map((row) => <article className="flight-crew-mobile-member" key={row.id}>
                             <div className="flight-crew-mobile-member-info"><strong>{row.crewMemberName}</strong><span>Badge: {row.badgeNumber}</span></div>
-                            <button type="button" className="admin-table-action is-danger" disabled={busy} onClick={() => { if (window.confirm(`Remove ${row.crewMemberName} from this flight?`)) remove.mutate(row); }}>Remove</button>
+                            <button type="button" className="admin-table-action is-danger" disabled={busy} onClick={() => { removeAssignment(row) }}>Remove</button>
                           </article>)}
                         </div>
                       </section>;
@@ -251,7 +258,7 @@ export function OperationsFlightCrewPage() {
           <div className="flight-crew-mobile-route">{flight.originCode} → {flight.destinationCode}</div>
           <div className="flight-crew-mobile-meta">{flight.crewCount} crew members</div>
           <button type="button" className="admin-secondary-button" onClick={() => void toggleFlight(flight.id)}>{expandedFlights.has(flight.id) ? "Hide crew" : "Load crew"}</button>
-          {expandedFlights.has(flight.id) && (manifests[flight.id] ?? []).map((row) => <article className="flight-crew-mobile-member" key={row.id}><div className="flight-crew-mobile-member-info"><strong>{row.crewMemberName}</strong><span>Badge: {row.badgeNumber}</span></div><button type="button" className="admin-table-action is-danger" onClick={() => remove.mutate(row)}>Remove</button></article>)}
+          {expandedFlights.has(flight.id) && (manifests[flight.id] ?? []).map((row) => <article className="flight-crew-mobile-member" key={row.id}><div className="flight-crew-mobile-member-info"><strong>{row.crewMemberName}</strong><span>Badge: {row.badgeNumber}</span></div><button type="button" className="admin-table-action is-danger" onClick={() => removeAssignment(row)}>Remove</button></article>)}
         </article>)}
         {!list.isFetching && (list.data?.rows.length ?? 0) === 0 && <div className="flight-crew-mobile-empty">{search ? "No flights match your search." : "No crew assignments exist for these flights yet. Select Assign crew to create an assignment."}</div>}
       </div>

@@ -16,6 +16,7 @@ const items = [
   { href: "/operations/crew-designations", label: "Crew designations", icon: "✳" },
   { href: "/operations/airlines", label: "Airlines", icon: "⇢" },
   { href: "/operations/airports", label: "Airports", icon: "⌖" },
+  { href: "/operations/maintenance", label: "Operational data & settings", icon: "⚙" },
 ];
 
 export function OperationsShell({

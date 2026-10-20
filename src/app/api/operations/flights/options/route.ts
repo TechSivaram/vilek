@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { flightsService } from "@/lib/admin/features/flights/service";
+import { flightsService } from "@/lib/operations/features/flights/service";
 
 export const dynamic = "force-dynamic";
 

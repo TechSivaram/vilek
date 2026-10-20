@@ -3,8 +3,8 @@ import { withRouteGuard } from "@/lib/auth/route-protection";
 import {
   listQuerySchema,
   formSchema,
-} from "@/lib/admin/features/flights/schema";
-import { flightsService } from "@/lib/admin/features/flights/service";
+} from "@/lib/operations/features/flights/schema";
+import { flightsService } from "@/lib/operations/features/flights/service";
 export const dynamic = "force-dynamic";
 export const GET = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
