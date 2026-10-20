@@ -1067,3 +1067,328 @@ body {
   background: #e7f6f4;
   color: #08786f;
 }
+
+/* Flight Operations dashboard styles (global to avoid styled-jsx hydration hash mismatches). */
+
+.ops-dashboard {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 1.55rem 2.1rem 2.5rem;
+  color: #203244;
+}
+.ops-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 205px;
+  overflow: hidden;
+  padding: 2rem 2.25rem;
+  border: 1px solid #dce7ec;
+  border-radius: 18px;
+  background: linear-gradient(115deg, #ffffff 0%, #f5fafb 58%, #eaf6f5 100%);
+  box-shadow: 0 5px 18px rgba(25, 52, 68, 0.035);
+}
+.ops-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+}
+.ops-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #087f7a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+.ops-eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0c9b91;
+  box-shadow: 0 0 0 4px rgba(12, 155, 145, 0.12);
+}
+.ops-hero h1 {
+  margin: 0.75rem 0 0.65rem;
+  color: #1d3041;
+  font-size: clamp(2rem, 3vw, 2.65rem);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  font-weight: 750;
+}
+.ops-hero p {
+  max-width: 650px;
+  margin: 0;
+  color: #52687a;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.ops-hero-mark {
+  position: absolute;
+  right: 3.5rem;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #dff3f0, #f8fcfc);
+  color: #087f7a;
+}
+.ops-hero-mark > span {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border: 1px solid rgba(8, 127, 122, 0.16);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(20, 87, 91, 0.12);
+  font-size: 2.35rem;
+}
+.ops-orbit {
+  position: absolute;
+  border: 1px solid rgba(8, 127, 122, 0.2);
+  border-radius: 50%;
+}
+.ops-orbit-one {
+  inset: -17px;
+}
+.ops-orbit-two {
+  inset: 15px;
+  border-style: dashed;
+}
+.ops-section {
+  margin-top: 1.8rem;
+}
+.ops-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+.ops-section-heading h2 {
+  margin: 0;
+  color: #24394b;
+  font-size: 1.1rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.ops-section-heading p {
+  margin: 0.3rem 0 0;
+  color: #718293;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.ops-section-count {
+  padding: 0.38rem 0.6rem;
+  border: 1px solid #e0e9ed;
+  border-radius: 7px;
+  background: #f8fafb;
+  color: #6b7f8e;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.ops-card-grid {
+  display: grid;
+  gap: 1rem;
+}
+.ops-card-grid-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.ops-card-grid-config {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ops-card {
+  position: relative;
+  display: flex;
+  min-height: 200px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.2rem 1.25rem 1.1rem;
+  overflow: hidden;
+  border: 1px solid #e1e9ed;
+  border-radius: 13px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(25, 52, 68, 0.025);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.ops-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #d8e8e8;
+  content: "";
+  transition: background 0.18s ease;
+}
+.ops-card-operations::before {
+  background: #0e8c86;
+}
+.ops-card-reference::before {
+  background: #8aa8bd;
+}
+.ops-card-configuration::before {
+  background: #c1a16a;
+}
+.ops-card:hover {
+  transform: translateY(-3px);
+  border-color: #b8d8d6;
+  box-shadow: 0 12px 26px rgba(25, 52, 68, 0.085);
+}
+.ops-card:focus-visible {
+  outline: 3px solid rgba(12, 155, 145, 0.35);
+  outline-offset: 3px;
+}
+.ops-card-top {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.ops-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid #dcecea;
+  border-radius: 12px;
+  background: #eff8f7;
+  color: #087f7a;
+  font-size: 1.45rem;
+}
+.ops-card-reference .ops-icon {
+  border-color: #e0e8ee;
+  background: #f3f7fa;
+  color: #59778d;
+}
+.ops-card-configuration .ops-icon {
+  border-color: #eee5d6;
+  background: #fbf7ef;
+  color: #94723c;
+}
+.ops-card-tag {
+  color: #7b8d9a;
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.045em;
+  text-align: right;
+}
+.ops-card h3 {
+  margin: 0 0 0.45rem;
+  color: #24394b;
+  font-size: 1.02rem;
+  font-weight: 750;
+  letter-spacing: -0.018em;
+}
+.ops-card p {
+  margin: 0;
+  color: #637789;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+.ops-card-action {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 1.05rem;
+  color: #087f7a;
+  font-size: 0.83rem;
+  font-weight: 750;
+}
+.ops-card-action span {
+  transition: transform 0.18s ease;
+}
+.ops-card:hover .ops-card-action span {
+  transform: translate(2px, -2px);
+}
+.ops-card-grid-config .ops-card {
+  min-height: 145px;
+}
+@media (max-width: 1050px) {
+  .ops-dashboard {
+    padding: 1.25rem 1.35rem 2rem;
+  }
+  .ops-card-grid-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ops-hero-mark {
+    right: 2rem;
+    opacity: 0.7;
+  }
+  .ops-hero-copy {
+    max-width: 75%;
+  }
+}
+@media (max-width: 650px) {
+  .ops-dashboard {
+    padding: 0.9rem 0.8rem 1.5rem;
+  }
+  .ops-hero {
+    min-height: auto;
+    padding: 1.4rem 1.2rem;
+    border-radius: 14px;
+  }
+  .ops-hero-copy {
+    max-width: 100%;
+  }
+  .ops-hero h1 {
+    font-size: 1.8rem;
+  }
+  .ops-hero p {
+    font-size: 0.9rem;
+  }
+  .ops-hero-mark {
+    display: none;
+  }
+  .ops-section {
+    margin-top: 1.4rem;
+  }
+  .ops-section-heading {
+    align-items: flex-start;
+  }
+  .ops-section-heading p {
+    max-width: 95%;
+  }
+  .ops-card-grid-three {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+  .ops-card {
+    min-height: auto;
+    padding: 1rem;
+  }
+  .ops-card-top {
+    margin-bottom: 0.7rem;
+  }
+  .ops-card-action {
+    padding-top: 0.8rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ops-card,
+  .ops-card-action span {
+    transition: none;
+  }
+  .ops-card:hover {
+    transform: none;
+  }
+}
