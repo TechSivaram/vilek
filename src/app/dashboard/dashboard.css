@@ -1295,7 +1295,6 @@ body:has(.workspace-picker-page) {
   font-size: 11px;
 }
 
-
 /* Profile dropdown is available from the all-workspaces landing page too. */
 .workspace-picker-user-identity {
   display: flex;

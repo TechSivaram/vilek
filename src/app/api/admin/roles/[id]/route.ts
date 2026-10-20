@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import { resourceConfigs } from "@/lib/admin/resources";
-import { roleIdSchema, updateInputSchema } from "@/lib/admin/features/roles/schema";
+import {
+  roleIdSchema,
+  updateInputSchema,
+} from "@/lib/admin/features/roles/schema";
 import { rolesService } from "@/lib/admin/features/roles/service";
 type Ctx = { params: Promise<{ id: string }> };
 export const PATCH = withRouteGuard(
@@ -9,7 +12,8 @@ export const PATCH = withRouteGuard(
   async (request: Request, context: Ctx) => {
     const { id } = await context.params;
     const parsedId = roleIdSchema.safeParse(id);
-    if (!parsedId.success) return NextResponse.json({ error: "Invalid role ID." }, { status: 400 });
+    if (!parsedId.success)
+      return NextResponse.json({ error: "Invalid role ID." }, { status: 400 });
     const config = resourceConfigs["roles"];
     if (!config?.canEdit)
       return NextResponse.json(
@@ -58,7 +62,8 @@ export const DELETE = withRouteGuard(
   async (_request: Request, context: Ctx, auth) => {
     const { id } = await context.params;
     const parsedId = roleIdSchema.safeParse(id);
-    if (!parsedId.success) return NextResponse.json({ error: "Invalid role ID." }, { status: 400 });
+    if (!parsedId.success)
+      return NextResponse.json({ error: "Invalid role ID." }, { status: 400 });
     const config = resourceConfigs["roles"];
     if (!config?.canDeactivate)
       return NextResponse.json(

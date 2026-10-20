@@ -1,7 +1,11 @@
 import "server-only";
 
 import { NextResponse } from "next/server";
-import { getLocalAuthenticatedUser, getValidatedAccessToken, getIssuer } from "@/lib/auth/tscloak";
+import {
+  getLocalAuthenticatedUser,
+  getValidatedAccessToken,
+  getIssuer,
+} from "@/lib/auth/tscloak";
 
 const MFA_PATH = "/api/mfa";
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
@@ -33,11 +37,17 @@ export async function proxyMfaRequest(
   if (method === "POST") {
     const contentType = request.headers.get("content-type") ?? "";
     if (!contentType.toLowerCase().includes("application/json")) {
-      return NextResponse.json({ error: "Expected application/json" }, { status: 415 });
+      return NextResponse.json(
+        { error: "Expected application/json" },
+        { status: 415 },
+      );
     }
     body = await request.text();
     if (body.length > 4096) {
-      return NextResponse.json({ error: "Request body too large" }, { status: 413 });
+      return NextResponse.json(
+        { error: "Request body too large" },
+        { status: 413 },
+      );
     }
   }
 
