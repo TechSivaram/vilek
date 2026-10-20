@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 export function ProfileMenu({
   firstName,
@@ -62,6 +63,15 @@ export function ProfileMenu({
             </span>
           </div>
           <div className="profile-menu__status">Signed in to ViLek</div>
+          <Link
+            href="/profile/security"
+            className="profile-menu__action"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <span aria-hidden="true">⌑</span>
+            Security &amp; MFA
+          </Link>
           <form action="/api/auth/logout" method="post">
             <button
               type="submit"

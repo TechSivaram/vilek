@@ -1294,3 +1294,18 @@ body:has(.workspace-picker-page) {
   color: #526579;
   font-size: 11px;
 }
+
+
+/* Profile dropdown is available from the all-workspaces landing page too. */
+.workspace-picker-user-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.workspace-picker-user .profile-menu {
+  margin-left: 2px;
+}
+.workspace-picker-user .profile-menu__trigger {
+  width: 38px;
+  height: 38px;
+}

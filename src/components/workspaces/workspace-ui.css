@@ -830,6 +830,29 @@
   color: #748494;
   font-size: 11px;
 }
+.profile-menu__action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: 9px;
+  color: #174a53;
+  background: #f0f8f7;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  text-align: left;
+  text-decoration: none;
+}
+.profile-menu__action:hover {
+  background: #e3f2f0;
+}
+.profile-menu__action span {
+  font-size: 17px;
+}
+
 .profile-menu__signout {
   display: flex;
   align-items: center;

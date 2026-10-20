@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireAuthenticatedUser } from "@/lib/auth/guards";
 import { getWorkspacesForRoles } from "@/lib/workspaces";
+import { WorkspacePickerHeader } from "@/components/workspaces/workspace-picker-header";
 import "./dashboard.css";
 
 export const dynamic = "force-dynamic";
@@ -36,39 +37,11 @@ export default async function DashboardSelectionPage() {
 
   return (
     <main className="workspace-picker-page">
-      <header className="workspace-picker-header">
-        <Link
-          href="/dashboard"
-          className="workspace-picker-brand"
-          aria-label="ViLek workspaces"
-        >
-          <Image
-            src="/Branding/logo.png"
-            alt=""
-            width={92}
-            height={58}
-            priority
-          />
-          <span className="workspace-picker-wordmark">ViLek</span>
-        </Link>
-        <div className="workspace-picker-user">
-          <span className="workspace-picker-avatar">
-            {authenticated.user.firstName.slice(0, 1)}
-            {authenticated.user.lastName.slice(0, 1)}
-          </span>
-          <span>
-            <strong>
-              {authenticated.user.firstName} {authenticated.user.lastName}
-            </strong>
-            <small>Signed in</small>
-          </span>
-          <form action="/api/auth/logout" method="post">
-            <button type="submit" className="workspace-picker-signout">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
+      <WorkspacePickerHeader
+        firstName={authenticated.user.firstName}
+        lastName={authenticated.user.lastName}
+        email={authenticated.user.email}
+      />
 
       <section className="workspace-picker-content">
         <div className="workspace-picker-intro">

@@ -37,3 +37,6 @@ export const formSchema: z.ZodType<RolesFormDto, RolesFormDto> = z
     isActive: z.boolean(),
   })
   .strict();
+
+/** Path parameter contract for role mutations. */
+export const roleIdSchema = z.string().trim().min(1).max(200);
