@@ -11,11 +11,10 @@ const resourceConfig = {
   required: [],
   columns: [],
 } as const;
-type Ctx = { params: Promise<{ resource: string }> };
 
 export const GET = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
-  async (_request: Request, _context: Ctx) => {
+  async (_request: Request) => {
     const name = "flight-crew-audit";
     const resource = resourceConfig;
 
@@ -84,7 +83,7 @@ export const GET = withRouteGuard(
 
 export const POST = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
-  async (request: Request, _context: Ctx) => {
+  async (request: Request) => {
     const name = "flight-crew-audit";
     const resource = resourceConfig;
 
