@@ -16,7 +16,22 @@ const items = [
   { href: "/operations/crew-designations", label: "Crew designations", icon: "✳" },
   { href: "/operations/airlines", label: "Airlines", icon: "⇢" },
   { href: "/operations/airports", label: "Airports", icon: "⌖" },
-  { href: "/operations/maintenance", label: "Operational data & settings", icon: "⚙" },
+];
+
+const configurationItems = [
+  { href: "/operations/maintenance/crew-designation-assignments", label: "Crew designation assignments", group: "Crew eligibility", icon: "♧" },
+  { href: "/operations/maintenance/qualification-types", label: "Qualification types", group: "Qualifications", icon: "✓" },
+  { href: "/operations/maintenance/crew-qualifications", label: "Crew qualifications", group: "Qualifications", icon: "✓" },
+  { href: "/operations/maintenance/designation-qualification-requirements", label: "Designation requirements", group: "Qualifications", icon: "✓" },
+  { href: "/operations/maintenance/crew-complement-defaults", label: "Default crew complement", group: "Crew complement", icon: "⊞" },
+  { href: "/operations/maintenance/flight-crew-requirements", label: "Flight-specific requirements", group: "Crew complement", icon: "⊞" },
+  { href: "/operations/maintenance/flight-operations-settings", label: "Flight Operations settings", group: "Operational settings", icon: "⚙" },
+  { href: "/operations/maintenance/audit-retention-policy", label: "Audit retention policy", group: "Operational settings", icon: "⚙" },
+  { href: "/operations/maintenance/qualification-alerts", label: "Qualification alerts", group: "Alerts & audit", icon: "≋" },
+  { href: "/operations/maintenance/flight-crew-audit", label: "Flight crew audit", group: "Alerts & audit", icon: "≋" },
+  { href: "/operations/maintenance/batch-requests", label: "Batch requests", group: "Alerts & audit", icon: "≋" },
+  { href: "/operations/maintenance/audit-exports", label: "Audit export history", group: "Alerts & audit", icon: "≋" },
+  { href: "/operations/maintenance/audit-retention-actions", label: "Retention actions", group: "Alerts & audit", icon: "≋" },
 ];
 
 export function OperationsShell({
@@ -69,6 +84,19 @@ export function OperationsShell({
               return <Link key={item.href} className={`admin-nav-link ${active ? "is-active" : ""}`} href={item.href} title={item.label} aria-current={active ? "page" : undefined}>
                 <span className="admin-nav-icon">{item.icon}</span><span className="admin-nav-label">{item.label}</span>
               </Link>;
+            })}
+          </section>
+          <section className="admin-nav-group ops-configuration-nav">
+            <h2 className="admin-nav-group-title">Configuration &amp; audit</h2>
+            {configurationItems.map((item, index) => {
+              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const showGroup = index === 0 || configurationItems[index - 1].group !== item.group;
+              return <div key={item.href}>
+                {showGroup && <h3 className="admin-nav-group-title ops-nav-feature-group">{item.group}</h3>}
+                <Link className={`admin-nav-link ops-nav-sub-link ${active ? "is-active" : ""}`} href={item.href} title={item.label} aria-current={active ? "page" : undefined}>
+                  <span className="admin-nav-icon">{item.icon}</span><span className="admin-nav-label">{item.label}</span>
+                </Link>
+              </div>;
             })}
           </section>
         </nav>

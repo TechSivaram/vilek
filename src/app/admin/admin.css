@@ -130,6 +130,22 @@
   letter-spacing: 1.15px;
   text-transform: uppercase;
 }
+
+/* Flight Operations configuration sections live in the left navigation. */
+.ops-configuration-nav {
+  padding-top: 8px;
+  border-top: 1px solid #2c4350;
+}
+.ops-nav-sub-link {
+  min-height: 35px;
+  margin-left: 7px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-size: 13px;
+}
+.ops-nav-sub-link .admin-nav-icon {
+  font-size: 14px;
+}
 .admin-sidebar-footer {
   flex: 0 0 auto;
   padding-top: 10px;
