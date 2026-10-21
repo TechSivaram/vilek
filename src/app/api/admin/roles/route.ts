@@ -40,11 +40,9 @@ export const GET = withRouteGuard(
   },
 );
 
-export const POST = withRouteGuard(
-  { roles: ["ADMIN"] },
-  async () =>
-    NextResponse.json(
-      { error: "Creating roles is not supported." },
-      { status: 405 },
-    ),
+export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () =>
+  NextResponse.json(
+    { error: "Creating roles is not supported." },
+    { status: 405 },
+  ),
 );

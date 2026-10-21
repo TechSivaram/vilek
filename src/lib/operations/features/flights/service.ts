@@ -1,9 +1,6 @@
 import "server-only";
 import { flightsRepository } from "./repository";
-import type {
-  FlightsListQuery,
-  FlightFormDto,
-} from "./dto";
+import type { FlightsListQuery, FlightFormDto } from "./dto";
 export const flightsService = {
   list(query: FlightsListQuery) {
     return flightsRepository.list(query);

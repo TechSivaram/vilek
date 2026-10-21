@@ -16,16 +16,30 @@ export const usersRepository = {
           like(users.oidcSubject, `%${q.replace(/[\\%_]/g, "\\$&")}%`),
         )
       : undefined;
-    const total = db.select({ value: count() }).from(users).where(where).get()?.value ?? 0;
+    const total =
+      db.select({ value: count() }).from(users).where(where).get()?.value ?? 0;
     const sortColumns = {
-      id: users.id, email: users.email, firstName: users.firstName,
-      lastName: users.lastName, isActive: users.isActive, updatedAt: users.updatedAt,
+      id: users.id,
+      email: users.email,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      isActive: users.isActive,
+      updatedAt: users.updatedAt,
     };
-    const sortColumn = input.sort && input.sort in sortColumns
-      ? sortColumns[input.sort as keyof typeof sortColumns] : undefined;
-    const ordering = sortColumn ? (input.direction === "desc" ? desc(sortColumn) : asc(sortColumn)) : undefined;
+    const sortColumn =
+      input.sort && input.sort in sortColumns
+        ? sortColumns[input.sort as keyof typeof sortColumns]
+        : undefined;
+    const ordering = sortColumn
+      ? input.direction === "desc"
+        ? desc(sortColumn)
+        : asc(sortColumn)
+      : undefined;
     const query = db.select().from(users).where(where);
-    const rows = (ordering ? query.orderBy(ordering) : query).limit(pageSize).offset((page - 1) * pageSize).all();
+    const rows = (ordering ? query.orderBy(ordering) : query)
+      .limit(pageSize)
+      .offset((page - 1) * pageSize)
+      .all();
     return { rows, total };
   },
   async findByEmail(email: string) {
@@ -143,7 +157,11 @@ export const usersRepository = {
     oidcSubject: string | null;
   }[] {
     return db
-      .select({ id: users.id, email: users.email, oidcSubject: users.oidcSubject })
+      .select({
+        id: users.id,
+        email: users.email,
+        oidcSubject: users.oidcSubject,
+      })
       .from(users)
       .all();
   },
@@ -155,33 +173,64 @@ export const usersRepository = {
       .run();
   },
   create(values: Record<string, unknown>) {
-    const result = db.insert(users).values(values as never).run();
+    const result = db
+      .insert(users)
+      .values(values as never)
+      .run();
     return { changes: result.changes };
   },
   update(id: string | number, values: Record<string, unknown>) {
-    if (values.isActive === false && isLastAdminUser(String(id))) throw new Error("LAST_ADMIN");
-    const result = db.update(users).set(values as never).where(eq(users.id, String(id))).run();
+    if (values.isActive === false && isLastAdminUser(String(id)))
+      throw new Error("LAST_ADMIN");
+    const result = db
+      .update(users)
+      .set(values as never)
+      .where(eq(users.id, String(id)))
+      .run();
     return { changes: result.changes };
   },
   deactivate(id: string | number) {
     if (isLastAdminUser(String(id))) throw new Error("LAST_ADMIN");
-    const result = db.update(users).set({ isActive: false }).where(eq(users.id, String(id))).run();
+    const result = db
+      .update(users)
+      .set({ isActive: false })
+      .where(eq(users.id, String(id)))
+      .run();
     return { changes: result.changes };
   },
 };
 
 function activeAdminCount() {
-  return db.select({ value: count() }).from(users)
-    .innerJoin(userRoles, eq(userRoles.userId, users.id))
-    .innerJoin(roles, eq(roles.id, userRoles.roleId))
-    .where(and(eq(users.isActive, true), eq(roles.code, "ADMIN"), eq(roles.isActive, true)))
-    .get()?.value ?? 0;
+  return (
+    db
+      .select({ value: count() })
+      .from(users)
+      .innerJoin(userRoles, eq(userRoles.userId, users.id))
+      .innerJoin(roles, eq(roles.id, userRoles.roleId))
+      .where(
+        and(
+          eq(users.isActive, true),
+          eq(roles.code, "ADMIN"),
+          eq(roles.isActive, true),
+        ),
+      )
+      .get()?.value ?? 0
+  );
 }
 function isLastAdminUser(id: string) {
-  const target = db.select({ id: users.id }).from(users)
+  const target = db
+    .select({ id: users.id })
+    .from(users)
     .innerJoin(userRoles, eq(userRoles.userId, users.id))
     .innerJoin(roles, eq(roles.id, userRoles.roleId))
-    .where(and(eq(users.id, id), eq(users.isActive, true), eq(roles.code, "ADMIN"), eq(roles.isActive, true)))
+    .where(
+      and(
+        eq(users.id, id),
+        eq(users.isActive, true),
+        eq(roles.code, "ADMIN"),
+        eq(roles.isActive, true),
+      ),
+    )
     .get();
   return Boolean(target) && activeAdminCount() <= 1;
 }
