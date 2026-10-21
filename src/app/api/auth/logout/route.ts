@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { clearAuthCookies, createLogoutRedirectUrl } from "@/lib/auth/tscloak";
+import {
+  clearAuthCookies,
+  createLogoutRedirectUrl,
+  getLocalAuthenticatedUser,
+} from "@/lib/auth/tscloak";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  // Logout is available to every business role, but only to an authenticated
+  // ViLek user. This intentionally does not check ADMIN/CREW/etc. roles.
+  const authenticatedUser = await getLocalAuthenticatedUser();
+  if (!authenticatedUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   // Logout changes authentication state, so accept only same-origin form posts.
   const origin = request.headers.get("origin");
 
