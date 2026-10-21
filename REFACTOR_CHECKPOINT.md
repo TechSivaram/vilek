@@ -1,40 +1,23 @@
-# ViLek Refactoring Checkpoint — Drizzle migration
+# ViLek Refactor Checkpoint 3 — Explicit Flight Operations repositories
 
-## Baseline
+## Changes in this checkpoint
 
-This checkpoint was made from the latest uploaded `src.zip` supplied in this conversation.
+- Replaced generic resource configuration in Airlines, Airports, and Crew Designations repositories with direct Drizzle table references.
+- Replaced dynamic table-column lookup for sorting with explicit `switch` cases and feature-specific searchable columns.
+- Replaced generic CRUD-factory writes in Airlines, Airports, Crew Designations, Crew Members, and Flights with direct Drizzle insert/update/deactivate operations.
+- Removed the now-unused Flight Operations `resources.ts` and `features/repository-crud.ts`.
+- Removed raw SQL string concatenation from Crew Members search/name projection. Name display is now composed in JavaScript after the database query.
+- Kept the shared `db` instance and existing feature repository export names.
 
-## Changes made
+## Verification performed
 
-- Replaced feature-level raw SQLite SQL in the following Operations repositories with Drizzle ORM query-builder calls:
-  - Audit Exports
-  - Audit Retention Actions
-  - Audit Retention Policy
-  - Batch Requests
-  - Designation Qualification Requirements
-  - Flight Crew Audit
-  - Flight Operations Settings
-  - Crew Complement Defaults
-  - Qualification Alerts
-  - Qualification Types
-  - Crew Designation Assignments
-  - Crew Qualifications
-  - Flight Crew Requirements
-- Replaced provider-specific repository class names in the migrated features with provider-neutral names.
-- Removed the legacy `getMaintenanceDb()` module and the generic raw-SQL `maintenanceRepository` / `SqliteMaintenanceResourceRepository` implementations after migrating their callers.
-- Reused the existing shared Drizzle instance from `src/lib/db`.
-- Preserved the existing list limit of 500 rows and added deterministic secondary ordering to affected list queries.
-- Corrected response mapping for text/UUID identifiers in the audit-related services.
+- ZIP contents extracted and rewritten successfully.
+- Static reference scan: no `resourceConfigs` references remain in Flight Operations source.
+- Static reference scan: no `makeCrudRepository` references remain in Flight Operations source.
+- Static reference scan: no remaining `OperationsField`, `OperationsResourceConfig`, or `FieldKind` imports/references outside the removed Operations configuration.
+- Full TypeScript check and Next.js production build were not run because this archive does not include `node_modules`.
 
-## Checks performed
+## Remaining work
 
-- Static TypeScript/TSX syntax parsing: 305 files parsed, zero syntax errors.
-- Source scan: no feature-layer `getMaintenanceDb`, `.prepare()`, or inline SELECT/INSERT/UPDATE/DELETE SQL statements remain under `src` outside the database migration/seed scripts.
-- Full typecheck and production build could not run because dependencies were not installed in this working copy. `npm ci` did not complete within the available execution window; `tsc --noEmit` reports missing dependency/type definitions.
-
-## Important remaining work
-
-- This is not a claim of full database-engine portability. `src/lib/db/client.ts` and `src/lib/db/schema.ts` currently use the Drizzle SQLite driver and SQLite schema definitions. Switching to another engine still requires changing the centralized driver/configuration and adapting dialect-specific schema defaults/types and migrations as necessary.
-- The existing Admin and master-data repository CRUD factories still need the dedicated repository refactor requested for ViLek.
-- Pagination/filter/sort consistency and operation-specific DTO/schema coverage still need a full audit.
-- Runtime, regression, and authorization tests have not been run.
+- Admin still uses generic `resourceConfigs` and `makeCrudRepository` patterns; this checkpoint intentionally does not change Admin.
+- Review and test feature DTO typing, validation, API behavior, authorization, and persistence with dependencies installed before deployment.

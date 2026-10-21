@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { resourceConfigs } from "@/lib/operations/resources";
 import { updateInputSchema } from "@/lib/operations/features/crew_members/schema";
 import { crew_membersService } from "@/lib/operations/features/crew_members/service";
 type Ctx = { params: Promise<{ id: string }> };
@@ -8,12 +7,6 @@ export const PATCH = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (request: Request, context: Ctx) => {
     const { id } = await context.params;
-    const config = resourceConfigs["crew-members"];
-    if (!config?.canEdit)
-      return NextResponse.json(
-        { error: "Update is not available for this resource." },
-        { status: 405 },
-      );
     let body: unknown;
     try {
       body = await request.json();
@@ -29,12 +22,7 @@ export const PATCH = withRouteGuard(
         { error: "Invalid input.", details: parsed.error.flatten() },
         { status: 400 },
       );
-    const values = {
-      ...parsed.data,
-      ...(["users", "crew-members"].includes("crew-members")
-        ? { updatedAt: new Date().toISOString() }
-        : {}),
-    };
+    const values = { ...parsed.data, updatedAt: new Date().toISOString() };
     try {
       const result = await crew_membersService.update(id, values);
       return result.changes
@@ -55,13 +43,6 @@ export const DELETE = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (_request: Request, context: Ctx, auth) => {
     const { id } = await context.params;
-    const config = resourceConfigs["crew-members"];
-    if (!config?.canDeactivate)
-      return NextResponse.json(
-        { error: "Delete/deactivation is not available for this resource." },
-        { status: 405 },
-      );
-
     try {
       const result = await crew_membersService.deactivate(id);
       return result.changes

@@ -40,16 +40,9 @@ export const GET = withRouteGuard(
   },
 );
 
-import { resourceConfigs } from "@/lib/operations/resources";
 export const POST = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (request: Request) => {
-    const config = resourceConfigs["crew-designations"];
-    if (!config?.canCreate || config.listOnly)
-      return NextResponse.json(
-        { error: "Create is not available for this resource." },
-        { status: 405 },
-      );
     let body: unknown;
     try {
       body = await request.json();

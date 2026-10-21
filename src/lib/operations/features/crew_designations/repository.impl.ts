@@ -1,56 +1,87 @@
 import "server-only";
 import { db } from "@/lib/db";
-import { resourceConfigs } from "@/lib/operations/resources";
-import { count, like, or, asc, desc } from "drizzle-orm";
-import { makeCrudRepository } from "../repository-crud";
+import { crewDesignations } from "@/lib/db/schema";
+import { asc, count, desc, eq, like, or, type SQL } from "drizzle-orm";
 import type { CrewDesignationsListQuery } from "./dto";
-const config = resourceConfigs["crew-designations"];
-const crud = makeCrudRepository("crew-designations");
+
 export const crew_designationsRepository = {
   async list(input: CrewDesignationsListQuery) {
-    const table = config?.table as any;
-    if (!table) return { rows: [], total: 0 };
     const page = Math.max(1, input.page ?? 1);
     const pageSize = Math.min(100, Math.max(1, input.pageSize ?? 10));
-    const q = (input.search ?? "").trim();
-    const searchable = (config.search ?? [])
-      .map((key) => table[key])
-      .filter(Boolean);
-    const where =
-      q && searchable.length
-        ? or(
-            ...searchable.map((column: any) =>
-              like(column, `%${q.replace(/[\\%_]/g, "\\$&")}%`),
-            ),
-          )
-        : undefined;
-    const total =
-      db.select({ value: count() }).from(table).where(where).get()?.value ?? 0;
-    const requestedSort =
-      input.sort && typeof input.sort === "string" ? input.sort : "";
-    const sortColumn =
-      requestedSort && (table as Record<string, any>)[requestedSort]
-        ? (table as Record<string, any>)[requestedSort]
-        : undefined;
-    const ordering = sortColumn
-      ? input.direction === "desc"
-        ? desc(sortColumn)
-        : asc(sortColumn)
+    const search = (input.search ?? "").trim();
+    const escaped = `%${search.replace(/[\\%_]/g, "\\$&")}%`;
+    const where = search
+      ? or(
+          like(crewDesignations.code, escaped),
+          like(crewDesignations.name, escaped),
+        )
       : undefined;
-    const baseQuery = db.select().from(table).where(where);
-    const rows = (ordering ? baseQuery.orderBy(ordering) : baseQuery)
+
+    const total =
+      db.select({ value: count() }).from(crewDesignations).where(where).get()
+        ?.value ?? 0;
+
+    let ordering: SQL;
+    switch (input.sort) {
+      case "code":
+        ordering =
+          input.direction === "desc"
+            ? desc(crewDesignations.code)
+            : asc(crewDesignations.code);
+        break;
+      case "name":
+        ordering =
+          input.direction === "desc"
+            ? desc(crewDesignations.name)
+            : asc(crewDesignations.name);
+        break;
+      case "isActive":
+        ordering =
+          input.direction === "desc"
+            ? desc(crewDesignations.isActive)
+            : asc(crewDesignations.isActive);
+        break;
+      case "id":
+        ordering =
+          input.direction === "desc"
+            ? desc(crewDesignations.id)
+            : asc(crewDesignations.id);
+        break;
+      default:
+        ordering = asc(crewDesignations.name);
+    }
+
+    const rows = db
+      .select()
+      .from(crewDesignations)
+      .where(where)
+      .orderBy(ordering, asc(crewDesignations.id))
       .limit(pageSize)
       .offset((page - 1) * pageSize)
       .all();
     return { rows, total };
   },
   create(values: Record<string, unknown>) {
-    return crud.create(values);
+    const result = db
+      .insert(crewDesignations)
+      .values(values as typeof crewDesignations.$inferInsert)
+      .run();
+    return { changes: result.changes };
   },
   update(id: string | number, values: Record<string, unknown>) {
-    return crud.update(id, values);
+    const result = db
+      .update(crewDesignations)
+      .set(values as Partial<typeof crewDesignations.$inferInsert>)
+      .where(eq(crewDesignations.id, Number(id)))
+      .run();
+    return { changes: result.changes };
   },
   deactivate(id: string | number) {
-    return crud.deactivate(id);
+    const result = db
+      .update(crewDesignations)
+      .set({ isActive: false })
+      .where(eq(crewDesignations.id, Number(id)))
+      .run();
+    return { changes: result.changes };
   },
 };

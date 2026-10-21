@@ -1,11 +1,8 @@
 import "server-only";
 import { db } from "@/lib/db";
 import { crewMembers, users } from "@/lib/db/schema";
-import { count, like, or, asc, desc, eq, sql } from "drizzle-orm";
-import { makeCrudRepository } from "../repository-crud";
+import { count, like, or, asc, desc, eq } from "drizzle-orm";
 import type { CrewMembersListQuery } from "./dto";
-
-const crud = makeCrudRepository("crew-members");
 
 export const crew_membersRepository = {
   async list(input: CrewMembersListQuery) {
@@ -18,7 +15,6 @@ export const crew_membersRepository = {
           like(users.firstName, `%${q}%`),
           like(users.lastName, `%${q}%`),
           like(users.email, `%${q}%`),
-          like(sql`(${users.firstName} || ' ' || ${users.lastName})`, `%${q}%`),
         )
       : undefined;
 
@@ -51,7 +47,6 @@ export const crew_membersRepository = {
         isActive: crewMembers.isActive,
         firstName: users.firstName,
         lastName: users.lastName,
-        userName: sql<string>`trim(${users.firstName} || ' ' || ${users.lastName})`,
         email: users.email,
       })
       .from(crewMembers)
@@ -62,16 +57,36 @@ export const crew_membersRepository = {
       .offset((page - 1) * pageSize)
       .all();
 
-    return { rows, total };
+    return {
+      rows: rows.map((row) => ({
+        ...row,
+        userName: `${row.firstName} ${row.lastName}`.trim(),
+      })),
+      total,
+    };
   },
   create(values: Record<string, unknown>) {
-    return crud.create(values);
+    const result = db
+      .insert(crewMembers)
+      .values(values as typeof crewMembers.$inferInsert)
+      .run();
+    return { changes: result.changes };
   },
   update(id: string | number, values: Record<string, unknown>) {
-    return crud.update(id, values);
+    const result = db
+      .update(crewMembers)
+      .set(values as Partial<typeof crewMembers.$inferInsert>)
+      .where(eq(crewMembers.id, String(id)))
+      .run();
+    return { changes: result.changes };
   },
   deactivate(id: string | number) {
-    return crud.deactivate(id);
+    const result = db
+      .update(crewMembers)
+      .set({ isActive: false })
+      .where(eq(crewMembers.id, String(id)))
+      .run();
+    return { changes: result.changes };
   },
   options() {
     return {

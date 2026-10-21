@@ -3,12 +3,11 @@ import { db } from "@/lib/db";
 import { airlines, airports, flights } from "@/lib/db/schema";
 import { alias } from "drizzle-orm/sqlite-core";
 import { and, asc, count, desc, eq, like, or, type SQL } from "drizzle-orm";
-import { makeCrudRepository } from "../repository-crud";
+
 import type { FlightsListQuery } from "./dto";
 
 const originAirport = alias(airports, "originAirport");
 const destinationAirport = alias(airports, "destinationAirport");
-const crud = makeCrudRepository("flights");
 
 const sortColumns = {
   id: flights.id,
@@ -108,13 +107,27 @@ export const flightsRepository = {
     return { rows, total };
   },
   create(values: Record<string, unknown>) {
-    return crud.create(values);
+    const result = db
+      .insert(flights)
+      .values(values as typeof flights.$inferInsert)
+      .run();
+    return { changes: result.changes };
   },
   update(id: string | number, values: Record<string, unknown>) {
-    return crud.update(id, values);
+    const result = db
+      .update(flights)
+      .set(values as Partial<typeof flights.$inferInsert>)
+      .where(eq(flights.id, String(id)))
+      .run();
+    return { changes: result.changes };
   },
   deactivate(id: string | number) {
-    return crud.deactivate(id);
+    const result = db
+      .update(flights)
+      .set({ isActive: false })
+      .where(eq(flights.id, String(id)))
+      .run();
+    return { changes: result.changes };
   },
   options() {
     return {
