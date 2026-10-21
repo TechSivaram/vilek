@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import type { CrewQualificationsCreateDto } from "@/lib/operations/features/crew-qualifications/dto";
 import { CrewQualificationsService } from "@/lib/operations/features/crew-qualifications/service";
-import { CrewQualificationsService } from "@/lib/operations/features/crew-qualifications/service";
 import {
   createInputSchema,
   updateInputSchema,
@@ -108,7 +107,7 @@ export const POST = withRouteGuard(
       const result = CrewQualificationsService.create(
         insertValues as unknown as CrewQualificationsCreateDto,
       );
-      return NextResponse.json({ ok: true, id: result.id }, { status: 201 });
+      return NextResponse.json({ ok: true, id: result }, { status: 201 });
     } catch (error) {
       const message =
         error instanceof Error &&

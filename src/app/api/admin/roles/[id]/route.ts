@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { resourceConfigs } from "@/lib/admin/resources";
 import {
   roleIdSchema,
   updateInputSchema,
@@ -14,12 +13,6 @@ export const PATCH = withRouteGuard(
     const parsedId = roleIdSchema.safeParse(id);
     if (!parsedId.success)
       return NextResponse.json({ error: "Invalid role ID." }, { status: 400 });
-    const config = resourceConfigs["roles"];
-    if (!config?.canEdit)
-      return NextResponse.json(
-        { error: "Update is not available for this resource." },
-        { status: 405 },
-      );
     let body: unknown;
     try {
       body = await request.json();
@@ -35,12 +28,7 @@ export const PATCH = withRouteGuard(
         { error: "Invalid input.", details: parsed.error.flatten() },
         { status: 400 },
       );
-    const values = {
-      ...parsed.data,
-      ...(["users", "crew-members"].includes("roles")
-        ? { updatedAt: new Date().toISOString() }
-        : {}),
-    };
+    const values = { ...parsed.data };
     try {
       const result = await rolesService.update(parsedId.data, values);
       return result.changes
@@ -64,12 +52,6 @@ export const DELETE = withRouteGuard(
     const parsedId = roleIdSchema.safeParse(id);
     if (!parsedId.success)
       return NextResponse.json({ error: "Invalid role ID." }, { status: 400 });
-    const config = resourceConfigs["roles"];
-    if (!config?.canDeactivate)
-      return NextResponse.json(
-        { error: "Delete/deactivation is not available for this resource." },
-        { status: 405 },
-      );
 
     try {
       const result = await rolesService.deactivate(parsedId.data);

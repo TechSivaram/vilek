@@ -91,7 +91,7 @@ export const flightCrewRequirementsRepository: FlightCrewRequirementsRepository 
         .all()
         .map((row) => ({
           ...row,
-          flight_route: `${airportCodes.get(row.origin_airport_id) ?? "?"} → ${airportCodes.get(row.destination_airport_id) ?? "?"}`,
+          flight_route: `${row.origin_airport_id == null ? "?" : (airportCodes.get(row.origin_airport_id) ?? "?")} → ${row.destination_airport_id == null ? "?" : (airportCodes.get(row.destination_airport_id) ?? "?")}`,
         }));
       return {
         rows,
@@ -154,7 +154,7 @@ export const flightCrewRequirementsRepository: FlightCrewRequirementsRepository 
         scheduled_departure: row.scheduled_departure,
         scheduled_arrival: row.scheduled_arrival,
         airline_name: row.airline_name,
-        flight_route: `${airportCodes.get(row.origin_airport_id) ?? "?"} → ${airportCodes.get(row.destination_airport_id) ?? "?"}`,
+        flight_route: `${row.origin_airport_id == null ? "?" : (airportCodes.get(row.origin_airport_id) ?? "?")} → ${row.destination_airport_id == null ? "?" : (airportCodes.get(row.destination_airport_id) ?? "?")}`,
         requirement_count: countByFlight.get(row.flight_id) ?? 0,
       }));
       return {

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import type { QualificationAlertsCreateDto } from "@/lib/operations/features/qualification-alerts/dto";
 import { QualificationAlertsService } from "@/lib/operations/features/qualification-alerts/service";
-import { QualificationAlertsService } from "@/lib/operations/features/qualification-alerts/service";
 import {
   createInputSchema,
   updateInputSchema,
@@ -108,7 +107,7 @@ export const POST = withRouteGuard(
       const result = QualificationAlertsService.create(
         insertValues as unknown as QualificationAlertsCreateDto,
       );
-      return NextResponse.json({ ok: true, id: result.id }, { status: 201 });
+      return NextResponse.json({ ok: true, id: result }, { status: 201 });
     } catch (error) {
       const message =
         error instanceof Error &&

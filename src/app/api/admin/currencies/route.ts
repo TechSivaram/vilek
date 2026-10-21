@@ -40,16 +40,9 @@ export const GET = withRouteGuard(
   },
 );
 
-import { resourceConfigs } from "@/lib/admin/resources";
 export const POST = withRouteGuard(
   { roles: ["ADMIN"] },
   async (request: Request) => {
-    const config = resourceConfigs["currencies"];
-    if (!config?.canCreate || config.listOnly)
-      return NextResponse.json(
-        { error: "Create is not available for this resource." },
-        { status: 405 },
-      );
     let body: unknown;
     try {
       body = await request.json();

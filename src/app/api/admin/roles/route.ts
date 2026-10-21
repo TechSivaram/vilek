@@ -40,41 +40,11 @@ export const GET = withRouteGuard(
   },
 );
 
-import { resourceConfigs } from "@/lib/admin/resources";
 export const POST = withRouteGuard(
   { roles: ["ADMIN"] },
-  async (request: Request) => {
-    const config = resourceConfigs["roles"];
-    if (!config?.canCreate || config.listOnly)
-      return NextResponse.json(
-        { error: "Create is not available for this resource." },
-        { status: 405 },
-      );
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
-    }
-    const parsed = createInputSchema.safeParse(body);
-    if (!parsed.success)
-      return NextResponse.json(
-        { error: "Invalid input.", details: parsed.error.flatten() },
-        { status: 400 },
-      );
-    try {
-      await rolesService.create(parsed.data);
-      return NextResponse.json({ ok: true }, { status: 201 });
-    } catch (error) {
-      const message =
-        error instanceof Error &&
-        /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
-          ? "The record violates a uniqueness, validation, or relationship constraint."
-          : "The record could not be saved.";
-      return NextResponse.json({ error: message }, { status: 409 });
-    }
-  },
+  async () =>
+    NextResponse.json(
+      { error: "Creating roles is not supported." },
+      { status: 405 },
+    ),
 );

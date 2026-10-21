@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { resourceConfigs } from "@/lib/admin/resources";
 import { updateInputSchema } from "@/lib/admin/features/users/schema";
 import { usersService } from "@/lib/admin/features/users/service";
 type Ctx = { params: Promise<{ id: string }> };
@@ -61,12 +60,6 @@ export const PATCH = withRouteGuard(
   { roles: ["ADMIN"] },
   async (request: Request, context: Ctx, auth) => {
     const { id } = await context.params;
-    const config = resourceConfigs["users"];
-    if (!config?.canEdit)
-      return NextResponse.json(
-        { error: "Update is not available for this resource." },
-        { status: 405 },
-      );
     let body: unknown;
     try {
       body = await request.json();
@@ -193,12 +186,6 @@ export const DELETE = withRouteGuard(
   { roles: ["ADMIN"] },
   async (_request: Request, context: Ctx, auth) => {
     const { id } = await context.params;
-    const config = resourceConfigs["users"];
-    if (!config?.canDeactivate)
-      return NextResponse.json(
-        { error: "Deactivation is not available for this resource." },
-        { status: 405 },
-      );
     if (id === auth.user.id)
       return NextResponse.json(
         { error: "You cannot deactivate your own administrator account." },
