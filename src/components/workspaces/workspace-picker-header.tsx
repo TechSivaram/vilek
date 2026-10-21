@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type WorkspacePickerHeaderProps = {
@@ -18,9 +19,17 @@ export function WorkspacePickerHeader({
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <Link
           href="/dashboard"
-          className="font-semibold tracking-tight text-[#20384b]"
+          className="flex items-center gap-2 font-semibold tracking-tight text-[#20384b]"
         >
-          ViLek
+          <Image
+            src="/Branding/logo.png"
+            alt="ViLek logo"
+            width={36}
+            height={36}
+            priority
+            className="h-9 w-9 object-contain"
+          />
+          <span>ViLek</span>
         </Link>
         <div className="min-w-0 text-right">
           <p className="truncate text-sm font-semibold text-[#20384b]">
