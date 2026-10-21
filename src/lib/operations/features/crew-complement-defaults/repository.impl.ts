@@ -1,6 +1,10 @@
 import "server-only";
-import { getMaintenanceDb } from "@/lib/operations/maintenance";
-import { maintenanceRepository } from "@/lib/operations/maintenance-repository";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/lib/db";
+import {
+  crewDesignations,
+  flightCrewComplementDefaults,
+} from "@/lib/db/schema";
 import type {
   CrewComplementDefaultsCreateDto,
   CrewComplementDefaultsUpdateDto,
@@ -8,45 +12,64 @@ import type {
 } from "./dto";
 import type { CrewComplementDefaultsRepository } from "./repository";
 
-/** SQLite persistence only; route handlers and services never issue SQL. */
-export class SqliteCrewComplementDefaultsRepository implements CrewComplementDefaultsRepository {
+export class CrewComplementDefaultsRepositoryImpl implements CrewComplementDefaultsRepository {
   list() {
-    const sqlite = getMaintenanceDb();
-    try {
-      const rows = sqlite
-        .prepare(
-          `SELECT c.id, c.designation_id, c.required_count, c.updated_at, d.name AS designation_name FROM Flight_Crew_Complement_Default c LEFT JOIN Crew_Designation d ON d.id=c.designation_id ORDER BY d.name LIMIT 500`,
-        )
-        .all() as CrewComplementDefaultsResponseDto[];
-      const designations = sqlite
-        .prepare(
-          `SELECT id AS value, name AS label FROM Crew_Designation ORDER BY name`,
-        )
-        .all() as { value: string | number; label: string }[];
-      return { rows, options: { designation_id: designations } };
-    } finally {
-      sqlite.close();
-    }
+    const rows = db
+      .select({
+        id: flightCrewComplementDefaults.id,
+        designation_id: flightCrewComplementDefaults.designationId,
+        required_count: flightCrewComplementDefaults.requiredCount,
+        updated_at: flightCrewComplementDefaults.updatedAt,
+        designation_name: crewDesignations.name,
+      })
+      .from(flightCrewComplementDefaults)
+      .leftJoin(
+        crewDesignations,
+        eq(flightCrewComplementDefaults.designationId, crewDesignations.id),
+      )
+      .orderBy(asc(crewDesignations.name), asc(flightCrewComplementDefaults.id))
+      .limit(500)
+      .all() as CrewComplementDefaultsResponseDto[];
+    const designations = db
+      .select({ value: crewDesignations.id, label: crewDesignations.name })
+      .from(crewDesignations)
+      .orderBy(asc(crewDesignations.name))
+      .all();
+    return { rows, options: { designation_id: designations } };
   }
   create(input: CrewComplementDefaultsCreateDto): string {
-    const sqlite = getMaintenanceDb();
-    try {
-      const result = sqlite
-        .prepare(
-          `INSERT INTO "Flight_Crew_Complement_Default" ("designation_id", "required_count") VALUES (?, ?)`,
-        )
-        .run(input.designation_id, input.required_count);
-      return result.lastInsertRowid.toString();
-    } finally {
-      sqlite.close();
-    }
+    const row = db
+      .insert(flightCrewComplementDefaults)
+      .values({
+        designationId: input.designation_id,
+        requiredCount: input.required_count,
+      })
+      .returning({ id: flightCrewComplementDefaults.id })
+      .get();
+    return String(row.id);
   }
   update(id: string, input: CrewComplementDefaultsUpdateDto): boolean {
-    return maintenanceRepository.update(
-      "Flight_Crew_Complement_Default",
-      "id",
-      id,
-      input as Record<string, unknown>,
+    const values: Partial<typeof flightCrewComplementDefaults.$inferInsert> =
+      {};
+    if (input.designation_id !== undefined)
+      values.designationId = input.designation_id;
+    if (input.required_count !== undefined)
+      values.requiredCount = input.required_count;
+    if (!Object.keys(values).length)
+      return (
+        db
+          .select({ id: flightCrewComplementDefaults.id })
+          .from(flightCrewComplementDefaults)
+          .where(eq(flightCrewComplementDefaults.id, Number(id)))
+          .get() !== undefined
+      );
+    return (
+      db
+        .update(flightCrewComplementDefaults)
+        .set({ ...values, updatedAt: new Date().toISOString() })
+        .where(eq(flightCrewComplementDefaults.id, Number(id)))
+        .returning({ id: flightCrewComplementDefaults.id })
+        .all().length > 0
     );
   }
 }

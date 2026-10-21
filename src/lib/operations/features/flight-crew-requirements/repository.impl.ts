@@ -1,5 +1,13 @@
 import "server-only";
-import { maintenanceRepository } from "@/lib/operations/maintenance-repository";
+import { asc, eq, like, or, count } from "drizzle-orm";
+import { db } from "@/lib/db";
+import {
+  airports,
+  airlines,
+  crewDesignations,
+  flightCrewRequirements,
+  flights,
+} from "@/lib/db/schema";
 import type {
   FlightCrewRequirementsCreateDto,
   FlightCrewRequirementsListResponseDto,
@@ -7,52 +15,197 @@ import type {
 } from "./dto";
 import type { FlightCrewRequirementsRepository } from "./repository";
 
-const flightOptionsSql = `SELECT f.id AS value, f.flight_number || ' — ' || coalesce(dep.iata_code,'?') || ' → ' || coalesce(arr.iata_code,'?') AS label FROM Flight f LEFT JOIN Airport dep ON dep.id=f.origin_airport_id LEFT JOIN Airport arr ON arr.id=f.destination_airport_id ORDER BY f.flight_number`;
-const designationOptionsSql = `SELECT id AS value, name AS label FROM Crew_Designation ORDER BY name`;
+function listFlightOptions() {
+  const airportRows = db
+    .select({ id: airports.id, code: airports.iataCode })
+    .from(airports)
+    .all();
+  const airportCodes = new Map(
+    airportRows.map((airport) => [airport.id, airport.code]),
+  );
+  return db
+    .select({
+      id: flights.id,
+      flight_number: flights.flightNumber,
+      origin_airport_id: flights.originAirportId,
+      destination_airport_id: flights.destinationAirportId,
+    })
+    .from(flights)
+    .orderBy(asc(flights.flightNumber), asc(flights.id))
+    .all()
+    .map((flight) => ({
+      value: flight.id,
+      label: `${flight.flight_number} — ${airportCodes.get(flight.origin_airport_id) ?? "?"} → ${airportCodes.get(flight.destination_airport_id) ?? "?"}`,
+    }));
+}
+function listDesignationOptions() {
+  return db
+    .select({ value: crewDesignations.id, label: crewDesignations.name })
+    .from(crewDesignations)
+    .orderBy(asc(crewDesignations.name))
+    .all();
+}
 
 export const flightCrewRequirementsRepository: FlightCrewRequirementsRepository =
   {
     list(flightId): FlightCrewRequirementsListResponseDto {
-      const rows = maintenanceRepository.queryAll(
-        `SELECT r.id, r.flight_id, r.designation_id, r.required_count, r.reason, r.created_at, f.flight_number, f.scheduled_departure, f.scheduled_arrival, a.name AS airline_name, coalesce(dep.iata_code,'?') || ' → ' || coalesce(arr.iata_code,'?') AS flight_route, d.name AS designation_name FROM Flight_Crew_Requirement r LEFT JOIN Flight f ON f.id=r.flight_id LEFT JOIN Airline a ON a.id=f.airline_id LEFT JOIN Airport dep ON dep.id=f.origin_airport_id LEFT JOIN Airport arr ON arr.id=f.destination_airport_id LEFT JOIN Crew_Designation d ON d.id=r.designation_id WHERE (? IS NULL OR r.flight_id = ?) ORDER BY d.name LIMIT 500`,
-        [flightId, flightId],
+      let query = db
+        .select({
+          id: flightCrewRequirements.id,
+          flight_id: flightCrewRequirements.flightId,
+          designation_id: flightCrewRequirements.designationId,
+          required_count: flightCrewRequirements.requiredCount,
+          reason: flightCrewRequirements.reason,
+          created_at: flightCrewRequirements.createdAt,
+          flight_number: flights.flightNumber,
+          scheduled_departure: flights.scheduledDeparture,
+          scheduled_arrival: flights.scheduledArrival,
+          airline_name: airlines.name,
+          origin_airport_id: flights.originAirportId,
+          destination_airport_id: flights.destinationAirportId,
+          designation_name: crewDesignations.name,
+        })
+        .from(flightCrewRequirements)
+        .leftJoin(flights, eq(flightCrewRequirements.flightId, flights.id))
+        .leftJoin(airlines, eq(flights.airlineId, airlines.id))
+        .leftJoin(airports, eq(flights.originAirportId, airports.id))
+        .leftJoin(
+          crewDesignations,
+          eq(flightCrewRequirements.designationId, crewDesignations.id),
+        )
+        .$dynamic();
+      if (flightId)
+        query = query.where(
+          eq(flightCrewRequirements.flightId, flightId),
+        ) as typeof query;
+      const airportRows = db
+        .select({ id: airports.id, code: airports.iataCode })
+        .from(airports)
+        .all();
+      const airportCodes = new Map(
+        airportRows.map((airport) => [airport.id, airport.code]),
       );
+      const rows = query
+        .orderBy(asc(crewDesignations.name), asc(flightCrewRequirements.id))
+        .limit(500)
+        .all()
+        .map((row) => ({
+          ...row,
+          flight_route: `${airportCodes.get(row.origin_airport_id) ?? "?"} → ${airportCodes.get(row.destination_airport_id) ?? "?"}`,
+        }));
       return {
         rows,
         options: {
-          flight_id: maintenanceRepository.queryAll(flightOptionsSql),
-          designation_id: maintenanceRepository.queryAll(designationOptionsSql),
+          flight_id: listFlightOptions(),
+          designation_id: listDesignationOptions(),
         },
       };
     },
     listFlights(search): FlightCrewListResponseDto {
-      const where = search
-        ? ` WHERE lower(coalesce(a.name,'') || ' ' || coalesce(f.flight_number,'') || ' ' || coalesce(dep.iata_code,'') || ' ' || coalesce(arr.iata_code,'')) LIKE ?`
-        : "";
-      const rows = maintenanceRepository.queryAll(
-        `SELECT f.id AS flight_id, f.flight_number, f.scheduled_departure, f.scheduled_arrival, a.name AS airline_name, coalesce(dep.iata_code,'?') || ' → ' || coalesce(arr.iata_code,'?') AS flight_route, (SELECT COUNT(*) FROM Flight_Crew_Requirement r WHERE r.flight_id=f.id) AS requirement_count FROM Flight f LEFT JOIN Airline a ON a.id=f.airline_id LEFT JOIN Airport dep ON dep.id=f.origin_airport_id LEFT JOIN Airport arr ON arr.id=f.destination_airport_id${where} ORDER BY a.name, f.flight_number LIMIT 500`,
-        search ? [`%${search.toLocaleLowerCase()}%`] : [],
+      const pattern = `%${search.trim()}%`;
+      const flightsQuery = db
+        .select({
+          flight_id: flights.id,
+          flight_number: flights.flightNumber,
+          scheduled_departure: flights.scheduledDeparture,
+          scheduled_arrival: flights.scheduledArrival,
+          airline_name: airlines.name,
+          origin_airport_id: flights.originAirportId,
+          destination_airport_id: flights.destinationAirportId,
+        })
+        .from(flights)
+        .leftJoin(airlines, eq(flights.airlineId, airlines.id))
+        .leftJoin(airports, eq(flights.originAirportId, airports.id))
+        .$dynamic();
+      const filtered = search.trim()
+        ? flightsQuery.where(
+            or(
+              like(flights.flightNumber, pattern),
+              like(airlines.name, pattern),
+              like(airports.iataCode, pattern),
+            ),
+          )
+        : flightsQuery;
+      const flightRows = filtered
+        .orderBy(asc(airlines.name), asc(flights.flightNumber), asc(flights.id))
+        .limit(500)
+        .all();
+      const counts = db
+        .select({
+          flightId: flightCrewRequirements.flightId,
+          requirementCount: count(),
+        })
+        .from(flightCrewRequirements)
+        .groupBy(flightCrewRequirements.flightId)
+        .all();
+      const countByFlight = new Map(
+        counts.map((row) => [row.flightId, row.requirementCount]),
       );
+      const airportRows = db
+        .select({ id: airports.id, code: airports.iataCode })
+        .from(airports)
+        .all();
+      const airportCodes = new Map(
+        airportRows.map((airport) => [airport.id, airport.code]),
+      );
+      const rows = flightRows.map((row) => ({
+        flight_id: row.flight_id,
+        flight_number: row.flight_number,
+        scheduled_departure: row.scheduled_departure,
+        scheduled_arrival: row.scheduled_arrival,
+        airline_name: row.airline_name,
+        flight_route: `${airportCodes.get(row.origin_airport_id) ?? "?"} → ${airportCodes.get(row.destination_airport_id) ?? "?"}`,
+        requirement_count: countByFlight.get(row.flight_id) ?? 0,
+      }));
       return {
         rows,
         options: {
-          flight_id: maintenanceRepository.queryAll(flightOptionsSql),
-          designation_id: maintenanceRepository.queryAll(designationOptionsSql),
+          flight_id: listFlightOptions(),
+          designation_id: listDesignationOptions(),
         },
       };
     },
     create(input: FlightCrewRequirementsCreateDto): string {
-      return maintenanceRepository.insert("Flight_Crew_Requirement", input).id;
+      const row = db
+        .insert(flightCrewRequirements)
+        .values({
+          flightId: String(input.flight_id),
+          designationId: input.designation_id,
+          requiredCount: input.required_count,
+          reason: input.reason ?? null,
+        })
+        .returning({ id: flightCrewRequirements.id })
+        .get();
+      return String(row.id);
     },
     update(
       id: string,
       input: Partial<FlightCrewRequirementsCreateDto>,
     ): boolean {
-      return maintenanceRepository.update(
-        "Flight_Crew_Requirement",
-        "id",
-        id,
-        input as Record<string, unknown>,
+      const values: Partial<typeof flightCrewRequirements.$inferInsert> = {};
+      if (input.flight_id !== undefined)
+        values.flightId = String(input.flight_id);
+      if (input.designation_id !== undefined)
+        values.designationId = input.designation_id;
+      if (input.required_count !== undefined)
+        values.requiredCount = input.required_count;
+      if (input.reason !== undefined) values.reason = input.reason;
+      if (!Object.keys(values).length)
+        return (
+          db
+            .select({ id: flightCrewRequirements.id })
+            .from(flightCrewRequirements)
+            .where(eq(flightCrewRequirements.id, Number(id)))
+            .get() !== undefined
+        );
+      values.updatedAt = new Date().toISOString();
+      return (
+        db
+          .update(flightCrewRequirements)
+          .set(values)
+          .where(eq(flightCrewRequirements.id, Number(id)))
+          .returning({ id: flightCrewRequirements.id })
+          .all().length > 0
       );
     },
   };

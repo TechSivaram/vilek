@@ -5,10 +5,10 @@ import type {
 } from "./dto";
 import {
   BatchRequestsResourceConfig,
-  SqliteBatchRequestsRepositoryImpl,
+  BatchRequestsRepositoryImpl,
 } from "./repository.impl";
 
-const repository = new SqliteBatchRequestsRepositoryImpl();
+const repository = new BatchRequestsRepositoryImpl();
 
 function mapRow(value: unknown): BatchRequestsRowDto {
   const r =
@@ -16,7 +16,7 @@ function mapRow(value: unknown): BatchRequestsRowDto {
       ? (value as Record<string, unknown>)
       : {};
   return {
-    id: Number(r.id),
+    id: String(r.id ?? ""),
     state: r.state == null ? null : String(r.state),
     requested_by_user_id:
       r.requested_by_user_id == null

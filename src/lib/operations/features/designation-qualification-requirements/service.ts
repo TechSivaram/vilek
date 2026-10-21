@@ -7,10 +7,10 @@ import type {
 } from "./dto";
 import {
   DesignationQualificationRequirementsResourceConfig,
-  SqliteDesignationQualificationRequirementsRepository,
+  DesignationQualificationRequirementsRepositoryImpl,
 } from "./repository.impl";
 
-const repository = new SqliteDesignationQualificationRequirementsRepository();
+const repository = new DesignationQualificationRequirementsRepositoryImpl();
 
 function mapRow(
   value: unknown,

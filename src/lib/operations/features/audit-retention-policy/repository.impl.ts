@@ -1,6 +1,7 @@
 import "server-only";
-import { SqliteMaintenanceResourceRepository } from "@/lib/operations/maintenance-resource.repository";
-import type { MaintenanceResourceConfig } from "@/lib/operations/maintenance-resource.repository";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { auditRetentionPolicy } from "@/lib/db/schema";
 import type {
   AuditRetentionPolicyCreateDto,
   AuditRetentionPolicyUpdateDto,
@@ -8,35 +9,67 @@ import type {
 import type { AuditRetentionPolicyRepository } from "./repository";
 
 export const AuditRetentionPolicyResourceConfig = {
-  table: "Audit_Retention_Policy",
   label: "Audit retention policy",
-  id: "id",
   writable: true,
   required: ["id"],
   columns: ["id", "retention_days"],
-} as const satisfies MaintenanceResourceConfig;
+} as const;
 
-const persistence = new SqliteMaintenanceResourceRepository();
-
-/** Feature repository adapter. SQL and persistence concerns remain behind this boundary. */
-export class SqliteAuditRetentionPolicyRepository implements AuditRetentionPolicyRepository {
+export class AuditRetentionPolicyRepositoryImpl implements AuditRetentionPolicyRepository {
   listWithMetadata() {
-    return persistence.list(
-      "audit-retention-policy",
-      AuditRetentionPolicyResourceConfig,
-    );
+    const rows = db
+      .select({
+        id: auditRetentionPolicy.id,
+        retention_days: auditRetentionPolicy.retentionDays,
+        updated_at: auditRetentionPolicy.updatedAt,
+      })
+      .from(auditRetentionPolicy)
+      .orderBy(asc(auditRetentionPolicy.id))
+      .limit(500)
+      .all()
+      .map((row) => ({
+        ...row,
+        retention_label:
+          row.retention_days == null
+            ? "Keep indefinitely"
+            : `${row.retention_days} days`,
+      }));
+    return {
+      rows,
+      options: {},
+      displayColumns: ["id", "retention_label", "updated_at"],
+    };
   }
+
   create(input: AuditRetentionPolicyCreateDto): string {
-    return persistence.create(
-      AuditRetentionPolicyResourceConfig,
-      input as Record<string, unknown>,
-    );
+    const created = db
+      .insert(auditRetentionPolicy)
+      .values({ id: input.id, retentionDays: input.retention_days })
+      .returning({ id: auditRetentionPolicy.id })
+      .get();
+    return String(created.id);
   }
+
   update(id: string, input: AuditRetentionPolicyUpdateDto): boolean {
-    return persistence.update(
-      AuditRetentionPolicyResourceConfig,
-      id,
-      input as Record<string, unknown>,
+    const values: Partial<typeof auditRetentionPolicy.$inferInsert> = {};
+    if (input.retention_days !== undefined)
+      values.retentionDays = input.retention_days;
+    if (input.id !== undefined) values.id = input.id;
+    if (!Object.keys(values).length)
+      return (
+        db
+          .select({ id: auditRetentionPolicy.id })
+          .from(auditRetentionPolicy)
+          .where(eq(auditRetentionPolicy.id, Number(id)))
+          .get() !== undefined
+      );
+    return (
+      db
+        .update(auditRetentionPolicy)
+        .set({ ...values, updatedAt: new Date().toISOString() })
+        .where(eq(auditRetentionPolicy.id, Number(id)))
+        .returning({ id: auditRetentionPolicy.id })
+        .all().length > 0
     );
   }
 }

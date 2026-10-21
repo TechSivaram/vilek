@@ -7,10 +7,10 @@ import type {
 } from "./dto";
 import {
   AuditRetentionPolicyResourceConfig,
-  SqliteAuditRetentionPolicyRepository,
+  AuditRetentionPolicyRepositoryImpl,
 } from "./repository.impl";
 
-const repository = new SqliteAuditRetentionPolicyRepository();
+const repository = new AuditRetentionPolicyRepositoryImpl();
 
 function mapRow(value: unknown): AuditRetentionPolicyResponseDto {
   const row =

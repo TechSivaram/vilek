@@ -1,22 +1,43 @@
 import "server-only";
-import { SqliteMaintenanceResourceRepository } from "@/lib/operations/maintenance-resource.repository";
-import type { MaintenanceResourceConfig } from "@/lib/operations/maintenance-resource.repository";
+import { desc, eq } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { flightCrewBatchRequests, users } from "@/lib/db/schema";
 import type { BatchRequestsRepository } from "./repository";
 
-const config = {
-  table: "Flight_Crew_Batch_Request",
+export const BatchRequestsResourceConfig = {
   label: "Crew batch requests",
-  id: "id",
-  writable: false,
-  required: [],
-  columns: [],
-} as const satisfies MaintenanceResourceConfig;
+  columns: [] as string[],
+} as const;
 
-const persistence = new SqliteMaintenanceResourceRepository();
-
-export class SqliteBatchRequestsRepositoryImpl implements BatchRequestsRepository {
+export class BatchRequestsRepositoryImpl implements BatchRequestsRepository {
   list() {
-    return persistence.list("batch-requests", config);
+    const rows = db
+      .select({
+        id: flightCrewBatchRequests.id,
+        state: flightCrewBatchRequests.state,
+        requested_by_user_id: flightCrewBatchRequests.requestedByUserId,
+        created_at: flightCrewBatchRequests.createdAt,
+        completed_at: flightCrewBatchRequests.completedAt,
+        requested_by_email: users.email,
+      })
+      .from(flightCrewBatchRequests)
+      .leftJoin(users, eq(flightCrewBatchRequests.requestedByUserId, users.id))
+      .orderBy(
+        desc(flightCrewBatchRequests.createdAt),
+        desc(flightCrewBatchRequests.id),
+      )
+      .limit(500)
+      .all();
+    return {
+      rows,
+      options: {},
+      displayColumns: [
+        "id",
+        "state",
+        "requested_by_email",
+        "created_at",
+        "completed_at",
+      ],
+    };
   }
 }
-export const BatchRequestsResourceConfig = config;

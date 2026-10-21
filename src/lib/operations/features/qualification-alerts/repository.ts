@@ -1,4 +1,4 @@
-import type { MaintenanceOption } from "@/lib/operations/maintenance-repository";
+type MaintenanceOption = { value: string | number; label: string };
 import type {
   QualificationAlertsCreateDto,
   QualificationAlertsUpdateDto,

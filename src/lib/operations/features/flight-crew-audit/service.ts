@@ -5,10 +5,10 @@ import type {
 } from "./dto";
 import {
   FlightCrewAuditResourceConfig,
-  SqliteFlightCrewAuditRepositoryImpl,
+  FlightCrewAuditRepositoryImpl,
 } from "./repository.impl";
 
-const repository = new SqliteFlightCrewAuditRepositoryImpl();
+const repository = new FlightCrewAuditRepositoryImpl();
 
 function mapRow(value: unknown): FlightCrewAuditRowDto {
   const r =
@@ -16,9 +16,9 @@ function mapRow(value: unknown): FlightCrewAuditRowDto {
       ? (value as Record<string, unknown>)
       : {};
   return {
-    id: Number(r.id),
-    flight_id: r.flight_id == null ? null : Number(r.flight_id),
-    crew_member_id: r.crew_member_id == null ? null : Number(r.crew_member_id),
+    id: String(r.id ?? ""),
+    flight_id: r.flight_id == null ? null : String(r.flight_id),
+    crew_member_id: r.crew_member_id == null ? null : String(r.crew_member_id),
     designation_id: r.designation_id == null ? null : Number(r.designation_id),
     action: r.action == null ? null : String(r.action),
     reason: r.reason == null ? null : String(r.reason),

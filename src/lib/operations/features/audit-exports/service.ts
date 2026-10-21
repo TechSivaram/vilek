@@ -5,10 +5,10 @@ import type {
 } from "./dto";
 import {
   AuditExportsResourceConfig,
-  SqliteAuditExportsRepositoryImpl,
+  AuditExportsRepositoryImpl,
 } from "./repository.impl";
 
-const repository = new SqliteAuditExportsRepositoryImpl();
+const repository = new AuditExportsRepositoryImpl();
 
 function mapRow(value: unknown): AuditExportsRowDto {
   const r =
@@ -16,8 +16,8 @@ function mapRow(value: unknown): AuditExportsRowDto {
       ? (value as Record<string, unknown>)
       : {};
   return {
-    id: Number(r.id),
-    actor_user_id: r.actor_user_id == null ? null : Number(r.actor_user_id),
+    id: String(r.id ?? ""),
+    actor_user_id: r.actor_user_id == null ? null : String(r.actor_user_id),
     format: r.format == null ? null : String(r.format),
     row_count: r.row_count == null ? null : Number(r.row_count),
     created_at: r.created_at == null ? null : String(r.created_at),

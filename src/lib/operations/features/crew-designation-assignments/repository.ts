@@ -1,4 +1,4 @@
-import type { MaintenanceOption } from "@/lib/operations/maintenance-repository";
+type MaintenanceOption = { value: string | number; label: string };
 export interface ResourceRepository {
   listRows(): Record<string, unknown>[];
   getOptions(field: string): MaintenanceOption[];

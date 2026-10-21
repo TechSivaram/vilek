@@ -1,6 +1,11 @@
 import "server-only";
-import { SqliteMaintenanceResourceRepository } from "@/lib/operations/maintenance-resource.repository";
-import type { MaintenanceResourceConfig } from "@/lib/operations/maintenance-resource.repository";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@/lib/db";
+import {
+  crewDesignations,
+  designationQualificationRequirements,
+  qualificationTypes,
+} from "@/lib/db/schema";
 import type {
   DesignationQualificationRequirementsCreateDto,
   DesignationQualificationRequirementsUpdateDto,
@@ -8,38 +13,106 @@ import type {
 import type { DesignationQualificationRequirementsRepository } from "./repository";
 
 export const DesignationQualificationRequirementsResourceConfig = {
-  table: "Designation_Qualification_Requirement",
   label: "Designation qualification requirements",
-  id: "id",
   writable: true,
   required: ["designation_id", "qualification_type_id"],
   columns: ["designation_id", "qualification_type_id", "is_required"],
-} as const satisfies MaintenanceResourceConfig;
+} as const;
 
-const persistence = new SqliteMaintenanceResourceRepository();
-
-/** Feature repository adapter. SQL and persistence concerns remain behind this boundary. */
-export class SqliteDesignationQualificationRequirementsRepository implements DesignationQualificationRequirementsRepository {
+export class DesignationQualificationRequirementsRepositoryImpl implements DesignationQualificationRequirementsRepository {
   listWithMetadata() {
-    return persistence.list(
-      "designation-qualification-requirements",
-      DesignationQualificationRequirementsResourceConfig,
-    );
+    const rows = db
+      .select({
+        id: designationQualificationRequirements.id,
+        designation_id: designationQualificationRequirements.designationId,
+        qualification_type_id:
+          designationQualificationRequirements.qualificationTypeId,
+        is_required: designationQualificationRequirements.isRequired,
+        created_at: designationQualificationRequirements.createdAt,
+        designation_name: crewDesignations.name,
+        qualification_name: qualificationTypes.name,
+      })
+      .from(designationQualificationRequirements)
+      .leftJoin(
+        crewDesignations,
+        eq(
+          designationQualificationRequirements.designationId,
+          crewDesignations.id,
+        ),
+      )
+      .leftJoin(
+        qualificationTypes,
+        eq(
+          designationQualificationRequirements.qualificationTypeId,
+          qualificationTypes.id,
+        ),
+      )
+      .orderBy(
+        asc(crewDesignations.name),
+        asc(qualificationTypes.name),
+        asc(designationQualificationRequirements.id),
+      )
+      .limit(500)
+      .all()
+      .map((row) => ({
+        ...row,
+        requirement_type: row.is_required ? "Required" : "Optional",
+      }));
+    return {
+      rows,
+      options: {},
+      displayColumns: [
+        "id",
+        "designation_name",
+        "qualification_name",
+        "requirement_type",
+        "created_at",
+      ],
+    };
   }
+
   create(input: DesignationQualificationRequirementsCreateDto): string {
-    return persistence.create(
-      DesignationQualificationRequirementsResourceConfig,
-      input as Record<string, unknown>,
-    );
+    const created = db
+      .insert(designationQualificationRequirements)
+      .values({
+        designationId: input.designation_id,
+        qualificationTypeId: input.qualification_type_id,
+        isRequired:
+          input.is_required === undefined ? true : Boolean(input.is_required),
+      })
+      .returning({ id: designationQualificationRequirements.id })
+      .get();
+    return String(created.id);
   }
+
   update(
     id: string,
     input: DesignationQualificationRequirementsUpdateDto,
   ): boolean {
-    return persistence.update(
-      DesignationQualificationRequirementsResourceConfig,
-      id,
-      input as Record<string, unknown>,
+    const values: Partial<
+      typeof designationQualificationRequirements.$inferInsert
+    > = {};
+    if (input.designation_id !== undefined)
+      values.designationId = input.designation_id;
+    if (input.qualification_type_id !== undefined)
+      values.qualificationTypeId = input.qualification_type_id;
+    if (input.is_required !== undefined)
+      values.isRequired = Boolean(input.is_required);
+    if (!Object.keys(values).length)
+      return (
+        db
+          .select({ id: designationQualificationRequirements.id })
+          .from(designationQualificationRequirements)
+          .where(eq(designationQualificationRequirements.id, Number(id)))
+          .get() !== undefined
+      );
+    return (
+      db
+        .update(designationQualificationRequirements)
+        .set(values)
+        .where(eq(designationQualificationRequirements.id, Number(id)))
+        .returning({ id: designationQualificationRequirements.id })
+        .all().length > 0
     );
   }
 }

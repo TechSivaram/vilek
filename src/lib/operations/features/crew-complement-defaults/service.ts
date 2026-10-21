@@ -2,9 +2,9 @@ import type {
   CrewComplementDefaultsCreateDto,
   CrewComplementDefaultsUpdateDto,
 } from "./dto";
-import { SqliteCrewComplementDefaultsRepository } from "./repository.impl";
+import { CrewComplementDefaultsRepositoryImpl } from "./repository.impl";
 
-const repository = new SqliteCrewComplementDefaultsRepository();
+const repository = new CrewComplementDefaultsRepositoryImpl();
 export const crewComplementDefaultsService = {
   list() {
     return repository.list();

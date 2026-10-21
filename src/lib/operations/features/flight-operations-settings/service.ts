@@ -7,10 +7,10 @@ import type {
 } from "./dto";
 import {
   FlightOperationsSettingsResourceConfig,
-  SqliteFlightOperationsSettingsRepository,
+  FlightOperationsSettingsRepositoryImpl,
 } from "./repository.impl";
 
-const repository = new SqliteFlightOperationsSettingsRepository();
+const repository = new FlightOperationsSettingsRepositoryImpl();
 
 function mapRow(value: unknown): FlightOperationsSettingsResponseDto {
   const row =

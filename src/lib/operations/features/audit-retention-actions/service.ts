@@ -5,10 +5,10 @@ import type {
 } from "./dto";
 import {
   AuditRetentionActionsResourceConfig,
-  SqliteAuditRetentionActionsRepositoryImpl,
+  AuditRetentionActionsRepositoryImpl,
 } from "./repository.impl";
 
-const repository = new SqliteAuditRetentionActionsRepositoryImpl();
+const repository = new AuditRetentionActionsRepositoryImpl();
 
 function mapRow(value: unknown): AuditRetentionActionsRowDto {
   const r =
@@ -16,11 +16,11 @@ function mapRow(value: unknown): AuditRetentionActionsRowDto {
       ? (value as Record<string, unknown>)
       : {};
   return {
-    id: Number(r.id),
+    id: String(r.id ?? ""),
     action: r.action == null ? null : String(r.action),
     cutoff_at: r.cutoff_at == null ? null : String(r.cutoff_at),
     affected_count: r.affected_count == null ? null : Number(r.affected_count),
-    actor_user_id: r.actor_user_id == null ? null : Number(r.actor_user_id),
+    actor_user_id: r.actor_user_id == null ? null : String(r.actor_user_id),
     created_at: r.created_at == null ? null : String(r.created_at),
     actor_email: r.actor_email == null ? null : String(r.actor_email),
   };
