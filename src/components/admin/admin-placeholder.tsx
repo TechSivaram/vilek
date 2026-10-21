@@ -32,13 +32,11 @@ export function AdminPlaceholder({
           <b />
         </div>
         <div className="admin-placeholder-copy">
-          <div className="admin-placeholder-kicker">
-            THIS SECTION IS PLANNED
-          </div>
+          <div className="admin-placeholder-kicker">THIS SECTION IS PLANNED</div>
           <h2>{title} workspace</h2>
           <p className="admin-placeholder-description">
-            This page is part of the ViLek administration workspace. Its
-            management actions will be enabled in a later implementation phase.
+            This page is part of the ViLek administration workspace. Its management actions will be
+            enabled in a later implementation phase.
           </p>
           <h3>Planned capabilities</h3>
           <ul>

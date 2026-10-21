@@ -20,9 +20,7 @@ const createShape = {
   isActive: z.boolean(),
 };
 
-export const createInputSchema: z.ZodType<CrewMembersCreateInput> = z
-  .object(createShape)
-  .strict();
+export const createInputSchema: z.ZodType<CrewMembersCreateInput> = z.object(createShape).strict();
 export const updateInputSchema: z.ZodType<CrewMembersUpdateInput> = z
   .object(createShape)
   .partial()

@@ -25,8 +25,5 @@ export const GET = withRouteGuard(
 export const POST = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (_request: Request) =>
-    NextResponse.json(
-      { error: "This history table is read-only." },
-      { status: 405 },
-    ),
+    NextResponse.json({ error: "This history table is read-only." }, { status: 405 }),
 );

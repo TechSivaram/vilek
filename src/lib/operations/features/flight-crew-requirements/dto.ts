@@ -5,8 +5,7 @@ export type FlightCrewRequirementsCreateDto = {
   required_count: number;
   reason?: string | null;
 };
-export type FlightCrewRequirementsUpdateDto =
-  Partial<FlightCrewRequirementsCreateDto>;
+export type FlightCrewRequirementsUpdateDto = Partial<FlightCrewRequirementsCreateDto>;
 export type FlightCrewRequirementsResponseDto = {
   id: number | string;
   flight_id: number | string;

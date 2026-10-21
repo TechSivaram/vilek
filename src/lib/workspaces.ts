@@ -24,14 +24,12 @@ export const WORKSPACES: WorkspaceDefinition[] = [
     code: "CREW",
     name: "Crew",
     shortName: "Crew workspace",
-    description:
-      "Manage your flights, expenses, receipts and reimbursement claims.",
+    description: "Manage your flights, expenses, receipts and reimbursement claims.",
     icon: "✈",
     href: "/crew",
     eyebrow: "YOUR FLIGHTS · YOUR EXPENSES",
     heading: "Crew workspace",
-    summary:
-      "Keep your flight-related expenses and reimbursement claims organized.",
+    summary: "Keep your flight-related expenses and reimbursement claims organized.",
     capabilities: [
       {
         icon: "↗",
@@ -57,14 +55,12 @@ export const WORKSPACES: WorkspaceDefinition[] = [
     code: "APPROVER",
     name: "Approver",
     shortName: "Approver workspace",
-    description:
-      "Review submitted reimbursement claims and manage approval work.",
+    description: "Review submitted reimbursement claims and manage approval work.",
     icon: "✓",
     href: "/approver",
     eyebrow: "CLAIM REVIEW · DECISIONS",
     heading: "Approver workspace",
-    summary:
-      "Focus on claims awaiting review and the decisions that need your attention.",
+    summary: "Focus on claims awaiting review and the decisions that need your attention.",
     capabilities: [
       {
         icon: "▤",
@@ -84,14 +80,12 @@ export const WORKSPACES: WorkspaceDefinition[] = [
     code: "FINANCE",
     name: "Finance",
     shortName: "Finance workspace",
-    description:
-      "Process approved reimbursements and review financial exceptions.",
+    description: "Process approved reimbursements and review financial exceptions.",
     icon: "₹",
     href: "/finance",
     eyebrow: "REIMBURSEMENTS · FINANCIAL CONTROL",
     heading: "Finance workspace",
-    summary:
-      "Manage approved reimbursements and keep payment processing moving.",
+    summary: "Manage approved reimbursements and keep payment processing moving.",
     capabilities: [
       {
         icon: "₹",
@@ -111,14 +105,12 @@ export const WORKSPACES: WorkspaceDefinition[] = [
     code: "FLIGHT_OPERATIONS_MANAGER",
     name: "Flight Operations",
     shortName: "Flight operations workspace",
-    description:
-      "Manage flight records, crew assignments and operational planning.",
+    description: "Manage flight records, crew assignments and operational planning.",
     icon: "◈",
     href: "/operations",
     eyebrow: "FLIGHTS · CREW · SCHEDULES",
     heading: "Flight operations workspace",
-    summary:
-      "Coordinate flight records and crew assignments from one operational workspace.",
+    summary: "Coordinate flight records and crew assignments from one operational workspace.",
     capabilities: [
       {
         icon: "✈",
@@ -138,8 +130,7 @@ export const WORKSPACES: WorkspaceDefinition[] = [
     code: "ADMIN",
     name: "Administration",
     shortName: "Admin workspace",
-    description:
-      "Manage users, roles, reference data and system configuration.",
+    description: "Manage users, roles, reference data and system configuration.",
     icon: "⚙",
     href: "/admin",
     eyebrow: "SYSTEM · ACCESS · CONFIGURATION",

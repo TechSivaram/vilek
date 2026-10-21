@@ -68,13 +68,8 @@ type AssignmentRow = z.infer<typeof rowSchema>;
 type FlightSummary = z.infer<typeof flightSchema>;
 type Options = z.infer<typeof optionsResponseSchema>["options"];
 
-async function requestJson<T>(
-  url: string,
-  schema: z.ZodType<T>,
-  init?: RequestInit,
-): Promise<T> {
-  if (typeof window !== "undefined")
-    window.dispatchEvent(new Event("vilek:loading-start"));
+async function requestJson<T>(url: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("vilek:loading-start"));
   try {
     const response = await fetch(url, {
       ...init,
@@ -105,14 +100,11 @@ async function requestJson<T>(
       );
     }
     if (body === null) {
-      throw new Error(
-        "The server returned an empty response. Refresh and try again.",
-      );
+      throw new Error("The server returned an empty response. Refresh and try again.");
     }
     return schema.parse(body);
   } finally {
-    if (typeof window !== "undefined")
-      window.dispatchEvent(new Event("vilek:loading-end"));
+    if (typeof window !== "undefined") window.dispatchEvent(new Event("vilek:loading-end"));
   }
 }
 const formatDate = (value: string) => {
@@ -133,21 +125,11 @@ export function OperationsFlightCrewPage() {
   const [groupBy, setGroupBy] = useState<"date-flight-designation" | "none">(
     "date-flight-designation",
   );
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
-    () => new Set(),
-  );
-  const [expandedFlights, setExpandedFlights] = useState<Set<string>>(
-    () => new Set(),
-  );
-  const [manifests, setManifests] = useState<Record<string, AssignmentRow[]>>(
-    {},
-  );
-  const [manifestErrors, setManifestErrors] = useState<Record<string, string>>(
-    {},
-  );
-  const [loadingManifests, setLoadingManifests] = useState<Set<string>>(
-    () => new Set(),
-  );
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => new Set());
+  const [expandedFlights, setExpandedFlights] = useState<Set<string>>(() => new Set());
+  const [manifests, setManifests] = useState<Record<string, AssignmentRow[]>>({});
+  const [manifestErrors, setManifestErrors] = useState<Record<string, string>>({});
+  const [loadingManifests, setLoadingManifests] = useState<Set<string>>(() => new Set());
   const toggleGroup = (key: string) =>
     setCollapsedGroups((current) => {
       const next = new Set(current);
@@ -172,17 +154,14 @@ export function OperationsFlightCrewPage() {
   });
   const optionsQuery = useQuery({
     queryKey: ["operations-flight-crew-options"],
-    queryFn: () =>
-      requestJson("/api/operations/flight-crew/options", optionsResponseSchema),
+    queryFn: () => requestJson("/api/operations/flight-crew/options", optionsResponseSchema),
   });
   const options: Options = optionsQuery.data?.options ?? {
     flights: [],
     crewMembers: [],
     designations: [],
   };
-  const selectedFlight = options.flights.find(
-    (flight) => flight.id === flightId,
-  );
+  const selectedFlight = options.flights.find((flight) => flight.id === flightId);
 
   const create = useMutation({
     mutationFn: () =>
@@ -230,8 +209,7 @@ export function OperationsFlightCrewPage() {
     },
   });
   const removeAssignment = (row: AssignmentRow) => {
-    if (!window.confirm(`Remove ${row.crewMemberName} from this flight?`))
-      return;
+    if (!window.confirm(`Remove ${row.crewMemberName} from this flight?`)) return;
     const reason = window.prompt(
       "Enter the reason for removing this crew assignment (required):",
       "",
@@ -312,10 +290,7 @@ export function OperationsFlightCrewPage() {
     } catch (e) {
       setManifestErrors((current) => ({
         ...current,
-        [flightId]:
-          e instanceof Error
-            ? e.message
-            : "Could not load this flight manifest.",
+        [flightId]: e instanceof Error ? e.message : "Could not load this flight manifest.",
       }));
     } finally {
       setLoadingManifests((current) => {
@@ -325,11 +300,7 @@ export function OperationsFlightCrewPage() {
       });
     }
   };
-  const busy =
-    list.isFetching ||
-    optionsQuery.isFetching ||
-    create.isPending ||
-    remove.isPending;
+  const busy = list.isFetching || optionsQuery.isFetching || create.isPending || remove.isPending;
 
   return (
     <>
@@ -337,10 +308,7 @@ export function OperationsFlightCrewPage() {
         <div>
           <div className="admin-eyebrow">FLIGHT OPERATIONS</div>
           <h1>Flight Crew</h1>
-          <p>
-            Assign eligible crew members to flights and maintain the flight crew
-            manifest.
-          </p>
+          <p>Assign eligible crew members to flights and maintain the flight crew manifest.</p>
         </div>
       </section>
       {notice && (
@@ -370,13 +338,8 @@ export function OperationsFlightCrewPage() {
           >
             <div className="admin-panel-heading">
               <div>
-                <h2 id="flight-crew-assignment-title">
-                  New flight crew assignment
-                </h2>
-                <p>
-                  Choose an active crew member and their designation for this
-                  flight.
-                </p>
+                <h2 id="flight-crew-assignment-title">New flight crew assignment</h2>
+                <p>Choose an active crew member and their designation for this flight.</p>
               </div>
               <button
                 className="admin-icon-button"
@@ -411,18 +374,13 @@ export function OperationsFlightCrewPage() {
                   {selectedFlight ? (
                     <>
                       <strong>
-                        {selectedFlight.airlineName} —{" "}
-                        {selectedFlight.flightNumber}
+                        {selectedFlight.airlineName} — {selectedFlight.flightNumber}
                       </strong>
                       <span>
-                        {selectedFlight.originCode} ({selectedFlight.originCity}
-                        ) → {selectedFlight.destinationCode} (
-                        {selectedFlight.destinationCity})
+                        {selectedFlight.originCode} ({selectedFlight.originCity}) →{" "}
+                        {selectedFlight.destinationCode} ({selectedFlight.destinationCity})
                       </span>
-                      <small>
-                        Departure:{" "}
-                        {formatDate(selectedFlight.scheduledDeparture)}
-                      </small>
+                      <small>Departure: {formatDate(selectedFlight.scheduledDeparture)}</small>
                     </>
                   ) : (
                     <strong>Selected flight</strong>
@@ -460,22 +418,13 @@ export function OperationsFlightCrewPage() {
                 </select>
               </label>
               {options.flights.length === 0 && (
-                <p>
-                  No active flights are available. Create or activate a flight
-                  first.
-                </p>
+                <p>No active flights are available. Create or activate a flight first.</p>
               )}
               {options.crewMembers.length === 0 && (
-                <p>
-                  No active crew members are available. Register a user as a
-                  crew member first.
-                </p>
+                <p>No active crew members are available. Register a user as a crew member first.</p>
               )}
               {options.designations.length === 0 && (
-                <p>
-                  No active crew designations are available. Add a designation
-                  first.
-                </p>
+                <p>No active crew designations are available. Add a designation first.</p>
               )}
               <div className="admin-form-actions">
                 <button
@@ -507,8 +456,7 @@ export function OperationsFlightCrewPage() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Flights{" "}
-              <span className="admin-count-badge">{pagination.total}</span>
+              Flights <span className="admin-count-badge">{pagination.total}</span>
             </h2>
             <p>
               {pagination.total
@@ -522,11 +470,7 @@ export function OperationsFlightCrewPage() {
               <select
                 aria-label="Group assignments by"
                 value={groupBy}
-                onChange={(e) =>
-                  setGroupBy(
-                    e.target.value as "date-flight-designation" | "none",
-                  )
-                }
+                onChange={(e) => setGroupBy(e.target.value as "date-flight-designation" | "none")}
               >
                 <option value="date-flight-designation">
                   Date → Time → Airline → Flight → Designation
@@ -576,18 +520,11 @@ export function OperationsFlightCrewPage() {
                           <button
                             type="button"
                             className="flight-crew-group-toggle"
-                            aria-expanded={
-                              !collapsedGroups.has(`date:${dateGroup.key}`)
-                            }
+                            aria-expanded={!collapsedGroups.has(`date:${dateGroup.key}`)}
                             onClick={() => toggleGroup(`date:${dateGroup.key}`)}
                           >
-                            <span
-                              aria-hidden="true"
-                              className="flight-crew-tree-icon"
-                            >
-                              {collapsedGroups.has(`date:${dateGroup.key}`)
-                                ? "+"
-                                : "−"}
+                            <span aria-hidden="true" className="flight-crew-tree-icon">
+                              {collapsedGroups.has(`date:${dateGroup.key}`) ? "+" : "−"}
                             </span>
                             <strong>{dateGroup.label}</strong>
                             <small>
@@ -616,10 +553,7 @@ export function OperationsFlightCrewPage() {
                                   aria-expanded={expandedFlights.has(flight.id)}
                                   onClick={() => void toggleFlight(flight.id)}
                                 >
-                                  <span
-                                    aria-hidden="true"
-                                    className="flight-crew-tree-icon"
-                                  >
+                                  <span aria-hidden="true" className="flight-crew-tree-icon">
                                     {expandedFlights.has(flight.id) ? "−" : "+"}
                                   </span>
                                   <strong>
@@ -627,13 +561,9 @@ export function OperationsFlightCrewPage() {
                                   </strong>
                                   <span>
                                     {flight.originCode} ({flight.originCity}) →{" "}
-                                    {flight.destinationCode} (
-                                    {flight.destinationCity})
+                                    {flight.destinationCode} ({flight.destinationCity})
                                   </span>
-                                  <span>
-                                    Departure:{" "}
-                                    {formatDate(flight.scheduledDeparture)}
-                                  </span>
+                                  <span>Departure: {formatDate(flight.scheduledDeparture)}</span>
                                   <small>Crew: {flight.crewCount}</small>
                                 </button>
                               </td>
@@ -717,14 +647,11 @@ export function OperationsFlightCrewPage() {
                                 (() => {
                                   const rows = manifests[flight.id] ?? [];
                                   const designations = Array.from(
-                                    new Set(
-                                      rows.map((row) => row.designationId),
-                                    ),
+                                    new Set(rows.map((row) => row.designationId)),
                                   );
                                   return designations.map((designationId) => {
                                     const members = rows.filter(
-                                      (row) =>
-                                        row.designationId === designationId,
+                                      (row) => row.designationId === designationId,
                                     );
                                     return (
                                       <Fragment key={designationId}>
@@ -744,9 +671,7 @@ export function OperationsFlightCrewPage() {
                                             >
                                               •
                                             </span>
-                                            <strong>
-                                              {members[0].designationName}
-                                            </strong>
+                                            <strong>{members[0].designationName}</strong>
                                             <small style={{ marginLeft: 8 }}>
                                               {members.length} member
                                               {members.length === 1 ? "" : "s"}
@@ -758,9 +683,7 @@ export function OperationsFlightCrewPage() {
                                             <td data-label="Flight / route" />
                                             <td data-label="Crew member">
                                               <div>{row.crewMemberName}</div>
-                                              <small>
-                                                Badge: {row.badgeNumber}
-                                              </small>
+                                              <small>Badge: {row.badgeNumber}</small>
                                             </td>
                                             <td data-label="Actions">
                                               <div className="admin-row-actions">
@@ -805,9 +728,7 @@ export function OperationsFlightCrewPage() {
                             className="admin-secondary-button"
                             onClick={() => void toggleFlight(flight.id)}
                           >
-                            {expandedFlights.has(flight.id)
-                              ? "Hide crew"
-                              : "Load crew"}
+                            {expandedFlights.has(flight.id) ? "Hide crew" : "Load crew"}
                           </button>
                         </td>
                       </tr>
@@ -816,8 +737,7 @@ export function OperationsFlightCrewPage() {
                           <tr key={row.id}>
                             <td />
                             <td>
-                              {row.crewMemberName}{" "}
-                              <small>Badge: {row.badgeNumber}</small>
+                              {row.crewMemberName} <small>Badge: {row.badgeNumber}</small>
                             </td>
                             <td>
                               <button
@@ -847,16 +767,11 @@ export function OperationsFlightCrewPage() {
         <div className="flight-crew-mobile-view">
           {groupBy === "date-flight-designation"
             ? groupedRows.map((dateGroup) => (
-                <section
-                  className="flight-crew-mobile-date"
-                  key={dateGroup.key}
-                >
+                <section className="flight-crew-mobile-date" key={dateGroup.key}>
                   <button
                     type="button"
                     className="flight-crew-mobile-date-toggle"
-                    aria-expanded={
-                      !collapsedGroups.has(`date:${dateGroup.key}`)
-                    }
+                    aria-expanded={!collapsedGroups.has(`date:${dateGroup.key}`)}
                     onClick={() => toggleGroup(`date:${dateGroup.key}`)}
                   >
                     <span className="flight-crew-tree-icon" aria-hidden="true">
@@ -871,34 +786,25 @@ export function OperationsFlightCrewPage() {
                   {!collapsedGroups.has(`date:${dateGroup.key}`) && (
                     <div className="flight-crew-mobile-date-content">
                       {dateGroup.flights.map((flight) => (
-                        <article
-                          className="flight-crew-mobile-flight"
-                          key={flight.id}
-                        >
+                        <article className="flight-crew-mobile-flight" key={flight.id}>
                           <button
                             type="button"
                             className="flight-crew-mobile-flight-toggle"
                             aria-expanded={expandedFlights.has(flight.id)}
                             onClick={() => void toggleFlight(flight.id)}
                           >
-                            <span
-                              className="flight-crew-tree-icon"
-                              aria-hidden="true"
-                            >
+                            <span className="flight-crew-tree-icon" aria-hidden="true">
                               {expandedFlights.has(flight.id) ? "−" : "+"}
                             </span>
                             <span className="flight-crew-mobile-flight-title">
                               {flight.airlineName} — {flight.flightNumber}
                             </span>
                             <span className="flight-crew-mobile-route">
-                              {flight.originCode} ({flight.originCity}) →{" "}
-                              {flight.destinationCode} ({flight.destinationCity}
-                              )
+                              {flight.originCode} ({flight.originCity}) → {flight.destinationCode} (
+                              {flight.destinationCity})
                             </span>
                             <span className="flight-crew-mobile-meta">
-                              <span>
-                                {formatDate(flight.scheduledDeparture)}
-                              </span>
+                              <span>{formatDate(flight.scheduledDeparture)}</span>
                               <span>{flight.crewCount} crew</span>
                             </span>
                           </button>
@@ -920,9 +826,7 @@ export function OperationsFlightCrewPage() {
                           {expandedFlights.has(flight.id) && (
                             <div className="flight-crew-mobile-manifest">
                               {loadingManifests.has(flight.id) ? (
-                                <p className="flight-crew-mobile-message">
-                                  Loading crew manifest…
-                                </p>
+                                <p className="flight-crew-mobile-message">Loading crew manifest…</p>
                               ) : manifestErrors[flight.id] ? (
                                 <p className="flight-crew-mobile-message is-error">
                                   {manifestErrors[flight.id]}{" "}
@@ -949,14 +853,11 @@ export function OperationsFlightCrewPage() {
                                 (() => {
                                   const rows = manifests[flight.id] ?? [];
                                   const designations = Array.from(
-                                    new Set(
-                                      rows.map((row) => row.designationId),
-                                    ),
+                                    new Set(rows.map((row) => row.designationId)),
                                   );
                                   return designations.map((designationId) => {
                                     const members = rows.filter(
-                                      (row) =>
-                                        row.designationId === designationId,
+                                      (row) => row.designationId === designationId,
                                     );
                                     return (
                                       <section
@@ -965,9 +866,7 @@ export function OperationsFlightCrewPage() {
                                       >
                                         <div className="flight-crew-mobile-designation-heading">
                                           <span aria-hidden="true">•</span>
-                                          <strong>
-                                            {members[0].designationName}
-                                          </strong>
+                                          <strong>{members[0].designationName}</strong>
                                           <small>
                                             {members.length} member
                                             {members.length === 1 ? "" : "s"}
@@ -980,12 +879,8 @@ export function OperationsFlightCrewPage() {
                                               key={row.id}
                                             >
                                               <div className="flight-crew-mobile-member-info">
-                                                <strong>
-                                                  {row.crewMemberName}
-                                                </strong>
-                                                <span>
-                                                  Badge: {row.badgeNumber}
-                                                </span>
+                                                <strong>{row.crewMemberName}</strong>
+                                                <span>Badge: {row.badgeNumber}</span>
                                               </div>
                                               <button
                                                 type="button"
@@ -1021,9 +916,7 @@ export function OperationsFlightCrewPage() {
                   <div className="flight-crew-mobile-route">
                     {flight.originCode} → {flight.destinationCode}
                   </div>
-                  <div className="flight-crew-mobile-meta">
-                    {flight.crewCount} crew members
-                  </div>
+                  <div className="flight-crew-mobile-meta">{flight.crewCount} crew members</div>
                   <button
                     type="button"
                     className="admin-secondary-button"
@@ -1033,10 +926,7 @@ export function OperationsFlightCrewPage() {
                   </button>
                   {expandedFlights.has(flight.id) &&
                     (manifests[flight.id] ?? []).map((row) => (
-                      <article
-                        className="flight-crew-mobile-member"
-                        key={row.id}
-                      >
+                      <article className="flight-crew-mobile-member" key={row.id}>
                         <div className="flight-crew-mobile-member-info">
                           <strong>{row.crewMemberName}</strong>
                           <span>Badge: {row.badgeNumber}</span>

@@ -16,8 +16,7 @@ export const usersRepository = {
           like(users.oidcSubject, `%${q.replace(/[\\%_]/g, "\\$&")}%`),
         )
       : undefined;
-    const total =
-      db.select({ value: count() }).from(users).where(where).get()?.value ?? 0;
+    const total = db.select({ value: count() }).from(users).where(where).get()?.value ?? 0;
     const sortColumns = {
       id: users.id,
       email: users.email,
@@ -180,8 +179,7 @@ export const usersRepository = {
     return { changes: result.changes };
   },
   update(id: string | number, values: Record<string, unknown>) {
-    if (values.isActive === false && isLastAdminUser(String(id)))
-      throw new Error("LAST_ADMIN");
+    if (values.isActive === false && isLastAdminUser(String(id))) throw new Error("LAST_ADMIN");
     const result = db
       .update(users)
       .set(values as never)
@@ -207,13 +205,7 @@ function activeAdminCount() {
       .from(users)
       .innerJoin(userRoles, eq(userRoles.userId, users.id))
       .innerJoin(roles, eq(roles.id, userRoles.roleId))
-      .where(
-        and(
-          eq(users.isActive, true),
-          eq(roles.code, "ADMIN"),
-          eq(roles.isActive, true),
-        ),
-      )
+      .where(and(eq(users.isActive, true), eq(roles.code, "ADMIN"), eq(roles.isActive, true)))
       .get()?.value ?? 0
   );
 }

@@ -55,32 +55,18 @@ export default function AdminDashboard() {
         <div>
           <div className="admin-eyebrow">ADMINISTRATION</div>
           <h1>Dashboard</h1>
-          <p>
-            Manage users, access, finance reference data, and system
-            configuration.
-          </p>
+          <p>Manage users, access, finance reference data, and system configuration.</p>
         </div>
       </section>
 
-      <section
-        className="admin-metrics-grid"
-        aria-label="Administration metrics"
-      >
+      <section className="admin-metrics-grid" aria-label="Administration metrics">
         {metrics.map((metric) => (
-          <Link
-            className="admin-metric-card"
-            href={metric.href}
-            key={metric.label}
-          >
+          <Link className="admin-metric-card" href={metric.href} key={metric.label}>
             <div className="admin-metric-top">
               <span>{metric.label}</span>
-              <span className={`admin-metric-icon tone-${metric.tone}`}>
-                {metric.icon}
-              </span>
+              <span className={`admin-metric-icon tone-${metric.tone}`}>{metric.icon}</span>
             </div>
-            <strong className="admin-metric-value">
-              {metric.value.toLocaleString("en-IN")}
-            </strong>
+            <strong className="admin-metric-value">{metric.value.toLocaleString("en-IN")}</strong>
             <span className="admin-metric-note">{metric.note}</span>
           </Link>
         ))}
@@ -152,8 +138,8 @@ export default function AdminDashboard() {
           <div className="admin-info-note">
             <span>i</span>
             <p>
-              Flight records, crew members, designations, airlines, and airports
-              are maintained in the Flight Operations workspace.
+              Flight records, crew members, designations, airlines, and airports are maintained in
+              the Flight Operations workspace.
             </p>
           </div>
           <div className="admin-quick-actions">

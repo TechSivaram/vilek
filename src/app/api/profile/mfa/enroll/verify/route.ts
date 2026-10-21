@@ -8,10 +8,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.toLowerCase().includes("application/json"))
-    return NextResponse.json(
-      { error: "Expected application/json" },
-      { status: 415 },
-    );
+    return NextResponse.json({ error: "Expected application/json" }, { status: 415 });
   let body: unknown;
   try {
     body = await request.json();

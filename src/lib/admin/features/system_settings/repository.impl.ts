@@ -4,10 +4,7 @@ import { currencies, systemSettings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 export const system_settingsRepository = {
   get() {
-    return (
-      db.select().from(systemSettings).where(eq(systemSettings.id, 1)).get() ??
-      null
-    );
+    return db.select().from(systemSettings).where(eq(systemSettings.id, 1)).get() ?? null;
   },
   currencyOptions() {
     return db
@@ -22,11 +19,7 @@ export const system_settingsRepository = {
   },
   currencyExists(id: number) {
     return Boolean(
-      db
-        .select({ id: currencies.id })
-        .from(currencies)
-        .where(eq(currencies.id, id))
-        .get(),
+      db.select({ id: currencies.id }).from(currencies).where(eq(currencies.id, id)).get(),
     );
   },
   save(defaultCurrencyId: number, maxUploadSizeBytes: number) {

@@ -1,12 +1,7 @@
 import "server-only";
 import { asc, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import {
-  crewDesignations,
-  crewMemberDesignations,
-  crewMembers,
-  users,
-} from "@/lib/db/schema";
+import { crewDesignations, crewMemberDesignations, crewMembers, users } from "@/lib/db/schema";
 import type { ResourceRepository } from "./repository";
 
 export const repository: ResourceRepository = {
@@ -27,15 +22,9 @@ export const repository: ResourceRepository = {
         designation_name: crewDesignations.name,
       })
       .from(crewMemberDesignations)
-      .leftJoin(
-        crewMembers,
-        eq(crewMemberDesignations.crewMemberId, crewMembers.id),
-      )
+      .leftJoin(crewMembers, eq(crewMemberDesignations.crewMemberId, crewMembers.id))
       .leftJoin(users, eq(crewMembers.userId, users.id))
-      .leftJoin(
-        crewDesignations,
-        eq(crewMemberDesignations.designationId, crewDesignations.id),
-      )
+      .leftJoin(crewDesignations, eq(crewMemberDesignations.designationId, crewDesignations.id))
       .orderBy(desc(crewMemberDesignations.id))
       .limit(500)
       .all()
@@ -79,15 +68,10 @@ export const repository: ResourceRepository = {
         crewMemberId: String(input.crew_member_id),
         designationId: Number(input.designation_id),
         validFrom:
-          input.valid_from == null || input.valid_from === ""
-            ? null
-            : String(input.valid_from),
+          input.valid_from == null || input.valid_from === "" ? null : String(input.valid_from),
         validUntil:
-          input.valid_until == null || input.valid_until === ""
-            ? null
-            : String(input.valid_until),
-        isActive:
-          input.is_active === undefined ? true : Boolean(input.is_active),
+          input.valid_until == null || input.valid_until === "" ? null : String(input.valid_until),
+        isActive: input.is_active === undefined ? true : Boolean(input.is_active),
       })
       .returning({ id: crewMemberDesignations.id })
       .get();
@@ -95,22 +79,15 @@ export const repository: ResourceRepository = {
   },
   update(id, input) {
     const values: Partial<typeof crewMemberDesignations.$inferInsert> = {};
-    if (input.crew_member_id !== undefined)
-      values.crewMemberId = String(input.crew_member_id);
-    if (input.designation_id !== undefined)
-      values.designationId = Number(input.designation_id);
+    if (input.crew_member_id !== undefined) values.crewMemberId = String(input.crew_member_id);
+    if (input.designation_id !== undefined) values.designationId = Number(input.designation_id);
     if (input.valid_from !== undefined)
       values.validFrom =
-        input.valid_from == null || input.valid_from === ""
-          ? null
-          : String(input.valid_from);
+        input.valid_from == null || input.valid_from === "" ? null : String(input.valid_from);
     if (input.valid_until !== undefined)
       values.validUntil =
-        input.valid_until == null || input.valid_until === ""
-          ? null
-          : String(input.valid_until);
-    if (input.is_active !== undefined)
-      values.isActive = Boolean(input.is_active);
+        input.valid_until == null || input.valid_until === "" ? null : String(input.valid_until);
+    if (input.is_active !== undefined) values.isActive = Boolean(input.is_active);
     if (!Object.keys(values).length)
       return (
         db

@@ -1,10 +1,6 @@
 import "server-only";
 import { airportsRepository } from "./repository";
-import type {
-  AirportsListQuery,
-  AirportsCreateInput,
-  AirportsUpdateInput,
-} from "./dto";
+import type { AirportsListQuery, AirportsCreateInput, AirportsUpdateInput } from "./dto";
 export const airportsService = {
   list(query: AirportsListQuery) {
     return airportsRepository.list(query);

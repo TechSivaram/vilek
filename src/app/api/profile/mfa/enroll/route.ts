@@ -30,27 +30,19 @@ export async function POST(request: Request) {
 
 async function parseJsonBody(
   request: Request,
-): Promise<
-  { ok: true; body: unknown } | { ok: false; response: NextResponse }
-> {
+): Promise<{ ok: true; body: unknown } | { ok: false; response: NextResponse }> {
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.toLowerCase().includes("application/json"))
     return {
       ok: false,
-      response: NextResponse.json(
-        { error: "Expected application/json" },
-        { status: 415 },
-      ),
+      response: NextResponse.json({ error: "Expected application/json" }, { status: 415 }),
     };
   try {
     return { ok: true, body: await request.json() };
   } catch {
     return {
       ok: false,
-      response: NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      ),
+      response: NextResponse.json({ error: "Invalid JSON body." }, { status: 400 }),
     };
   }
 }

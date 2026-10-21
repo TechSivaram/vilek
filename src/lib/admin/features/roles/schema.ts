@@ -1,10 +1,5 @@
 import { z } from "zod";
-import type {
-  RolesCreateInput,
-  RolesUpdateInput,
-  ListQueryParams,
-  RolesFormDto,
-} from "./dto";
+import type { RolesCreateInput, RolesUpdateInput, ListQueryParams, RolesFormDto } from "./dto";
 
 export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
   q: z.string().trim().max(200).optional(),
@@ -21,9 +16,7 @@ const createShape = {
   isActive: z.boolean(),
 };
 
-export const createInputSchema: z.ZodType<RolesCreateInput> = z
-  .object(createShape)
-  .strict();
+export const createInputSchema: z.ZodType<RolesCreateInput> = z.object(createShape).strict();
 export const updateInputSchema: z.ZodType<RolesUpdateInput> = z
   .object(createShape)
   .partial()

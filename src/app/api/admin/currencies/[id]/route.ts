@@ -11,10 +11,7 @@ export const PATCH = withRouteGuard(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
     }
     const parsed = updateInputSchema.safeParse(body);
     if (!parsed.success)
@@ -55,10 +52,7 @@ export const DELETE = withRouteGuard(
         ? NextResponse.json({ ok: true })
         : NextResponse.json({ error: "Record not found." }, { status: 404 });
     } catch {
-      return NextResponse.json(
-        { error: "The record could not be deactivated." },
-        { status: 409 },
-      );
+      return NextResponse.json({ error: "The record could not be deactivated." }, { status: 409 });
     }
   },
 );

@@ -14,10 +14,7 @@ export type UsersListRow = {
   oidcSubject: string | null;
   isActive: boolean;
 };
-export type UsersCreateInput = Omit<
-  UsersListRow,
-  "id" | "oidcSubject" | "isActive"
->;
+export type UsersCreateInput = Omit<UsersListRow, "id" | "oidcSubject" | "isActive">;
 export type UsersUpdateInput = Partial<UsersCreateInput>;
 export type UsersListResult = {
   rows: UsersListRow[];

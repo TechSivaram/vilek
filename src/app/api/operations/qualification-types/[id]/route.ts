@@ -24,25 +24,16 @@ export const PATCH = withRouteGuard(
     const resource = resourceConfig;
 
     if (!resource.writable)
-      return NextResponse.json(
-        { error: "This history table is read-only." },
-        { status: 405 },
-      );
+      return NextResponse.json({ error: "This history table is read-only." }, { status: 405 });
     let body: unknown;
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
     }
     const id = routeId;
     if (id === undefined || id === null || id === "")
-      return NextResponse.json(
-        { error: "Record id is required." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Record id is required." }, { status: 400 });
     const parsedInput = updateInputSchema.safeParse(body);
     if (!parsedInput.success)
       return NextResponse.json(
@@ -58,8 +49,7 @@ export const PATCH = withRouteGuard(
     } catch {
       return NextResponse.json(
         {
-          error:
-            "The record could not be updated. Check constraints and linked records.",
+          error: "The record could not be updated. Check constraints and linked records.",
         },
         { status: 409 },
       );

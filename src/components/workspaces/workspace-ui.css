@@ -644,8 +644,7 @@
 .role-dashboard--finance .workspace-switcher__trigger:hover,
 .role-dashboard--finance .workspace-switcher__trigger[aria-expanded="true"],
 .role-dashboard--flight_operations_manager .workspace-switcher__trigger:hover,
-.role-dashboard--flight_operations_manager
-  .workspace-switcher__trigger[aria-expanded="true"] {
+.role-dashboard--flight_operations_manager .workspace-switcher__trigger[aria-expanded="true"] {
   border-color: var(--rd-accent-line);
 }
 .workspace-switcher__item-icon[data-theme="crew"] {
@@ -1085,12 +1084,7 @@
 /* Finance Tiranga icon treatment across workspace headers and switchers. */
 .workspace-switcher__trigger-icon[data-theme="finance"] {
   color: #087f3e !important;
-  background: linear-gradient(
-    180deg,
-    #fff0df 0%,
-    #ffffff 48%,
-    #e5f5e8 100%
-  ) !important;
+  background: linear-gradient(180deg, #fff0df 0%, #ffffff 48%, #e5f5e8 100%) !important;
   border: 1px solid #b9dfc2;
   box-shadow:
     inset 0 3px 0 #ff9933,
@@ -1151,7 +1145,6 @@
   border-color: #b9dfc2;
 }
 .role-dashboard--flight_operations_manager .workspace-switcher__trigger:hover,
-.role-dashboard--flight_operations_manager
-  .workspace-switcher__trigger[aria-expanded="true"] {
+.role-dashboard--flight_operations_manager .workspace-switcher__trigger[aria-expanded="true"] {
   border-color: #b9dfc2;
 }

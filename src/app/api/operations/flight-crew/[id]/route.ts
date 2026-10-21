@@ -12,10 +12,7 @@ export const DELETE = withRouteGuard(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "A removal reason is required." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "A removal reason is required." }, { status: 400 });
     }
     const parsed = removeFlightCrewSchema.safeParse(body);
     if (!parsed.success)
@@ -30,15 +27,9 @@ export const DELETE = withRouteGuard(
       });
       return result.changes
         ? NextResponse.json({ ok: true })
-        : NextResponse.json(
-            { error: "Assignment not found." },
-            { status: 404 },
-          );
+        : NextResponse.json({ error: "Assignment not found." }, { status: 404 });
     } catch {
-      return NextResponse.json(
-        { error: "The assignment could not be removed." },
-        { status: 409 },
-      );
+      return NextResponse.json({ error: "The assignment could not be removed." }, { status: 409 });
     }
   },
 );

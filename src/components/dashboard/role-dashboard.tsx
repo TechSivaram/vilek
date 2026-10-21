@@ -31,19 +31,12 @@ export function RoleDashboard({
   metrics: DashboardMetric[];
   actions: DashboardAction[];
 }) {
-  const initials =
-    `${user.firstName.slice(0, 1)}${user.lastName.slice(0, 1)}`.toUpperCase();
+  const initials = `${user.firstName.slice(0, 1)}${user.lastName.slice(0, 1)}`.toUpperCase();
   return (
     <main className="role-dashboard">
       <aside className="role-sidebar">
         <Link href="/" className="role-brand" aria-label="ViLek home">
-          <Image
-            src="/Branding/logo.png"
-            alt="ViLek"
-            width={126}
-            height={50}
-            priority
-          />
+          <Image src="/Branding/logo.png" alt="ViLek" width={126} height={50} priority />
         </Link>
         <p className="role-sidebar-label">WORKSPACE</p>
         <Link href="/" className="role-nav-item role-nav-item-active">
@@ -58,12 +51,7 @@ export function RoleDashboard({
             <span>{roleLabel}</span>
           </div>
           <form action="/api/auth/logout" method="post">
-            <button
-              className="role-logout"
-              type="submit"
-              aria-label="Sign out"
-              title="Sign out"
-            >
+            <button className="role-logout" type="submit" aria-label="Sign out" title="Sign out">
               ↪
             </button>
           </form>
@@ -124,8 +112,8 @@ export function RoleDashboard({
           <div className="role-note">
             <span>i</span>
             <p>
-              This dashboard is tailored to your ViLek role. Available tasks are
-              governed by your assigned permissions.
+              This dashboard is tailored to your ViLek role. Available tasks are governed by your
+              assigned permissions.
             </p>
           </div>
         </div>

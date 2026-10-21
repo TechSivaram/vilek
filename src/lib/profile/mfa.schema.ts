@@ -9,6 +9,4 @@ export const mfaCodeRequestSchema: z.ZodType<MfaCodeRequestDto> = z
       .regex(/^\d{6}$/, "Enter the six-digit authenticator code."),
   })
   .strict();
-export const mfaEnrollRequestSchema: z.ZodType<MfaEnrollRequestDto> = z
-  .object({})
-  .strict();
+export const mfaEnrollRequestSchema: z.ZodType<MfaEnrollRequestDto> = z.object({}).strict();

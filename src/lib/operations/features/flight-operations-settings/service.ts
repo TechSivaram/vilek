@@ -13,10 +13,7 @@ import {
 const repository = new FlightOperationsSettingsRepositoryImpl();
 
 function mapRow(value: unknown): FlightOperationsSettingsResponseDto {
-  const row =
-    value && typeof value === "object"
-      ? (value as Record<string, unknown>)
-      : {};
+  const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
   return {
     id: Number(row.id),
     setting_key: String(row.setting_key ?? ""),
@@ -24,8 +21,7 @@ function mapRow(value: unknown): FlightOperationsSettingsResponseDto {
     description: row.description == null ? null : String(row.description),
     updated_at: row.updated_at == null ? null : String(row.updated_at),
     setting: String(row.setting ?? row.setting_key ?? ""),
-    setting_description:
-      row.setting_description == null ? null : String(row.setting_description),
+    setting_description: row.setting_description == null ? null : String(row.setting_description),
   };
 }
 
@@ -39,8 +35,7 @@ export const flightOperationsSettingsService = {
       writable: FlightOperationsSettingsResourceConfig.writable,
       columns: FlightOperationsSettingsResourceConfig.columns,
       displayColumns:
-        result.displayColumns ??
-        FlightOperationsSettingsResourceConfig.columns.slice(),
+        result.displayColumns ?? FlightOperationsSettingsResourceConfig.columns.slice(),
       rows: result.rows.map(mapRow),
       options: result.options,
     };

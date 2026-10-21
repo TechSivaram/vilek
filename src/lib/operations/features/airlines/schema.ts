@@ -21,9 +21,7 @@ const createShape = {
   isActive: z.boolean(),
 };
 
-export const createInputSchema: z.ZodType<AirlinesCreateInput> = z
-  .object(createShape)
-  .strict();
+export const createInputSchema: z.ZodType<AirlinesCreateInput> = z.object(createShape).strict();
 export const updateInputSchema: z.ZodType<AirlinesUpdateInput> = z
   .object(createShape)
   .partial()

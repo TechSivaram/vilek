@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import {
-  listQuerySchema,
-  createInputSchema,
-} from "@/lib/operations/features/airports/schema";
+import { listQuerySchema, createInputSchema } from "@/lib/operations/features/airports/schema";
 import { airportsService } from "@/lib/operations/features/airports/service";
 export const dynamic = "force-dynamic";
 export const GET = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (request: Request) => {
-    const parsed = listQuerySchema.safeParse(
-      Object.fromEntries(new URL(request.url).searchParams),
-    );
+    const parsed = listQuerySchema.safeParse(Object.fromEntries(new URL(request.url).searchParams));
     if (!parsed.success)
       return NextResponse.json(
         {
@@ -47,10 +42,7 @@ export const POST = withRouteGuard(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
     }
     const parsed = createInputSchema.safeParse(body);
     if (!parsed.success)
@@ -63,8 +55,7 @@ export const POST = withRouteGuard(
       return NextResponse.json({ ok: true }, { status: 201 });
     } catch (error) {
       const message =
-        error instanceof Error &&
-        /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
+        error instanceof Error && /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
           ? "The record violates a uniqueness, validation, or relationship constraint."
           : "The record could not be saved.";
       return NextResponse.json({ error: message }, { status: 409 });

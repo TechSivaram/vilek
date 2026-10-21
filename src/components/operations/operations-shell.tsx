@@ -127,9 +127,7 @@ export function OperationsShell({
   }, [drawerOpen]);
 
   return (
-    <div
-      className={`admin-app ${collapsed ? "admin-app--collapsed" : ""} operations-app`}
-    >
+    <div className={`admin-app ${collapsed ? "admin-app--collapsed" : ""} operations-app`}>
       <button
         className={`admin-drawer-backdrop ${drawerOpen ? "is-visible" : ""}`}
         aria-label="Close navigation"
@@ -141,18 +139,8 @@ export function OperationsShell({
         aria-label="Flight Operations navigation"
       >
         <div className="admin-brand-row">
-          <Link
-            href="/operations"
-            className="admin-brand"
-            aria-label="ViLek Flight Operations"
-          >
-            <Image
-              src="/Branding/logo.png"
-              alt="ViLek"
-              width={118}
-              height={46}
-              priority
-            />
+          <Link href="/operations" className="admin-brand" aria-label="ViLek Flight Operations">
+            <Image src="/Branding/logo.png" alt="ViLek" width={118} height={46} priority />
           </Link>
           <button
             className="admin-sidebar-collapse"
@@ -177,8 +165,7 @@ export function OperationsShell({
           <section className="admin-nav-group">
             <h2 className="admin-nav-group-title">Flight operations</h2>
             {items.map((item) => {
-              const active =
-                pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link
                   key={item.href}
@@ -196,17 +183,12 @@ export function OperationsShell({
           <section className="admin-nav-group ops-configuration-nav">
             <h2 className="admin-nav-group-title">Configuration &amp; audit</h2>
             {configurationItems.map((item, index) => {
-              const active =
-                pathname === item.href || pathname.startsWith(`${item.href}/`);
-              const showGroup =
-                index === 0 ||
-                configurationItems[index - 1].group !== item.group;
+              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const showGroup = index === 0 || configurationItems[index - 1].group !== item.group;
               return (
                 <div key={item.href}>
                   {showGroup && (
-                    <h3 className="admin-nav-group-title ops-nav-feature-group">
-                      {item.group}
-                    </h3>
+                    <h3 className="admin-nav-group-title ops-nav-feature-group">{item.group}</h3>
                   )}
                   <Link
                     className={`admin-nav-link ops-nav-sub-link ${active ? "is-active" : ""}`}
@@ -248,15 +230,8 @@ export function OperationsShell({
             </div>
           </div>
           <div className="admin-topbar-right">
-            <WorkspaceSwitcher
-              roleCodes={roleCodes}
-              currentRole="FLIGHT_OPERATIONS_MANAGER"
-            />
-            <ProfileMenu
-              firstName={user.firstName}
-              lastName={user.lastName}
-              email={user.email}
-            />
+            <WorkspaceSwitcher roleCodes={roleCodes} currentRole="FLIGHT_OPERATIONS_MANAGER" />
+            <ProfileMenu firstName={user.firstName} lastName={user.lastName} email={user.email} />
           </div>
         </header>
         <main className="admin-content">{children}</main>

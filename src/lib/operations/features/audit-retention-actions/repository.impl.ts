@@ -23,23 +23,13 @@ export class AuditRetentionActionsRepositoryImpl implements AuditRetentionAction
       })
       .from(auditRetentionActions)
       .leftJoin(users, eq(auditRetentionActions.actorUserId, users.id))
-      .orderBy(
-        desc(auditRetentionActions.createdAt),
-        desc(auditRetentionActions.id),
-      )
+      .orderBy(desc(auditRetentionActions.createdAt), desc(auditRetentionActions.id))
       .limit(500)
       .all();
     return {
       rows,
       options: {},
-      displayColumns: [
-        "id",
-        "action",
-        "cutoff_at",
-        "affected_count",
-        "actor_email",
-        "created_at",
-      ],
+      displayColumns: ["id", "action", "cutoff_at", "affected_count", "actor_email", "created_at"],
     };
   }
 }

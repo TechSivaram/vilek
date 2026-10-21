@@ -11,14 +11,9 @@ export const currenciesRepository = {
     const q = (input.search ?? "").trim();
     const escapedQuery = q.replace(/[\\%_]/g, "\\$&");
     const where = q
-      ? or(
-          like(currencies.code, `%${escapedQuery}%`),
-          like(currencies.name, `%${escapedQuery}%`),
-        )
+      ? or(like(currencies.code, `%${escapedQuery}%`), like(currencies.name, `%${escapedQuery}%`))
       : undefined;
-    const total =
-      db.select({ value: count() }).from(currencies).where(where).get()
-        ?.value ?? 0;
+    const total = db.select({ value: count() }).from(currencies).where(where).get()?.value ?? 0;
     const sortColumns = {
       id: currencies.id,
       code: currencies.code,

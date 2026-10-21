@@ -54,10 +54,7 @@ export const flightsRepository = {
         .from(flights)
         .leftJoin(airlines, eq(flights.airlineId, airlines.id))
         .leftJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-        .leftJoin(
-          destinationAirport,
-          eq(flights.destinationAirportId, destinationAirport.id),
-        )
+        .leftJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
         .where(where)
         .get()?.value ?? 0;
 
@@ -94,10 +91,7 @@ export const flightsRepository = {
       .from(flights)
       .leftJoin(airlines, eq(flights.airlineId, airlines.id))
       .leftJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-      .leftJoin(
-        destinationAirport,
-        eq(flights.destinationAirportId, destinationAirport.id),
-      )
+      .leftJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
       .where(where)
       .orderBy(ordering)
       .limit(pageSize)

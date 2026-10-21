@@ -82,18 +82,8 @@ export function AdminShell({
         aria-label="Administration navigation"
       >
         <div className="admin-brand-row">
-          <Link
-            href="/dashboard"
-            className="admin-brand"
-            aria-label="ViLek workspaces"
-          >
-            <Image
-              src="/Branding/logo.png"
-              alt="ViLek"
-              width={118}
-              height={46}
-              priority
-            />
+          <Link href="/dashboard" className="admin-brand" aria-label="ViLek workspaces">
+            <Image src="/Branding/logo.png" alt="ViLek" width={118} height={46} priority />
           </Link>
           <button
             className="admin-sidebar-collapse"
@@ -120,9 +110,7 @@ export function AdminShell({
             <section className="admin-nav-group" key={group.label}>
               <h2 className="admin-nav-group-title">{group.label}</h2>
               {group.items.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`);
+                const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
                   <Link
                     key={item.href}
@@ -168,11 +156,7 @@ export function AdminShell({
           </div>
           <div className="admin-topbar-right">
             <WorkspaceSwitcher roleCodes={roleCodes} currentRole="ADMIN" />
-            <ProfileMenu
-              firstName={user.firstName}
-              lastName={user.lastName}
-              email={user.email}
-            />
+            <ProfileMenu firstName={user.firstName} lastName={user.lastName} email={user.email} />
           </div>
         </header>
         <main className="admin-content">{children}</main>

@@ -27,9 +27,8 @@ export default async function AccessDeniedPage() {
       >
         <h1>Access not configured</h1>
         <p>
-          Hello {auth.user.firstName}, your ViLek account is authenticated but
-          does not have an active application role assigned. Please contact your
-          administrator.
+          Hello {auth.user.firstName}, your ViLek account is authenticated but does not have an
+          active application role assigned. Please contact your administrator.
         </p>
         <form action="/api/auth/logout" method="post">
           <button type="submit">Sign out</button>

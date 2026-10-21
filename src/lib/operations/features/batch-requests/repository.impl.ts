@@ -22,22 +22,13 @@ export class BatchRequestsRepositoryImpl implements BatchRequestsRepository {
       })
       .from(flightCrewBatchRequests)
       .leftJoin(users, eq(flightCrewBatchRequests.requestedByUserId, users.id))
-      .orderBy(
-        desc(flightCrewBatchRequests.createdAt),
-        desc(flightCrewBatchRequests.id),
-      )
+      .orderBy(desc(flightCrewBatchRequests.createdAt), desc(flightCrewBatchRequests.id))
       .limit(500)
       .all();
     return {
       rows,
       options: {},
-      displayColumns: [
-        "id",
-        "state",
-        "requested_by_email",
-        "created_at",
-        "completed_at",
-      ],
+      displayColumns: ["id", "state", "requested_by_email", "created_at", "completed_at"],
     };
   }
 }

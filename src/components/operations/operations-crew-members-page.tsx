@@ -10,10 +10,7 @@ import type {
   CrewMembersListResult,
 } from "@/lib/operations/features/crew_members/dto";
 
-async function requestJson<T = any>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
+async function requestJson<T = any>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, {
     ...init,
     headers: {
@@ -58,9 +55,7 @@ export function OperationsCrewMembersPage() {
   const list = useQuery<CrewMembersListResult>({
     queryKey: ["operations-crew_members", search, page, pageSize],
     queryFn: () =>
-      requestJson(
-        `${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`,
-      ),
+      requestJson(`${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`),
   });
 
   const save = useMutation({
@@ -176,11 +171,7 @@ export function OperationsCrewMembersPage() {
               <h2>{editing ? "Edit " : "Add "}Crew Members</h2>
               <p>Manage crew records linked to local ViLek user accounts.</p>
             </div>
-            <button
-              className="admin-icon-button"
-              type="button"
-              onClick={cancel}
-            >
+            <button className="admin-icon-button" type="button" onClick={cancel}>
               ×
             </button>
           </div>
@@ -219,18 +210,10 @@ export function OperationsCrewMembersPage() {
               <span>Active</span>
             </label>
             <div className="admin-form-actions">
-              <button
-                type="button"
-                className="admin-secondary-button"
-                onClick={cancel}
-              >
+              <button type="button" className="admin-secondary-button" onClick={cancel}>
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="admin-primary-button"
-                disabled={busy}
-              >
+              <button type="submit" className="admin-primary-button" disabled={busy}>
                 {busy ? "Saving…" : "Save changes"}
               </button>
             </div>
@@ -241,8 +224,7 @@ export function OperationsCrewMembersPage() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Records{" "}
-              <span className="admin-count-badge">{pagination.total}</span>
+              Records <span className="admin-count-badge">{pagination.total}</span>
             </h2>
             <p>
               {pagination.total
@@ -282,9 +264,7 @@ export function OperationsCrewMembersPage() {
                 <tr key={String(row.id)}>
                   <td key="userName" data-label="Crew member">
                     <div>
-                      {row.userName ||
-                        `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim() ||
-                        "—"}
+                      {row.userName || `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim() || "—"}
                     </div>
                     {row.email && <small>{row.email}</small>}
                   </td>
@@ -293,13 +273,9 @@ export function OperationsCrewMembersPage() {
                   </td>
                   <td key="isActive" data-label="Status">
                     {row.isActive ? (
-                      <span className="admin-status-pill is-active">
-                        Active
-                      </span>
+                      <span className="admin-status-pill is-active">Active</span>
                     ) : (
-                      <span className="admin-status-pill is-inactive">
-                        Inactive
-                      </span>
+                      <span className="admin-status-pill is-inactive">Inactive</span>
                     )}
                   </td>
                   <td data-label="Actions">
@@ -317,11 +293,7 @@ export function OperationsCrewMembersPage() {
                           type="button"
                           className="admin-table-action is-danger"
                           onClick={() => {
-                            if (
-                              window.confirm(
-                                `Deactivate this crew members record?`,
-                              )
-                            )
+                            if (window.confirm(`Deactivate this crew members record?`))
                               deactivate.mutate(row);
                           }}
                           disabled={busy}
@@ -346,10 +318,7 @@ export function OperationsCrewMembersPage() {
         <div className="admin-pagination">
           <label>
             Rows per page{" "}
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-            >
+            <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -371,9 +340,7 @@ export function OperationsCrewMembersPage() {
             <button
               type="button"
               className="admin-secondary-button"
-              onClick={() =>
-                setPage((p) => Math.min(pagination.totalPages, p + 1))
-              }
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page >= pagination.totalPages || busy}
             >
               Next

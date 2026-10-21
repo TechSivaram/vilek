@@ -42,12 +42,8 @@ export const repository: ResourceRepository = {
       .values({
         code: String(input.code),
         name: String(input.name),
-        expiryRequired:
-          input.expiry_required === undefined
-            ? true
-            : Boolean(input.expiry_required),
-        isActive:
-          input.is_active === undefined ? true : Boolean(input.is_active),
+        expiryRequired: input.expiry_required === undefined ? true : Boolean(input.expiry_required),
+        isActive: input.is_active === undefined ? true : Boolean(input.is_active),
       })
       .returning({ id: qualificationTypes.id })
       .get();
@@ -57,10 +53,8 @@ export const repository: ResourceRepository = {
     const values: Partial<typeof qualificationTypes.$inferInsert> = {};
     if (input.code !== undefined) values.code = String(input.code);
     if (input.name !== undefined) values.name = String(input.name);
-    if (input.expiry_required !== undefined)
-      values.expiryRequired = Boolean(input.expiry_required);
-    if (input.is_active !== undefined)
-      values.isActive = Boolean(input.is_active);
+    if (input.expiry_required !== undefined) values.expiryRequired = Boolean(input.expiry_required);
+    if (input.is_active !== undefined) values.isActive = Boolean(input.is_active);
     if (!Object.keys(values).length)
       return (
         db

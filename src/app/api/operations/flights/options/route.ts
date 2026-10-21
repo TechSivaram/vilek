@@ -6,10 +6,7 @@ export const dynamic = "force-dynamic";
 
 // Dropdown lookup data is fetched only when the create/edit form is opened,
 // not on every paginated/search request for flight rows.
-export const GET = withRouteGuard(
-  { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
-  async () => {
-    const options = await flightsService.options();
-    return NextResponse.json({ options });
-  },
-);
+export const GET = withRouteGuard({ roles: ["FLIGHT_OPERATIONS_MANAGER"] }, async () => {
+  const options = await flightsService.options();
+  return NextResponse.json({ options });
+});

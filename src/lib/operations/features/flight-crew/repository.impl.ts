@@ -1,18 +1,13 @@
 import "server-only";
 import { flightCrewRepository } from "@/lib/operations/flight-crew";
 import type { FlightCrewFeatureRepository } from "./repository";
-import type {
-  CreateFlightCrewInput,
-  ListFlightCrewQuery,
-  RemoveFlightCrewInput,
-} from "./schema";
+import type { CreateFlightCrewInput, ListFlightCrewQuery, RemoveFlightCrewInput } from "./schema";
 import type { FlightCrewActorDto } from "./dto";
 
 /** Adapter to the established Drizzle-backed flight crew repository. */
 export const flightCrewFeatureRepository: FlightCrewFeatureRepository = {
   list(query: ListFlightCrewQuery) {
-    if (query.flightId)
-      return { rows: flightCrewRepository.manifest(query.flightId) };
+    if (query.flightId) return { rows: flightCrewRepository.manifest(query.flightId) };
     const result = flightCrewRepository.listFlights({
       search: query.q,
       page: query.page,

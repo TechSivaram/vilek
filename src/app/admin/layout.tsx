@@ -5,11 +5,7 @@ import "./admin.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
   const authenticated = await requireRole("ADMIN");
 
   return (

@@ -63,19 +63,11 @@ export const userRolesRepository = {
           .from(users)
           .innerJoin(userRoles, eq(userRoles.userId, users.id))
           .innerJoin(roles, eq(roles.id, userRoles.roleId))
-          .where(
-            and(
-              eq(users.isActive, true),
-              eq(roles.code, "ADMIN"),
-              eq(roles.isActive, true),
-            ),
-          )
+          .where(and(eq(users.isActive, true), eq(roles.code, "ADMIN"), eq(roles.isActive, true)))
           .get()?.value ?? 0;
       if (admins <= 1) return { status: "last-admin" as const };
     }
     const result = db.delete(userRoles).where(eq(userRoles.id, id)).run();
-    return result.changes
-      ? { status: "ok" as const }
-      : { status: "missing" as const };
+    return result.changes ? { status: "ok" as const } : { status: "missing" as const };
   },
 };

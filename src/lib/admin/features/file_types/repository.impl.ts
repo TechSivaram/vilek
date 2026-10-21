@@ -20,10 +20,7 @@ export const fileTypesRepository = {
       .all();
   },
   create(settingId: number, fileType: string) {
-    return db
-      .insert(allowedFileTypes)
-      .values({ systemSettingId: settingId, fileType })
-      .run();
+    return db.insert(allowedFileTypes).values({ systemSettingId: settingId, fileType }).run();
   },
   remove(id: number) {
     return db.delete(allowedFileTypes).where(eq(allowedFileTypes.id, id)).run();

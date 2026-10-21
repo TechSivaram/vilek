@@ -13,8 +13,7 @@ export type ExpenseCategoriesListRow = {
   isActive: boolean;
 };
 export type ExpenseCategoriesCreateInput = Omit<ExpenseCategoriesListRow, "id">;
-export type ExpenseCategoriesUpdateInput =
-  Partial<ExpenseCategoriesCreateInput>;
+export type ExpenseCategoriesUpdateInput = Partial<ExpenseCategoriesCreateInput>;
 export type ExpenseCategoriesListResult = {
   rows: ExpenseCategoriesListRow[];
   options?: {

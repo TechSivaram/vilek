@@ -16,9 +16,7 @@ function resolveDatabasePath() {
   }
   // SQLite is the active adapter. Keep the setting explicit rather than silently
   // treating a future PostgreSQL URL as a local file path.
-  throw new Error(
-    "This build uses SQLite. Set DATABASE_URL=file:./data/vilek.db.",
-  );
+  throw new Error("This build uses SQLite. Set DATABASE_URL=file:./data/vilek.db.");
 }
 
 const globalForDb = globalThis as unknown as { sqlite?: Database.Database };

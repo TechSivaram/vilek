@@ -18,37 +18,24 @@ export const airlinesRepository = {
         )
       : undefined;
 
-    const total =
-      db.select({ value: count() }).from(airlines).where(where).get()?.value ??
-      0;
+    const total = db.select({ value: count() }).from(airlines).where(where).get()?.value ?? 0;
 
     let ordering: SQL;
     switch (input.sort) {
       case "iataCode":
-        ordering =
-          input.direction === "desc"
-            ? desc(airlines.iataCode)
-            : asc(airlines.iataCode);
+        ordering = input.direction === "desc" ? desc(airlines.iataCode) : asc(airlines.iataCode);
         break;
       case "icaoCode":
-        ordering =
-          input.direction === "desc"
-            ? desc(airlines.icaoCode)
-            : asc(airlines.icaoCode);
+        ordering = input.direction === "desc" ? desc(airlines.icaoCode) : asc(airlines.icaoCode);
         break;
       case "name":
-        ordering =
-          input.direction === "desc" ? desc(airlines.name) : asc(airlines.name);
+        ordering = input.direction === "desc" ? desc(airlines.name) : asc(airlines.name);
         break;
       case "isActive":
-        ordering =
-          input.direction === "desc"
-            ? desc(airlines.isActive)
-            : asc(airlines.isActive);
+        ordering = input.direction === "desc" ? desc(airlines.isActive) : asc(airlines.isActive);
         break;
       case "id":
-        ordering =
-          input.direction === "desc" ? desc(airlines.id) : asc(airlines.id);
+        ordering = input.direction === "desc" ? desc(airlines.id) : asc(airlines.id);
         break;
       default:
         ordering = asc(airlines.name);

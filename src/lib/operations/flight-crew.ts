@@ -1,16 +1,5 @@
 import "server-only";
-import {
-  and,
-  asc,
-  countDistinct,
-  desc,
-  eq,
-  inArray,
-  like,
-  or,
-  sql,
-  type SQL,
-} from "drizzle-orm";
+import { and, asc, countDistinct, desc, eq, inArray, like, or, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { db } from "@/lib/db";
 import {
@@ -57,10 +46,7 @@ export const flightCrewRepository = {
           like(destinationAirport.city, `%${search}%`),
           like(users.firstName, `%${search}%`),
           like(users.lastName, `%${search}%`),
-          like(
-            sql`(${users.firstName} || ' ' || ${users.lastName})`,
-            `%${search}%`,
-          ),
+          like(sql`(${users.firstName} || ' ' || ${users.lastName})`, `%${search}%`),
           like(crewMembers.badgeNumber, `%${search}%`),
           like(crewDesignations.name, `%${search}%`),
         )
@@ -72,17 +58,11 @@ export const flightCrewRepository = {
         .from(flights)
         .innerJoin(airlines, eq(flights.airlineId, airlines.id))
         .innerJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-        .innerJoin(
-          destinationAirport,
-          eq(flights.destinationAirportId, destinationAirport.id),
-        )
+        .innerJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
         .leftJoin(flightCrew, eq(flightCrew.flightId, flights.id))
         .leftJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
         .leftJoin(users, eq(crewMembers.userId, users.id))
-        .leftJoin(
-          crewDesignations,
-          eq(flightCrew.designationId, crewDesignations.id),
-        )
+        .leftJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
         .where(where)
         .get()?.value ?? 0;
 
@@ -101,23 +81,13 @@ export const flightCrewRepository = {
       .from(flights)
       .innerJoin(airlines, eq(flights.airlineId, airlines.id))
       .innerJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-      .innerJoin(
-        destinationAirport,
-        eq(flights.destinationAirportId, destinationAirport.id),
-      )
+      .innerJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
       .leftJoin(flightCrew, eq(flightCrew.flightId, flights.id))
       .leftJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
       .leftJoin(users, eq(crewMembers.userId, users.id))
-      .leftJoin(
-        crewDesignations,
-        eq(flightCrew.designationId, crewDesignations.id),
-      )
+      .leftJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
       .where(where)
-      .orderBy(
-        desc(flights.scheduledDeparture),
-        asc(airlines.name),
-        asc(flights.flightNumber),
-      )
+      .orderBy(desc(flights.scheduledDeparture), asc(airlines.name), asc(flights.flightNumber))
       .limit(pageSize)
       .offset((page - 1) * pageSize)
       .all();
@@ -158,22 +128,12 @@ export const flightCrewRepository = {
       .innerJoin(flights, eq(flightCrew.flightId, flights.id))
       .innerJoin(airlines, eq(flights.airlineId, airlines.id))
       .innerJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-      .innerJoin(
-        destinationAirport,
-        eq(flights.destinationAirportId, destinationAirport.id),
-      )
+      .innerJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
       .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
       .innerJoin(users, eq(crewMembers.userId, users.id))
-      .innerJoin(
-        crewDesignations,
-        eq(flightCrew.designationId, crewDesignations.id),
-      )
+      .innerJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
       .where(eq(flights.id, flightId))
-      .orderBy(
-        asc(crewDesignations.name),
-        asc(users.lastName),
-        asc(users.firstName),
-      )
+      .orderBy(asc(crewDesignations.name), asc(users.lastName), asc(users.firstName))
       .all();
   },
   list(input: FlightCrewListInput) {
@@ -194,10 +154,7 @@ export const flightCrewRepository = {
           like(destinationAirport.city, `%${search}%`),
           like(users.firstName, `%${search}%`),
           like(users.lastName, `%${search}%`),
-          like(
-            sql`(${users.firstName} || ' ' || ${users.lastName})`,
-            `%${search}%`,
-          ),
+          like(sql`(${users.firstName} || ' ' || ${users.lastName})`, `%${search}%`),
           like(crewMembers.badgeNumber, `%${search}%`),
           like(crewDesignations.name, `%${search}%`),
         )
@@ -209,17 +166,11 @@ export const flightCrewRepository = {
         .from(flights)
         .innerJoin(airlines, eq(flights.airlineId, airlines.id))
         .innerJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-        .innerJoin(
-          destinationAirport,
-          eq(flights.destinationAirportId, destinationAirport.id),
-        )
+        .innerJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
         .innerJoin(flightCrew, eq(flightCrew.flightId, flights.id))
         .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
         .innerJoin(users, eq(crewMembers.userId, users.id))
-        .innerJoin(
-          crewDesignations,
-          eq(flightCrew.designationId, crewDesignations.id),
-        )
+        .innerJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
         .where(where)
         .get()?.value ?? 0;
 
@@ -230,23 +181,13 @@ export const flightCrewRepository = {
       .from(flights)
       .innerJoin(airlines, eq(flights.airlineId, airlines.id))
       .innerJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-      .innerJoin(
-        destinationAirport,
-        eq(flights.destinationAirportId, destinationAirport.id),
-      )
+      .innerJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
       .innerJoin(flightCrew, eq(flightCrew.flightId, flights.id))
       .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
       .innerJoin(users, eq(crewMembers.userId, users.id))
-      .innerJoin(
-        crewDesignations,
-        eq(flightCrew.designationId, crewDesignations.id),
-      )
+      .innerJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
       .where(where)
-      .orderBy(
-        desc(flights.scheduledDeparture),
-        asc(airlines.name),
-        asc(flights.flightNumber),
-      )
+      .orderBy(desc(flights.scheduledDeparture), asc(airlines.name), asc(flights.flightNumber))
       .limit(pageSize)
       .offset((page - 1) * pageSize)
       .all()
@@ -277,16 +218,10 @@ export const flightCrewRepository = {
       .innerJoin(flights, eq(flightCrew.flightId, flights.id))
       .innerJoin(airlines, eq(flights.airlineId, airlines.id))
       .innerJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-      .innerJoin(
-        destinationAirport,
-        eq(flights.destinationAirportId, destinationAirport.id),
-      )
+      .innerJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
       .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
       .innerJoin(users, eq(crewMembers.userId, users.id))
-      .innerJoin(
-        crewDesignations,
-        eq(flightCrew.designationId, crewDesignations.id),
-      )
+      .innerJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
       .where(inArray(flights.id, flightIds))
       .orderBy(
         desc(flights.scheduledDeparture),
@@ -317,10 +252,7 @@ export const flightCrewRepository = {
       .from(flights)
       .innerJoin(airlines, eq(flights.airlineId, airlines.id))
       .innerJoin(originAirport, eq(flights.originAirportId, originAirport.id))
-      .innerJoin(
-        destinationAirport,
-        eq(flights.destinationAirportId, destinationAirport.id),
-      )
+      .innerJoin(destinationAirport, eq(flights.destinationAirportId, destinationAirport.id))
       .where(eq(flights.isActive, true))
       .orderBy(desc(flights.scheduledDeparture))
       .all();
@@ -394,10 +326,7 @@ export const flightCrewRepository = {
         .select({ id: crewDesignations.id, name: crewDesignations.name })
         .from(crewDesignations)
         .where(
-          and(
-            eq(crewDesignations.id, input.designationId),
-            eq(crewDesignations.isActive, true),
-          ),
+          and(eq(crewDesignations.id, input.designationId), eq(crewDesignations.isActive, true)),
         )
         .get();
       if (!designation) throw new Error("DESIGNATION_NOT_AVAILABLE");
@@ -427,24 +356,17 @@ export const flightCrewRepository = {
 
       const required = tx
         .select({
-          qualificationTypeId:
-            designationQualificationRequirements.qualificationTypeId,
+          qualificationTypeId: designationQualificationRequirements.qualificationTypeId,
           typeName: qualificationTypes.name,
         })
         .from(designationQualificationRequirements)
         .innerJoin(
           qualificationTypes,
-          eq(
-            designationQualificationRequirements.qualificationTypeId,
-            qualificationTypes.id,
-          ),
+          eq(designationQualificationRequirements.qualificationTypeId, qualificationTypes.id),
         )
         .where(
           and(
-            eq(
-              designationQualificationRequirements.designationId,
-              input.designationId,
-            ),
+            eq(designationQualificationRequirements.designationId, input.designationId),
             eq(designationQualificationRequirements.isRequired, true),
             eq(qualificationTypes.isActive, true),
           ),
@@ -457,18 +379,14 @@ export const flightCrewRepository = {
           .where(
             and(
               eq(crewQualifications.crewMemberId, input.crewMemberId),
-              eq(
-                crewQualifications.qualificationTypeId,
-                requirement.qualificationTypeId,
-              ),
+              eq(crewQualifications.qualificationTypeId, requirement.qualificationTypeId),
               eq(crewQualifications.status, "ACTIVE"),
               sql`${crewQualifications.validFrom} <= ${departureDate}`,
               sql`(${crewQualifications.validUntil} IS NULL OR ${crewQualifications.validUntil} >= ${departureDate})`,
             ),
           )
           .get();
-        if (!valid)
-          throw new Error(`QUALIFICATION_MISSING:${requirement.typeName}`);
+        if (!valid) throw new Error(`QUALIFICATION_MISSING:${requirement.typeName}`);
       }
 
       const assignment = tx.insert(flightCrew).values(input).returning().get();
@@ -512,10 +430,7 @@ export const flightCrewRepository = {
         .innerJoin(flights, eq(flightCrew.flightId, flights.id))
         .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
         .innerJoin(users, eq(crewMembers.userId, users.id))
-        .innerJoin(
-          crewDesignations,
-          eq(flightCrew.designationId, crewDesignations.id),
-        )
+        .innerJoin(crewDesignations, eq(flightCrew.designationId, crewDesignations.id))
         .where(eq(flightCrew.id, id))
         .get();
       if (!assignment) return { changes: 0 };

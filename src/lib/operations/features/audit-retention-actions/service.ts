@@ -11,10 +11,7 @@ import {
 const repository = new AuditRetentionActionsRepositoryImpl();
 
 function mapRow(value: unknown): AuditRetentionActionsRowDto {
-  const r =
-    value && typeof value === "object"
-      ? (value as Record<string, unknown>)
-      : {};
+  const r = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
   return {
     id: String(r.id ?? ""),
     action: r.action == null ? null : String(r.action),

@@ -363,8 +363,7 @@
 .workspace-card:hover {
   border-color: var(--card-accent);
   border-top-color: var(--card-accent);
-  box-shadow: 0 14px 30px
-    color-mix(in srgb, var(--card-accent) 15%, transparent);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--card-accent) 15%, transparent);
 }
 .workspace-card:hover .workspace-card-arrow {
   color: var(--card-accent);
@@ -379,13 +378,7 @@
   margin-top: 22px;
   border-radius: 5px;
   content: "";
-  background: linear-gradient(
-    90deg,
-    #ff9933 0 33%,
-    #fff 33% 38%,
-    #138808 38% 68%,
-    #1565c0 68%
-  );
+  background: linear-gradient(90deg, #ff9933 0 33%, #fff 33% 38%, #138808 38% 68%, #1565c0 68%);
 }
 @media (prefers-reduced-motion: reduce) {
   .workspace-card,

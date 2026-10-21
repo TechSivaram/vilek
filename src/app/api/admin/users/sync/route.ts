@@ -24,14 +24,10 @@ async function getScimToken(issuer: string) {
   const clientSecret = requiredEnv("TSCLOAK_SCIM_CLIENT_SECRET");
 
   if (clientId !== requiredEnv("TSCLOAK_CLIENT_ID")) {
-    throw new Error(
-      "TSCLOAK_SCIM_CLIENT_ID must match TSCLOAK_CLIENT_ID for this deployment.",
-    );
+    throw new Error("TSCLOAK_SCIM_CLIENT_ID must match TSCLOAK_CLIENT_ID for this deployment.");
   }
 
-  const method = (
-    process.env.TSCLOAK_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post"
-  ).toLowerCase();
+  const method = (process.env.TSCLOAK_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post").toLowerCase();
   const form = new URLSearchParams({
     grant_type: "client_credentials",
     scope: "scim",
@@ -74,29 +70,19 @@ async function getScimToken(issuer: string) {
 
   if (!response.ok || !tokenResult.success || !tokenResult.data.access_token) {
     const detail = tokenResult.success
-      ? (tokenResult.data.error_description ??
-        tokenResult.data.error ??
-        "no access token returned")
+      ? (tokenResult.data.error_description ?? tokenResult.data.error ?? "no access token returned")
       : "identity provider returned an invalid token response";
-    throw new Error(
-      `TSCloak token request failed (HTTP ${response.status}): ${detail}`,
-    );
+    throw new Error(`TSCloak token request failed (HTTP ${response.status}): ${detail}`);
   }
 
-  if (
-    tokenResult.data.scope &&
-    !tokenResult.data.scope.split(/\s+/).includes("scim")
-  ) {
+  if (tokenResult.data.scope && !tokenResult.data.scope.split(/\s+/).includes("scim")) {
     throw new Error("TSCloak returned a token without the scim scope.");
   }
 
   return tokenResult.data.access_token;
 }
 
-async function listScimUsers(
-  issuer: string,
-  token: string,
-): Promise<ScimUser[]> {
+async function listScimUsers(issuer: string, token: string): Promise<ScimUser[]> {
   const users: ScimUser[] = [];
   const pageSize = 100;
   let startIndex = 1;
@@ -151,30 +137,18 @@ async function listScimUsers(
       })
       .safeParse(payload);
 
-    if (
-      !response.ok ||
-      !parsed.success ||
-      !Array.isArray(parsed.data.Resources)
-    ) {
+    if (!response.ok || !parsed.success || !Array.isArray(parsed.data.Resources)) {
       const detail = parsed.success
-        ? (parsed.data.detail ??
-          parsed.data.message ??
-          "expected a SCIM Resources list")
+        ? (parsed.data.detail ?? parsed.data.message ?? "expected a SCIM Resources list")
         : "identity provider returned an invalid SCIM list response";
-      throw new Error(
-        `TSCloak SCIM list failed (HTTP ${response.status}): ${detail}`,
-      );
+      throw new Error(`TSCloak SCIM list failed (HTTP ${response.status}): ${detail}`);
     }
 
     const pageUsers = parsed.data.Resources;
     users.push(...pageUsers);
 
     const totalResults = parsed.data.totalResults;
-    if (
-      totalResults === undefined ||
-      users.length >= totalResults ||
-      pageUsers.length === 0
-    ) {
+    if (totalResults === undefined || users.length >= totalResults || pageUsers.length === 0) {
       return users;
     }
 
@@ -189,8 +163,7 @@ export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () => {
     if (process.env.TSCLOAK_SCIM_ENABLED !== "true") {
       return NextResponse.json(
         {
-          error:
-            "SCIM sync is disabled. Set TSCLOAK_SCIM_ENABLED=true to enable it.",
+          error: "SCIM sync is disabled. Set TSCLOAK_SCIM_ENABLED=true to enable it.",
         },
         { status: 503 },
       );
@@ -219,14 +192,9 @@ export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () => {
       const normalizedEmail = email.trim().toLowerCase();
       const givenName = identity.name?.givenName?.trim();
       const familyName = identity.name?.familyName?.trim();
-      const displayParts = (identity.displayName ?? "")
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
-      const firstName =
-        givenName || displayParts[0] || identity.userName || normalizedEmail;
-      const lastName =
-        familyName || displayParts.slice(1).join(" ") || "Unknown";
+      const displayParts = (identity.displayName ?? "").trim().split(/\s+/).filter(Boolean);
+      const firstName = givenName || displayParts[0] || identity.userName || normalizedEmail;
+      const lastName = familyName || displayParts.slice(1).join(" ") || "Unknown";
 
       if (identity.active === false) inactiveAtProvider += 1;
 
@@ -257,8 +225,7 @@ export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () => {
         console.error("Failed to import SCIM user into ViLek", {
           scimId: identity.id,
           email: normalizedEmail,
-          error:
-            error instanceof Error ? error.message : "Unknown database error",
+          error: error instanceof Error ? error.message : "Unknown database error",
         });
       }
     }
@@ -267,9 +234,7 @@ export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () => {
       `SCIM sync completed. ${created} new provider users imported into ViLek; ` +
       `${matched} already-existing local accounts matched; ${alreadyImported} were already imported from SCIM; ` +
       `${unmatched} provider identities could not be imported` +
-      (inactiveAtProvider
-        ? `; ${inactiveAtProvider} provider accounts are inactive`
-        : "") +
+      (inactiveAtProvider ? `; ${inactiveAtProvider} provider accounts are inactive` : "") +
       ". Local ViLek role assignments were preserved. Newly imported accounts store the provider resource ID verbatim in oidc_subject without a synthetic prefix.";
 
     return NextResponse.json({
@@ -282,8 +247,7 @@ export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () => {
       inactiveAtProvider,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "TSCloak sync failed.";
+    const message = error instanceof Error ? error.message : "TSCloak sync failed.";
     return NextResponse.json({ error: message }, { status: 502 });
   }
 });

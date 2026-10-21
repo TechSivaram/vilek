@@ -17,8 +17,7 @@ export const expense_categoriesRepository = {
         )
       : undefined;
     const total =
-      db.select({ value: count() }).from(expenseCategories).where(where).get()
-        ?.value ?? 0;
+      db.select({ value: count() }).from(expenseCategories).where(where).get()?.value ?? 0;
     const sortColumns = {
       id: expenseCategories.id,
       code: expenseCategories.code,

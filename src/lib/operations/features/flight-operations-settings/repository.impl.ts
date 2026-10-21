@@ -2,10 +2,7 @@ import "server-only";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { flightOperationsSettings } from "@/lib/db/schema";
-import type {
-  FlightOperationsSettingsCreateDto,
-  FlightOperationsSettingsUpdateDto,
-} from "./dto";
+import type { FlightOperationsSettingsCreateDto, FlightOperationsSettingsUpdateDto } from "./dto";
 import type { FlightOperationsSettingsRepository } from "./repository";
 
 export const FlightOperationsSettingsResourceConfig = {
@@ -26,10 +23,7 @@ export class FlightOperationsSettingsRepositoryImpl implements FlightOperationsS
         updated_at: flightOperationsSettings.updatedAt,
       })
       .from(flightOperationsSettings)
-      .orderBy(
-        asc(flightOperationsSettings.settingKey),
-        asc(flightOperationsSettings.id),
-      )
+      .orderBy(asc(flightOperationsSettings.settingKey), asc(flightOperationsSettings.id))
       .limit(500)
       .all()
       .map((row) => ({
@@ -40,13 +34,7 @@ export class FlightOperationsSettingsRepositoryImpl implements FlightOperationsS
     return {
       rows,
       options: {},
-      displayColumns: [
-        "id",
-        "setting",
-        "value_json",
-        "setting_description",
-        "updated_at",
-      ],
+      displayColumns: ["id", "setting", "value_json", "setting_description", "updated_at"],
     };
   }
 

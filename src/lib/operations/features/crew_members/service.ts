@@ -1,10 +1,6 @@
 import "server-only";
 import { crew_membersRepository } from "./repository";
-import type {
-  CrewMembersListQuery,
-  CrewMembersCreateInput,
-  CrewMembersUpdateInput,
-} from "./dto";
+import type { CrewMembersListQuery, CrewMembersCreateInput, CrewMembersUpdateInput } from "./dto";
 export const crew_membersService = {
   list(query: CrewMembersListQuery) {
     return crew_membersRepository.list(query);

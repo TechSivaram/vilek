@@ -11,29 +11,21 @@ export const crew_designationsRepository = {
     const search = (input.search ?? "").trim();
     const escaped = `%${search.replace(/[\\%_]/g, "\\$&")}%`;
     const where = search
-      ? or(
-          like(crewDesignations.code, escaped),
-          like(crewDesignations.name, escaped),
-        )
+      ? or(like(crewDesignations.code, escaped), like(crewDesignations.name, escaped))
       : undefined;
 
     const total =
-      db.select({ value: count() }).from(crewDesignations).where(where).get()
-        ?.value ?? 0;
+      db.select({ value: count() }).from(crewDesignations).where(where).get()?.value ?? 0;
 
     let ordering: SQL;
     switch (input.sort) {
       case "code":
         ordering =
-          input.direction === "desc"
-            ? desc(crewDesignations.code)
-            : asc(crewDesignations.code);
+          input.direction === "desc" ? desc(crewDesignations.code) : asc(crewDesignations.code);
         break;
       case "name":
         ordering =
-          input.direction === "desc"
-            ? desc(crewDesignations.name)
-            : asc(crewDesignations.name);
+          input.direction === "desc" ? desc(crewDesignations.name) : asc(crewDesignations.name);
         break;
       case "isActive":
         ordering =
@@ -43,9 +35,7 @@ export const crew_designationsRepository = {
         break;
       case "id":
         ordering =
-          input.direction === "desc"
-            ? desc(crewDesignations.id)
-            : asc(crewDesignations.id);
+          input.direction === "desc" ? desc(crewDesignations.id) : asc(crewDesignations.id);
         break;
       default:
         ordering = asc(crewDesignations.name);

@@ -14,17 +14,12 @@ export function ProfileMenu({
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const initials =
-    `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`.toUpperCase();
+  const initials = `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`.toUpperCase();
 
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        !rootRef.current?.contains(event.target)
-      )
-        setOpen(false);
+      if (event.target instanceof Node && !rootRef.current?.contains(event.target)) setOpen(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -52,9 +47,7 @@ export function ProfileMenu({
       {open && (
         <div className="profile-menu__panel" role="menu">
           <div className="profile-menu__identity">
-            <span className="profile-menu__avatar profile-menu__avatar--large">
-              {initials}
-            </span>
+            <span className="profile-menu__avatar profile-menu__avatar--large">{initials}</span>
             <span className="profile-menu__copy">
               <strong>
                 {firstName} {lastName}
@@ -73,11 +66,7 @@ export function ProfileMenu({
             Security &amp; MFA
           </Link>
           <form action="/api/auth/logout" method="post">
-            <button
-              type="submit"
-              className="profile-menu__signout"
-              role="menuitem"
-            >
+            <button type="submit" className="profile-menu__signout" role="menuitem">
               <span aria-hidden="true">↪</span> Sign out
             </button>
           </form>

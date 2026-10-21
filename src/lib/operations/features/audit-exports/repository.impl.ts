@@ -28,13 +28,7 @@ export class AuditExportsRepositoryImpl implements AuditExportsRepository {
     return {
       rows,
       options: {},
-      displayColumns: [
-        "id",
-        "actor_email",
-        "format",
-        "row_count",
-        "created_at",
-      ],
+      displayColumns: ["id", "actor_email", "format", "row_count", "created_at"],
     };
   }
 }

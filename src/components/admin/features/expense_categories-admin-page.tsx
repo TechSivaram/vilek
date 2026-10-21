@@ -10,10 +10,7 @@ import type {
   ExpenseCategoriesListResult,
 } from "@/lib/admin/features/expense_categories/dto";
 
-async function requestJson<T = any>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
+async function requestJson<T = any>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, {
     ...init,
     headers: {
@@ -58,9 +55,7 @@ export function ExpenseCategoriesAdminPage() {
   const list = useQuery<ExpenseCategoriesListResult>({
     queryKey: ["admin-expense_categories", search, page, pageSize],
     queryFn: () =>
-      requestJson(
-        `${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`,
-      ),
+      requestJson(`${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`),
   });
 
   const save = useMutation({
@@ -172,11 +167,7 @@ export function ExpenseCategoriesAdminPage() {
               <h2>{editing ? "Edit " : "Add "}Expense Categories</h2>
               <p>Manage categories used when recording crew expenses.</p>
             </div>
-            <button
-              className="admin-icon-button"
-              type="button"
-              onClick={cancel}
-            >
+            <button className="admin-icon-button" type="button" onClick={cancel}>
               ×
             </button>
           </div>
@@ -204,18 +195,10 @@ export function ExpenseCategoriesAdminPage() {
               <span>Active</span>
             </label>
             <div className="admin-form-actions">
-              <button
-                type="button"
-                className="admin-secondary-button"
-                onClick={cancel}
-              >
+              <button type="button" className="admin-secondary-button" onClick={cancel}>
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="admin-primary-button"
-                disabled={busy}
-              >
+              <button type="submit" className="admin-primary-button" disabled={busy}>
                 {busy ? "Saving…" : "Save changes"}
               </button>
             </div>
@@ -226,8 +209,7 @@ export function ExpenseCategoriesAdminPage() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Records{" "}
-              <span className="admin-count-badge">{pagination.total}</span>
+              Records <span className="admin-count-badge">{pagination.total}</span>
             </h2>
             <p>
               {pagination.total
@@ -273,13 +255,9 @@ export function ExpenseCategoriesAdminPage() {
                   </td>
                   <td key="isActive" data-label="Status">
                     {row.isActive ? (
-                      <span className="admin-status-pill is-active">
-                        Active
-                      </span>
+                      <span className="admin-status-pill is-active">Active</span>
                     ) : (
-                      <span className="admin-status-pill is-inactive">
-                        Inactive
-                      </span>
+                      <span className="admin-status-pill is-inactive">Inactive</span>
                     )}
                   </td>
                   <td data-label="Actions">
@@ -297,11 +275,7 @@ export function ExpenseCategoriesAdminPage() {
                           type="button"
                           className="admin-table-action is-danger"
                           onClick={() => {
-                            if (
-                              window.confirm(
-                                `Deactivate this expense categories record?`,
-                              )
-                            )
+                            if (window.confirm(`Deactivate this expense categories record?`))
                               deactivate.mutate(row);
                           }}
                           disabled={busy}
@@ -326,10 +300,7 @@ export function ExpenseCategoriesAdminPage() {
         <div className="admin-pagination">
           <label>
             Rows per page{" "}
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-            >
+            <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -351,9 +322,7 @@ export function ExpenseCategoriesAdminPage() {
             <button
               type="button"
               className="admin-secondary-button"
-              onClick={() =>
-                setPage((p) => Math.min(pagination.totalPages, p + 1))
-              }
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page >= pagination.totalPages || busy}
             >
               Next

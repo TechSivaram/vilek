@@ -33,10 +33,7 @@ export const POST = withRouteGuard(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
     }
     const parsed = createFlightCrewSchema.safeParse(body);
     if (!parsed.success)
@@ -55,27 +52,12 @@ export const POST = withRouteGuard(
       return NextResponse.json({ ok: true }, { status: 201 });
     } catch (error) {
       if (error instanceof Error && error.message === "FLIGHT_NOT_AVAILABLE")
-        return NextResponse.json(
-          { error: "Select an active flight." },
-          { status: 400 },
-        );
+        return NextResponse.json({ error: "Select an active flight." }, { status: 400 });
       if (error instanceof Error && error.message === "CREW_NOT_AVAILABLE")
-        return NextResponse.json(
-          { error: "Select an active crew member." },
-          { status: 400 },
-        );
-      if (
-        error instanceof Error &&
-        error.message === "DESIGNATION_NOT_AVAILABLE"
-      )
-        return NextResponse.json(
-          { error: "Select an active crew designation." },
-          { status: 400 },
-        );
-      if (
-        error instanceof Error &&
-        error.message === "CREW_NOT_QUALIFIED_FOR_DESIGNATION"
-      )
+        return NextResponse.json({ error: "Select an active crew member." }, { status: 400 });
+      if (error instanceof Error && error.message === "DESIGNATION_NOT_AVAILABLE")
+        return NextResponse.json({ error: "Select an active crew designation." }, { status: 400 });
+      if (error instanceof Error && error.message === "CREW_NOT_QUALIFIED_FOR_DESIGNATION")
         return NextResponse.json(
           {
             error:
@@ -83,10 +65,7 @@ export const POST = withRouteGuard(
           },
           { status: 422 },
         );
-      if (
-        error instanceof Error &&
-        error.message.startsWith("QUALIFICATION_MISSING:")
-      )
+      if (error instanceof Error && error.message.startsWith("QUALIFICATION_MISSING:"))
         return NextResponse.json(
           {
             error: `Assignment blocked: current ${error.message.split(":")[1]} qualification is required for this designation.`,

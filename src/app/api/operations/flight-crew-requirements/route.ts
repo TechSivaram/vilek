@@ -29,8 +29,7 @@ export const GET = withRouteGuard(
     const query = new URL(request.url).searchParams;
     const flightId = query.get("flight_id");
     const search = (query.get("q") ?? "").trim();
-    const isFlightList =
-      query.get("view") === "flights" || (!flightId && query.has("q"));
+    const isFlightList = query.get("view") === "flights" || (!flightId && query.has("q"));
     try {
       const result = isFlightList
         ? flightCrewRequirementsService.listFlights(search)
@@ -73,10 +72,7 @@ export const POST = withRouteGuard(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
     }
 
     const parsed = createInputSchema.safeParse(body);
@@ -91,8 +87,7 @@ export const POST = withRouteGuard(
       return NextResponse.json({ ok: true, id }, { status: 201 });
     } catch (error) {
       const message =
-        error instanceof Error &&
-        /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
+        error instanceof Error && /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
           ? "The record conflicts with a unique, validation, or relationship constraint."
           : "The record could not be saved.";
       return NextResponse.json({ error: message }, { status: 409 });

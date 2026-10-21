@@ -20,53 +20,33 @@ export const airportsRepository = {
         )
       : undefined;
 
-    const total =
-      db.select({ value: count() }).from(airports).where(where).get()?.value ??
-      0;
+    const total = db.select({ value: count() }).from(airports).where(where).get()?.value ?? 0;
 
     let ordering: SQL;
     switch (input.sort) {
       case "iataCode":
-        ordering =
-          input.direction === "desc"
-            ? desc(airports.iataCode)
-            : asc(airports.iataCode);
+        ordering = input.direction === "desc" ? desc(airports.iataCode) : asc(airports.iataCode);
         break;
       case "icaoCode":
-        ordering =
-          input.direction === "desc"
-            ? desc(airports.icaoCode)
-            : asc(airports.icaoCode);
+        ordering = input.direction === "desc" ? desc(airports.icaoCode) : asc(airports.icaoCode);
         break;
       case "name":
-        ordering =
-          input.direction === "desc" ? desc(airports.name) : asc(airports.name);
+        ordering = input.direction === "desc" ? desc(airports.name) : asc(airports.name);
         break;
       case "city":
-        ordering =
-          input.direction === "desc" ? desc(airports.city) : asc(airports.city);
+        ordering = input.direction === "desc" ? desc(airports.city) : asc(airports.city);
         break;
       case "country":
-        ordering =
-          input.direction === "desc"
-            ? desc(airports.country)
-            : asc(airports.country);
+        ordering = input.direction === "desc" ? desc(airports.country) : asc(airports.country);
         break;
       case "timeZone":
-        ordering =
-          input.direction === "desc"
-            ? desc(airports.timeZone)
-            : asc(airports.timeZone);
+        ordering = input.direction === "desc" ? desc(airports.timeZone) : asc(airports.timeZone);
         break;
       case "isActive":
-        ordering =
-          input.direction === "desc"
-            ? desc(airports.isActive)
-            : asc(airports.isActive);
+        ordering = input.direction === "desc" ? desc(airports.isActive) : asc(airports.isActive);
         break;
       case "id":
-        ordering =
-          input.direction === "desc" ? desc(airports.id) : asc(airports.id);
+        ordering = input.direction === "desc" ? desc(airports.id) : asc(airports.id);
         break;
       default:
         ordering = asc(airports.name);

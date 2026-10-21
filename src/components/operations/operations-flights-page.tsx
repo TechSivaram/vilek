@@ -33,13 +33,9 @@ async function requestJson<T>(
   });
   const body: unknown = await response.json();
   if (!response.ok) {
-    const errorPayload = z
-      .object({ error: z.string().optional() })
-      .safeParse(body);
+    const errorPayload = z.object({ error: z.string().optional() }).safeParse(body);
     throw new Error(
-      errorPayload.success
-        ? (errorPayload.data.error ?? "Request failed.")
-        : "Request failed.",
+      errorPayload.success ? (errorPayload.data.error ?? "Request failed.") : "Request failed.",
     );
   }
   return responseSchema.parse(body);
@@ -93,11 +89,7 @@ export function OperationsFlightsPage() {
   });
   const flightOptions = useQuery<FlightOptionsResponseDto>({
     queryKey: ["flight-options"],
-    queryFn: () =>
-      requestJson(
-        "/api/operations/flights/options",
-        flightOptionsResponseSchema,
-      ),
+    queryFn: () => requestJson("/api/operations/flights/options", flightOptionsResponseSchema),
     enabled: creating || Boolean(editing),
   });
   const save = useMutation({
@@ -121,11 +113,9 @@ export function OperationsFlightsPage() {
   });
   const deactivate = useMutation({
     mutationFn: (row: FlightListRow) =>
-      requestJson(
-        `${PAGE}/${encodeURIComponent(String(row.id))}`,
-        flightMutationResponseSchema,
-        { method: "DELETE" },
-      ),
+      requestJson(`${PAGE}/${encodeURIComponent(String(row.id))}`, flightMutationResponseSchema, {
+        method: "DELETE",
+      }),
     onSuccess: async () => {
       setMessage("Record deactivated.");
       await qc.invalidateQueries({ queryKey: ["operations-flights"] });
@@ -134,10 +124,7 @@ export function OperationsFlightsPage() {
 
   const options = flightOptions.data?.options ?? { airlines: [], airports: [] };
   const busy =
-    list.isFetching ||
-    flightOptions.isFetching ||
-    save.isPending ||
-    deactivate.isPending;
+    list.isFetching || flightOptions.isFetching || save.isPending || deactivate.isPending;
   useEffect(() => {
     setPage(1);
   }, [search, pageSize]);
@@ -199,9 +186,7 @@ export function OperationsFlightsPage() {
         actualDeparture: values.actualDeparture
           ? new Date(values.actualDeparture).toISOString()
           : null,
-        actualArrival: values.actualArrival
-          ? new Date(values.actualArrival).toISOString()
-          : null,
+        actualArrival: values.actualArrival ? new Date(values.actualArrival).toISOString() : null,
       };
       const validatedPayload = formSchema.parse(payload);
       await save.mutateAsync({ id: editing?.id, values: validatedPayload });
@@ -247,11 +232,7 @@ export function OperationsFlightsPage() {
               <h2>{editing ? "Edit " : "Add "}Flights</h2>
               <p>Maintain scheduled flight records and operational details.</p>
             </div>
-            <button
-              className="admin-icon-button"
-              type="button"
-              onClick={cancel}
-            >
+            <button className="admin-icon-button" type="button" onClick={cancel}>
               ×
             </button>
           </div>
@@ -327,10 +308,7 @@ export function OperationsFlightsPage() {
             </label>
             <label className="admin-field">
               <span>Scheduled departure *</span>
-              <input
-                type="datetime-local"
-                {...form.register("scheduledDeparture")}
-              />
+              <input type="datetime-local" {...form.register("scheduledDeparture")} />
               {form.formState.errors.scheduledDeparture?.message && (
                 <small className="admin-field-error">
                   {String(form.formState.errors.scheduledDeparture?.message)}
@@ -339,10 +317,7 @@ export function OperationsFlightsPage() {
             </label>
             <label className="admin-field">
               <span>Scheduled arrival *</span>
-              <input
-                type="datetime-local"
-                {...form.register("scheduledArrival")}
-              />
+              <input type="datetime-local" {...form.register("scheduledArrival")} />
               {form.formState.errors.scheduledArrival?.message && (
                 <small className="admin-field-error">
                   {String(form.formState.errors.scheduledArrival?.message)}
@@ -351,10 +326,7 @@ export function OperationsFlightsPage() {
             </label>
             <label className="admin-field">
               <span>Actual departure (optional)</span>
-              <input
-                type="datetime-local"
-                {...form.register("actualDeparture")}
-              />
+              <input type="datetime-local" {...form.register("actualDeparture")} />
               {form.formState.errors.actualDeparture?.message && (
                 <small className="admin-field-error">
                   {String(form.formState.errors.actualDeparture?.message)}
@@ -363,10 +335,7 @@ export function OperationsFlightsPage() {
             </label>
             <label className="admin-field">
               <span>Actual arrival (optional)</span>
-              <input
-                type="datetime-local"
-                {...form.register("actualArrival")}
-              />
+              <input type="datetime-local" {...form.register("actualArrival")} />
               {form.formState.errors.actualArrival?.message && (
                 <small className="admin-field-error">
                   {String(form.formState.errors.actualArrival?.message)}
@@ -378,18 +347,10 @@ export function OperationsFlightsPage() {
               <span>Active</span>
             </label>
             <div className="admin-form-actions">
-              <button
-                type="button"
-                className="admin-secondary-button"
-                onClick={cancel}
-              >
+              <button type="button" className="admin-secondary-button" onClick={cancel}>
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="admin-primary-button"
-                disabled={busy}
-              >
+              <button type="submit" className="admin-primary-button" disabled={busy}>
                 {busy ? "Saving…" : "Save changes"}
               </button>
             </div>
@@ -400,8 +361,7 @@ export function OperationsFlightsPage() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Records{" "}
-              <span className="admin-count-badge">{pagination.total}</span>
+              Records <span className="admin-count-badge">{pagination.total}</span>
             </h2>
             <p>
               {pagination.total
@@ -446,26 +406,17 @@ export function OperationsFlightsPage() {
               {(list.data?.rows ?? []).map((row: FlightListRow) => (
                 <tr key={String(row.id)}>
                   <td key="airlineName" data-label="Airline">
-                    {[row.airlineCode, row.airlineName]
-                      .filter(Boolean)
-                      .join(" — ") || "—"}
+                    {[row.airlineCode, row.airlineName].filter(Boolean).join(" — ") || "—"}
                   </td>
                   <td key="flightNumber" data-label="Flight number">
                     {row.flightNumber ?? "—"}
                   </td>
                   <td key="originAirportName" data-label="Origin airport">
-                    {[
-                      row.originAirportCode,
-                      row.originAirportName,
-                      row.originAirportCity,
-                    ]
+                    {[row.originAirportCode, row.originAirportName, row.originAirportCity]
                       .filter(Boolean)
                       .join(" — ") || "—"}
                   </td>
-                  <td
-                    key="destinationAirportName"
-                    data-label="Destination airport"
-                  >
+                  <td key="destinationAirportName" data-label="Destination airport">
                     {[
                       row.destinationAirportCode,
                       row.destinationAirportName,
@@ -488,13 +439,9 @@ export function OperationsFlightsPage() {
                   </td>
                   <td key="isActive" data-label="Status">
                     {row.isActive ? (
-                      <span className="admin-status-pill is-active">
-                        Active
-                      </span>
+                      <span className="admin-status-pill is-active">Active</span>
                     ) : (
-                      <span className="admin-status-pill is-inactive">
-                        Inactive
-                      </span>
+                      <span className="admin-status-pill is-inactive">Inactive</span>
                     )}
                   </td>
                   <td data-label="Actions">
@@ -512,9 +459,7 @@ export function OperationsFlightsPage() {
                           type="button"
                           className="admin-table-action is-danger"
                           onClick={() => {
-                            if (
-                              window.confirm(`Deactivate this flights record?`)
-                            )
+                            if (window.confirm(`Deactivate this flights record?`))
                               deactivate.mutate(row);
                           }}
                           disabled={busy}
@@ -539,10 +484,7 @@ export function OperationsFlightsPage() {
         <div className="admin-pagination">
           <label>
             Rows per page{" "}
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-            >
+            <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -564,9 +506,7 @@ export function OperationsFlightsPage() {
             <button
               type="button"
               className="admin-secondary-button"
-              onClick={() =>
-                setPage((p) => Math.min(pagination.totalPages, p + 1))
-              }
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page >= pagination.totalPages || busy}
             >
               Next

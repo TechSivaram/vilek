@@ -4,11 +4,6 @@ import { auditOutbox } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 export const operationsRepository = {
   async list() {
-    return db
-      .select()
-      .from(auditOutbox)
-      .orderBy(desc(auditOutbox.createdAt))
-      .limit(200)
-      .all();
+    return db.select().from(auditOutbox).orderBy(desc(auditOutbox.createdAt)).limit(200).all();
   },
 };

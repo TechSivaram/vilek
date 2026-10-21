@@ -57,13 +57,10 @@ export function SecurityMfaPanel() {
         credentials: "same-origin",
       });
       const body = (await response.json()) as MfaStatus & { error?: string };
-      if (!response.ok)
-        throw new Error(errorMessage(body, "Unable to load MFA status."));
+      if (!response.ok) throw new Error(errorMessage(body, "Unable to load MFA status."));
       setStatus(body);
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Unable to load MFA status.",
-      );
+      setError(cause instanceof Error ? cause.message : "Unable to load MFA status.");
     } finally {
       setLoading(false);
     }
@@ -85,16 +82,11 @@ export function SecurityMfaPanel() {
         body: "{}",
       });
       const body = (await response.json()) as Enrollment;
-      if (!response.ok)
-        throw new Error(errorMessage(body, "Unable to start MFA enrollment."));
+      if (!response.ok) throw new Error(errorMessage(body, "Unable to start MFA enrollment."));
       setEnrollment(body);
       setCode("");
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Unable to start MFA enrollment.",
-      );
+      setError(cause instanceof Error ? cause.message : "Unable to start MFA enrollment.");
     } finally {
       setStarting(false);
     }
@@ -121,21 +113,14 @@ export function SecurityMfaPanel() {
         message?: string;
       };
       if (!response.ok)
-        throw new Error(
-          errorMessage(body, "The authenticator code could not be verified."),
-        );
+        throw new Error(errorMessage(body, "The authenticator code could not be verified."));
       setEnrollment(null);
       setCode("");
-      setNotice(
-        body.message ||
-          "Multi-factor authentication has been enabled successfully.",
-      );
+      setNotice(body.message || "Multi-factor authentication has been enabled successfully.");
       await loadStatus();
     } catch (cause) {
       setError(
-        cause instanceof Error
-          ? cause.message
-          : "The authenticator code could not be verified.",
+        cause instanceof Error ? cause.message : "The authenticator code could not be verified.",
       );
     } finally {
       setVerifying(false);
@@ -165,44 +150,27 @@ export function SecurityMfaPanel() {
         error?: string;
         message?: string;
       };
-      if (!response.ok)
-        throw new Error(errorMessage(body, "Unable to disable MFA."));
+      if (!response.ok) throw new Error(errorMessage(body, "Unable to disable MFA."));
       setEnrollment(null);
       setCode("");
       setDisableCode("");
       setShowDisableForm(false);
-      setNotice(
-        body.message || "Multi-factor authentication has been disabled.",
-      );
+      setNotice(body.message || "Multi-factor authentication has been disabled.");
       await loadStatus();
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Unable to disable MFA.",
-      );
+      setError(cause instanceof Error ? cause.message : "Unable to disable MFA.");
     } finally {
       setDisabling(false);
     }
   }
 
-  const qrCode = [
-    enrollment?.qrCodeDataUrl,
-    enrollment?.qrCode,
-    enrollment?.qrCodeUrl,
-  ].find(
+  const qrCode = [enrollment?.qrCodeDataUrl, enrollment?.qrCode, enrollment?.qrCodeUrl].find(
     (value): value is string => typeof value === "string" && value.length > 0,
   );
-  const setupUri = [
-    enrollment?.otpauthUrl,
-    enrollment?.setupUri,
-    enrollment?.uri,
-  ].find(
+  const setupUri = [enrollment?.otpauthUrl, enrollment?.setupUri, enrollment?.uri].find(
     (value): value is string => typeof value === "string" && value.length > 0,
   );
-  const setupKey = [
-    enrollment?.manualSetupKey,
-    enrollment?.setupKey,
-    enrollment?.secret,
-  ].find(
+  const setupKey = [enrollment?.manualSetupKey, enrollment?.setupKey, enrollment?.secret].find(
     (value): value is string => typeof value === "string" && value.length > 0,
   );
 
@@ -214,12 +182,10 @@ export function SecurityMfaPanel() {
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#087f80]">
               Authenticator app
             </p>
-            <h2 className="mt-2 text-lg font-bold text-[#20384b]">
-              Two-factor authentication
-            </h2>
+            <h2 className="mt-2 text-lg font-bold text-[#20384b]">Two-factor authentication</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d7181]">
-              Use an authenticator app such as Google Authenticator, Microsoft
-              Authenticator, or another TOTP-compatible app.
+              Use an authenticator app such as Google Authenticator, Microsoft Authenticator, or
+              another TOTP-compatible app.
             </p>
           </div>
           <span
@@ -228,18 +194,14 @@ export function SecurityMfaPanel() {
             <span
               className={`h-2 w-2 rounded-full ${status?.enabled ? "bg-[#188447]" : "bg-[#bd7a1a]"}`}
             />
-            {loading
-              ? "Checking status…"
-              : status?.enabled
-                ? "MFA enabled"
-                : "MFA not enabled"}
+            {loading ? "Checking status…" : status?.enabled ? "MFA enabled" : "MFA not enabled"}
           </span>
         </div>
         {status?.enabled ? (
           <>
             <p className="mt-5 rounded-lg border border-[#ccebd7] bg-[#f1fbf4] p-4 text-sm leading-6 text-[#286341]">
-              Your authenticator is configured. TSCloak verifies your second
-              factor during authentication.
+              Your authenticator is configured. TSCloak verifies your second factor during
+              authentication.
               {status.enrolledAt
                 ? ` Enrolled ${new Date(status.enrolledAt).toLocaleString()}.`
                 : ""}
@@ -264,12 +226,10 @@ export function SecurityMfaPanel() {
                   onSubmit={disableMfa}
                   className="mt-4 rounded-lg border border-[#f0d5d2] bg-[#fffaf9] p-4"
                 >
-                  <h3 className="text-sm font-bold text-[#20384b]">
-                    Confirm disabling MFA
-                  </h3>
+                  <h3 className="text-sm font-bold text-[#20384b]">Confirm disabling MFA</h3>
                   <p className="mt-1 text-sm leading-5 text-[#5d7181]">
-                    Enter the current six-digit code from your authenticator app
-                    to disable multi-factor authentication.
+                    Enter the current six-digit code from your authenticator app to disable
+                    multi-factor authentication.
                   </p>
                   <div className="mt-3 flex flex-wrap items-end gap-3">
                     <div>
@@ -287,9 +247,7 @@ export function SecurityMfaPanel() {
                         maxLength={6}
                         value={disableCode}
                         onChange={(event) =>
-                          setDisableCode(
-                            event.target.value.replace(/\D/g, "").slice(0, 6),
-                          )
+                          setDisableCode(event.target.value.replace(/\D/g, "").slice(0, 6))
                         }
                         placeholder="123456"
                         required
@@ -320,8 +278,7 @@ export function SecurityMfaPanel() {
               )}
               {!showDisableForm && (
                 <p className="mt-2 text-xs leading-5 text-[#7a8d94]">
-                  Disabling MFA removes the second-factor requirement from your
-                  TSCloak account.
+                  Disabling MFA removes the second-factor requirement from your TSCloak account.
                 </p>
               )}
             </div>
@@ -334,11 +291,7 @@ export function SecurityMfaPanel() {
               disabled={loading || starting || Boolean(enrollment)}
               className="inline-flex items-center justify-center rounded-lg bg-[#087f80] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#066c6d] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {starting
-                ? "Preparing setup…"
-                : enrollment
-                  ? "Enrollment in progress"
-                  : "Enable MFA"}
+              {starting ? "Preparing setup…" : enrollment ? "Enrollment in progress" : "Enable MFA"}
             </button>
           </div>
         )}
@@ -347,9 +300,7 @@ export function SecurityMfaPanel() {
       {enrollment && !status?.enabled && (
         <section className="overflow-hidden rounded-xl border border-[#e2e9ed] bg-white">
           <header className="border-b border-[#e8eef1] px-6 py-5">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#087f80]">
-              Step 1
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#087f80]">Step 1</p>
             <h2 className="mt-2 font-bold text-[#20384b]">Scan the QR code</h2>
           </header>
           <div className="grid gap-6 p-6 md:grid-cols-[200px_1fr]">
@@ -368,8 +319,7 @@ export function SecurityMfaPanel() {
               </div>
             ) : (
               <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-[#cbd9de] bg-[#f9fbfa] p-4 text-center text-sm text-[#5d7181]">
-                TSCloak did not return a QR image. Use the setup key or URI
-                instead.
+                TSCloak did not return a QR image. Use the setup key or URI instead.
               </div>
             )}
             <div className="space-y-4">
@@ -390,9 +340,7 @@ export function SecurityMfaPanel() {
                     />
                     <button
                       type="button"
-                      onClick={() =>
-                        void navigator.clipboard.writeText(setupKey)
-                      }
+                      onClick={() => void navigator.clipboard.writeText(setupKey)}
                       className="rounded-lg border border-[#d5e2df] px-3 py-2 text-sm font-semibold text-[#087f80] hover:bg-[#f3faf7]"
                     >
                       Copy
@@ -418,24 +366,15 @@ export function SecurityMfaPanel() {
                 </div>
               )}
               <p className="text-xs leading-5 text-[#7a8d94]">
-                Keep the setup key private. It can be used to generate codes for
-                your account.
+                Keep the setup key private. It can be used to generate codes for your account.
               </p>
             </div>
           </div>
-          <form
-            onSubmit={verifyEnrollment}
-            className="border-t border-[#e8eef1] bg-[#fbfdfc] p-6"
-          >
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#087f80]">
-              Step 2
-            </p>
-            <h2 className="mt-2 font-bold text-[#20384b]">
-              Verify your authenticator
-            </h2>
+          <form onSubmit={verifyEnrollment} className="border-t border-[#e8eef1] bg-[#fbfdfc] p-6">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#087f80]">Step 2</p>
+            <h2 className="mt-2 font-bold text-[#20384b]">Verify your authenticator</h2>
             <p className="mt-1 text-sm text-[#5d7181]">
-              Enter the current six-digit code generated by your authenticator
-              app.
+              Enter the current six-digit code generated by your authenticator app.
             </p>
             <div className="mt-4 flex flex-wrap items-end gap-3">
               <div>
@@ -452,9 +391,7 @@ export function SecurityMfaPanel() {
                   pattern="[0-9]{6}"
                   maxLength={6}
                   value={code}
-                  onChange={(event) =>
-                    setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
+                  onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
                   placeholder="123456"
                   required
                   className="w-56 rounded-lg border border-[#b9d6c6] bg-white px-4 py-3 text-center font-mono tracking-[0.25em] text-[#20384b] outline-none focus:border-[#168447] focus:ring-2 focus:ring-[#168447]/15"

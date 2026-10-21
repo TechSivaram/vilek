@@ -1,10 +1,6 @@
 import "server-only";
 import { flightCrewFeatureRepository } from "./repository.impl";
-import type {
-  CreateFlightCrewInput,
-  ListFlightCrewQuery,
-  RemoveFlightCrewInput,
-} from "./schema";
+import type { CreateFlightCrewInput, ListFlightCrewQuery, RemoveFlightCrewInput } from "./schema";
 import type { FlightCrewActorDto } from "./dto";
 
 /** Application/service boundary for flight crew assignment workflows. */

@@ -31,8 +31,7 @@ export const VILEK_PERMISSIONS = [
 ] as const;
 
 export type VilekPermission = (typeof VILEK_PERMISSIONS)[number];
-export type VilekRoleCode =
-  "ADMIN" | "CREW" | "APPROVER" | "FINANCE" | "FLIGHT_OPERATIONS_MANAGER";
+export type VilekRoleCode = "ADMIN" | "CREW" | "APPROVER" | "FINANCE" | "FLIGHT_OPERATIONS_MANAGER";
 
 const ADMIN_PERMISSIONS: readonly VilekPermission[] = VILEK_PERMISSIONS;
 
@@ -56,17 +55,12 @@ export function hasVilekPermission(
   roleCodes: readonly string[],
   permission: VilekPermission,
 ): boolean {
-  return roleCodes.some((code) =>
-    ROLE_PERMISSIONS[code as VilekRoleCode]?.includes(permission),
-  );
+  return roleCodes.some((code) => ROLE_PERMISSIONS[code as VilekRoleCode]?.includes(permission));
 }
 
 export function hasAnyVilekRole(
   actualRoles: readonly string[],
   requiredRoles: readonly string[],
 ): boolean {
-  return (
-    requiredRoles.length === 0 ||
-    requiredRoles.some((role) => actualRoles.includes(role))
-  );
+  return requiredRoles.length === 0 || requiredRoles.some((role) => actualRoles.includes(role));
 }

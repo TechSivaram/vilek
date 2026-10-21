@@ -1,7 +1,4 @@
-import type {
-  CrewComplementDefaultsCreateDto,
-  CrewComplementDefaultsUpdateDto,
-} from "./dto";
+import type { CrewComplementDefaultsCreateDto, CrewComplementDefaultsUpdateDto } from "./dto";
 import { CrewComplementDefaultsRepositoryImpl } from "./repository.impl";
 
 const repository = new CrewComplementDefaultsRepositoryImpl();

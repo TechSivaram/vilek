@@ -14,9 +14,7 @@ async function getScimToken(issuer: string) {
   const clientSecret = requiredEnv("TSCLOAK_SCIM_CLIENT_SECRET");
   if (clientId !== requiredEnv("TSCLOAK_CLIENT_ID"))
     throw new Error("SCIM client ID must match the configured OIDC client ID.");
-  const method = (
-    process.env.TSCLOAK_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post"
-  ).toLowerCase();
+  const method = (process.env.TSCLOAK_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post").toLowerCase();
   const form = new URLSearchParams({
     grant_type: "client_credentials",
     scope: "scim",
@@ -64,10 +62,7 @@ export const PATCH = withRouteGuard(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
     }
     const parsed = updateInputSchema.safeParse(body);
     if (!parsed.success)
@@ -85,8 +80,7 @@ export const PATCH = withRouteGuard(
         { status: 500 },
       );
     }
-    if (!current)
-      return NextResponse.json({ error: "Record not found." }, { status: 404 });
+    if (!current) return NextResponse.json({ error: "Record not found." }, { status: 404 });
     if (!current.oidcSubject || current.oidcSubject.startsWith("demo|")) {
       return NextResponse.json(
         {
@@ -99,8 +93,7 @@ export const PATCH = withRouteGuard(
     if (process.env.TSCLOAK_SCIM_ENABLED !== "true")
       return NextResponse.json(
         {
-          error:
-            "Identity-provider synchronization is disabled; no local changes were saved.",
+          error: "Identity-provider synchronization is disabled; no local changes were saved.",
         },
         { status: 503 },
       );
@@ -108,16 +101,11 @@ export const PATCH = withRouteGuard(
       const issuer = requiredEnv("TSCLOAK_ISSUER").replace(/\/$/, "");
       const token = await getScimToken(issuer);
       const operations = Object.entries(parsed.data).flatMap(([key, value]) => {
-        if (key === "isActive")
-          return [{ op: "replace", path: "active", value }];
+        if (key === "isActive") return [{ op: "replace", path: "active", value }];
         if (key === "email")
-          return [
-            { op: "replace", path: 'emails[type eq "work"].value', value },
-          ];
-        if (key === "firstName")
-          return [{ op: "replace", path: "name.givenName", value }];
-        if (key === "lastName")
-          return [{ op: "replace", path: "name.familyName", value }];
+          return [{ op: "replace", path: 'emails[type eq "work"].value', value }];
+        if (key === "firstName") return [{ op: "replace", path: "name.givenName", value }];
+        if (key === "lastName") return [{ op: "replace", path: "name.familyName", value }];
         return [];
       });
       if (!operations.length)
@@ -159,8 +147,7 @@ export const PATCH = withRouteGuard(
       return result.changes
         ? NextResponse.json({
             ok: true,
-            message:
-              "User changes saved to ViLek and the configured identity provider.",
+            message: "User changes saved to ViLek and the configured identity provider.",
           })
         : NextResponse.json(
             {
@@ -193,11 +180,7 @@ export const DELETE = withRouteGuard(
       );
     try {
       const current = await usersService.findById(id);
-      if (!current)
-        return NextResponse.json(
-          { error: "Record not found." },
-          { status: 404 },
-        );
+      if (!current) return NextResponse.json({ error: "Record not found." }, { status: 404 });
       if (!current.isActive)
         return NextResponse.json({
           ok: true,
@@ -215,8 +198,7 @@ export const DELETE = withRouteGuard(
       if (process.env.TSCLOAK_SCIM_ENABLED !== "true")
         return NextResponse.json(
           {
-            error:
-              "Identity-provider synchronization is disabled; the user was not deactivated.",
+            error: "Identity-provider synchronization is disabled; the user was not deactivated.",
           },
           { status: 503 },
         );
@@ -254,8 +236,7 @@ export const DELETE = withRouteGuard(
       return result.changes
         ? NextResponse.json({
             ok: true,
-            message:
-              "User deactivated in ViLek and the configured identity provider.",
+            message: "User deactivated in ViLek and the configured identity provider.",
           })
         : NextResponse.json(
             {

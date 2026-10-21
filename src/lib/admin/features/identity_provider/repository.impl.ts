@@ -18,8 +18,7 @@ export const identity_providerRepository = {
           like(users.oidcSubject, `%${escapedQuery}%`),
         )
       : undefined;
-    const total =
-      db.select({ value: count() }).from(users).where(where).get()?.value ?? 0;
+    const total = db.select({ value: count() }).from(users).where(where).get()?.value ?? 0;
     const sortColumns = {
       id: users.id,
       email: users.email,

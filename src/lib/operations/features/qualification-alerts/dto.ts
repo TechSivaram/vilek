@@ -7,8 +7,7 @@ export type QualificationAlertsCreateDto = {
   generated_at?: string | null;
   resolved_at?: string | null;
 };
-export type QualificationAlertsUpdateDto =
-  Partial<QualificationAlertsCreateDto>;
+export type QualificationAlertsUpdateDto = Partial<QualificationAlertsCreateDto>;
 export type QualificationAlertsResponseDto = {
   id: number | string;
   crew_qualification_id: number | string;

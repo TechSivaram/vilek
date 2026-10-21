@@ -8,10 +8,7 @@ export const DELETE = withRouteGuard(
     const { id } = await context.params;
     const n = Number(id);
     if (!Number.isSafeInteger(n) || n < 1)
-      return NextResponse.json(
-        { error: "Invalid file type ID." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid file type ID." }, { status: 400 });
     const result = fileTypesService.remove(n);
     return result.changes
       ? NextResponse.json({ ok: true })

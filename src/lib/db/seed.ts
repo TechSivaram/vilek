@@ -125,9 +125,7 @@ function requiredEnv(name: string): string {
 }
 
 async function fetchScimToken(): Promise<string> {
-  const issuer = (
-    process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com"
-  ).replace(/\/$/, "");
+  const issuer = (process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com").replace(/\/$/, "");
   const clientId = requiredEnv("TSCLOAK_SCIM_CLIENT_ID");
   const clientSecret = requiredEnv("TSCLOAK_SCIM_CLIENT_SECRET");
   const authMethod = (
@@ -166,26 +164,19 @@ async function fetchScimToken(): Promise<string> {
     );
   }
   if (body.scope && !body.scope.split(/\s+/).includes("scim")) {
-    throw new Error(
-      "TSCloak returned a token without the required scim scope.",
-    );
+    throw new Error("TSCloak returned a token without the required scim scope.");
   }
   return body.access_token;
 }
 
 function scimEmail(user: ScimUser): string | undefined {
   return (
-    user.emails
-      ?.find((entry) => entry.primary && entry.value)
-      ?.value?.toLowerCase() ??
+    user.emails?.find((entry) => entry.primary && entry.value)?.value?.toLowerCase() ??
     user.emails?.find((entry) => entry.value)?.value?.toLowerCase()
   );
 }
 
-async function listScimUsers(
-  issuer: string,
-  token: string,
-): Promise<ScimUser[]> {
+async function listScimUsers(issuer: string, token: string): Promise<ScimUser[]> {
   const response = await fetch(`${issuer}/scim/v2/Users`, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -211,9 +202,7 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
       "SCIM provisioning is disabled. Set TSCLOAK_SCIM_ENABLED=true to intentionally provision demo users in hosted TSCloak.",
     );
   }
-  const issuer = (
-    process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com"
-  ).replace(/\/$/, "");
+  const issuer = (process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com").replace(/\/$/, "");
   const scimClientId = requiredEnv("TSCLOAK_SCIM_CLIENT_ID");
   const oidcClientId = requiredEnv("TSCLOAK_CLIENT_ID");
   // TSCloak provisions users into the client context represented by the SCIM token.
@@ -228,9 +217,7 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
   let existing = await listScimUsers(issuer, token);
   const ids = new Map<string, string>();
   for (const person of people) {
-    let match = existing.find(
-      (user) => scimEmail(user) === person.email.toLowerCase(),
-    );
+    let match = existing.find((user) => scimEmail(user) === person.email.toLowerCase());
     if (!match) {
       const username = person.email;
       const response = await fetch(`${issuer}/scim/v2/Users`, {
@@ -280,9 +267,7 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
       }
     }
     if (!match?.id)
-      throw new Error(
-        `TSCloak SCIM response for ${person.email} did not include an id.`,
-      );
+      throw new Error(`TSCloak SCIM response for ${person.email} did not include an id.`);
     if (match.active === false) {
       throw new Error(
         `The existing TSCloak identity ${person.email} is inactive; refusing to silently reactivate it during seeding.`,
@@ -290,9 +275,7 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
     }
     ids.set(person.email.toLowerCase(), match.id);
   }
-  console.log(
-    `TSCloak SCIM ready: ${ids.size} demo identities found or provisioned.`,
-  );
+  console.log(`TSCloak SCIM ready: ${ids.size} demo identities found or provisioned.`);
   return ids;
 }
 
@@ -317,15 +300,10 @@ function seedFlightOperationsDemoData() {
     const hasTable = (name: string) =>
       Boolean(
         sqlite
-          ?.prepare(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
-          )
+          ?.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?")
           .get(name),
       );
-    if (
-      !hasTable("Flight_Operations_Setting") ||
-      !hasTable("Crew_Member_Designation")
-    ) {
+    if (!hasTable("Flight_Operations_Setting") || !hasTable("Crew_Member_Designation")) {
       console.log(
         "Flight Operations sample data skipped: migration 0003 is not applied. Run `npm run db:migrate`, then `npm run db:seed`.",
       );
@@ -340,28 +318,16 @@ function seedFlightOperationsDemoData() {
 
   db.transaction((tx) => {
     const findCrew = (badge: string) =>
-      tx
-        .select()
-        .from(crewMembers)
-        .where(eq(crewMembers.badgeNumber, badge))
-        .get();
-    const findUser = (email: string) =>
-      tx.select().from(users).where(eq(users.email, email)).get();
+      tx.select().from(crewMembers).where(eq(crewMembers.badgeNumber, badge)).get();
+    const findUser = (email: string) => tx.select().from(users).where(eq(users.email, email)).get();
     const findDesignation = (code: string) =>
-      tx
-        .select()
-        .from(crewDesignations)
-        .where(eq(crewDesignations.code, code))
-        .get()!;
+      tx.select().from(crewDesignations).where(eq(crewDesignations.code, code)).get()!;
     const findAirline = (code: string) =>
       tx.select().from(airlines).where(eq(airlines.iataCode, code)).get()!;
     const findAirport = (code: string) =>
       tx.select().from(airports).where(eq(airports.iataCode, code)).get()!;
 
-    const crewByBadge = new Map<
-      string,
-      NonNullable<ReturnType<typeof findCrew>>
-    >();
+    const crewByBadge = new Map<string, NonNullable<ReturnType<typeof findCrew>>>();
     for (const person of people) {
       const crew = findCrew(person.badge);
       if (crew) crewByBadge.set(person.badge, crew);
@@ -394,21 +360,13 @@ function seedFlightOperationsDemoData() {
     ] as const;
     for (const spec of qualificationTypeSpecs) {
       if (
-        !tx
-          .select()
-          .from(qualificationTypes)
-          .where(eq(qualificationTypes.code, spec.code))
-          .get()
+        !tx.select().from(qualificationTypes).where(eq(qualificationTypes.code, spec.code)).get()
       ) {
         tx.insert(qualificationTypes).values(spec).run();
       }
     }
     const qualificationType = (code: string) =>
-      tx
-        .select()
-        .from(qualificationTypes)
-        .where(eq(qualificationTypes.code, code))
-        .get()!;
+      tx.select().from(qualificationTypes).where(eq(qualificationTypes.code, code)).get()!;
 
     const designationPairs: Array<{
       badge: string;
@@ -429,11 +387,7 @@ function seedFlightOperationsDemoData() {
         .select()
         .from(crewMemberDesignations)
         .all()
-        .find(
-          (row) =>
-            row.crewMemberId === crew.id &&
-            row.designationId === designation.id,
-        );
+        .find((row) => row.crewMemberId === crew.id && row.designationId === designation.id);
       if (!existing) {
         tx.insert(crewMemberDesignations)
           .values({
@@ -462,11 +416,7 @@ function seedFlightOperationsDemoData() {
         .select()
         .from(designationQualificationRequirements)
         .all()
-        .some(
-          (row) =>
-            row.designationId === designation.id &&
-            row.qualificationTypeId === type.id,
-        );
+        .some((row) => row.designationId === designation.id && row.qualificationTypeId === type.id);
       if (!existing)
         tx.insert(designationQualificationRequirements)
           .values({
@@ -711,8 +661,7 @@ function seedFlightOperationsDemoData() {
         flight = tx
           .insert(flights)
           .values({
-            airlineId: findAirline(spec.number.startsWith("AI") ? "AI" : "6E")
-              .id,
+            airlineId: findAirline(spec.number.startsWith("AI") ? "AI" : "6E").id,
             flightNumber: spec.number,
             originAirportId: findAirport(spec.from).id,
             destinationAirportId: findAirport(spec.to).id,
@@ -745,10 +694,7 @@ function seedFlightOperationsDemoData() {
         .select()
         .from(flightCrewRequirements)
         .all()
-        .some(
-          (row) =>
-            row.flightId === flight.id && row.designationId === designation.id,
-        );
+        .some((row) => row.flightId === flight.id && row.designationId === designation.id);
       if (!existing)
         tx.insert(flightCrewRequirements)
           .values({
@@ -781,9 +727,7 @@ function seedFlightOperationsDemoData() {
         .select()
         .from(flightCrew)
         .all()
-        .some(
-          (row) => row.flightId === flight.id && row.crewMemberId === crew.id,
-        );
+        .some((row) => row.flightId === flight.id && row.crewMemberId === crew.id);
       if (!existing)
         tx.insert(flightCrew)
           .values({
@@ -804,9 +748,7 @@ function seedFlightOperationsDemoData() {
           .from(qualificationAlerts)
           .all()
           .some(
-            (row) =>
-              row.crewQualificationId === expiring.id &&
-              row.alertIntervalDays === interval,
+            (row) => row.crewQualificationId === expiring.id && row.alertIntervalDays === interval,
           );
         if (!exists)
           tx.insert(qualificationAlerts)
@@ -820,13 +762,7 @@ function seedFlightOperationsDemoData() {
       }
     }
 
-    if (
-      !tx
-        .select()
-        .from(auditRetentionPolicy)
-        .where(eq(auditRetentionPolicy.id, 1))
-        .get()
-    ) {
+    if (!tx.select().from(auditRetentionPolicy).where(eq(auditRetentionPolicy.id, 1)).get()) {
       tx.insert(auditRetentionPolicy)
         .values({ id: 1, retentionDays: null, updatedByUserId: manager.id })
         .run();
@@ -883,12 +819,7 @@ async function main() {
         .where(eq(users.email, person.email))
         .get();
       const scimId = scimIds.get(person.email.toLowerCase());
-      if (
-        local &&
-        scimId &&
-        local.oidcSubject &&
-        local.oidcSubject.startsWith("demo|")
-      ) {
+      if (local && scimId && local.oidcSubject && local.oidcSubject.startsWith("demo|")) {
         const conflict = tx
           .select({ id: users.id })
           .from(users)
@@ -1020,24 +951,14 @@ async function main() {
       .onConflictDoNothing()
       .run();
 
-    const gender = (code: string) =>
-      tx.select().from(genders).where(eq(genders.code, code)).get()!;
-    const role = (code: string) =>
-      tx.select().from(roles).where(eq(roles.code, code)).get()!;
+    const gender = (code: string) => tx.select().from(genders).where(eq(genders.code, code)).get()!;
+    const role = (code: string) => tx.select().from(roles).where(eq(roles.code, code)).get()!;
     const currency = (code: string) =>
       tx.select().from(currencies).where(eq(currencies.code, code)).get()!;
     const category = (code: string) =>
-      tx
-        .select()
-        .from(expenseCategories)
-        .where(eq(expenseCategories.code, code))
-        .get()!;
+      tx.select().from(expenseCategories).where(eq(expenseCategories.code, code)).get()!;
     const designation = (code: string) =>
-      tx
-        .select()
-        .from(crewDesignations)
-        .where(eq(crewDesignations.code, code))
-        .get()!;
+      tx.select().from(crewDesignations).where(eq(crewDesignations.code, code)).get()!;
     const airline = (code: string) =>
       tx.select().from(airlines).where(eq(airlines.iataCode, code)).get()!;
     const airport = (code: string) =>
@@ -1386,9 +1307,7 @@ async function main() {
     const approver = personRows[5].user;
     const crewUser = (personIndex: number) => personRows[personIndex].user;
     expenseRows.forEach((row, i) => {
-      if (
-        ["SUBMITTED", "APPROVED", "PAID", "REJECTED"].includes(row.spec.status)
-      ) {
+      if (["SUBMITTED", "APPROVED", "PAID", "REJECTED"].includes(row.spec.status)) {
         const comment =
           row.spec.status === "REJECTED"
             ? "Please attach an itemised hotel invoice and clarify why this stay was required."
@@ -1455,11 +1374,7 @@ async function main() {
       })
       .onConflictDoNothing()
       .run();
-    const setting = tx
-      .select()
-      .from(systemSettings)
-      .where(eq(systemSettings.id, 1))
-      .get();
+    const setting = tx.select().from(systemSettings).where(eq(systemSettings.id, 1)).get();
     if (setting)
       tx.insert(allowedFileTypes)
         .values([
@@ -1482,10 +1397,7 @@ async function main() {
           source: "demo-seed",
         }),
         correlationId: `demo-correlation-${String(i + 1).padStart(3, "0")}`,
-        actorUserId:
-          i < 2
-            ? crewUser(assignments[row.spec.a].personIndex).id
-            : approver.id,
+        actorUserId: i < 2 ? crewUser(assignments[row.spec.a].personIndex).id : approver.id,
         processedAt: i < 3 ? "2026-10-15T02:10:00.000Z" : null,
         attemptCount: i < 3 ? 1 : 0,
       }),
@@ -1505,8 +1417,7 @@ async function main() {
 }
 
 main().catch((error: unknown) => {
-  const message =
-    error instanceof Error ? error.message : "Unknown seed failure";
+  const message = error instanceof Error ? error.message : "Unknown seed failure";
   console.error(`ViLek seed failed: ${message}`);
   process.exitCode = 1;
 });

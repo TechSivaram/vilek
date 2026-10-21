@@ -7,8 +7,7 @@ export async function GET() {
   try {
     return NextResponse.redirect(await createLoginRedirect());
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unable to start sign-in";
+    const message = error instanceof Error ? error.message : "Unable to start sign-in";
     return NextResponse.redirect(
       new URL(
         `/login?error=${encodeURIComponent(message)}`,

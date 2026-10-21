@@ -66,9 +66,7 @@ export default async function ProfileSecurityPage() {
             </div>
           </div>
           <div className="rounded-lg border border-[#dfe7eb] bg-white px-4 py-3 text-sm text-[#607583]">
-            <span className="font-semibold text-[#20384b]">
-              Identity provider
-            </span>
+            <span className="font-semibold text-[#20384b]">Identity provider</span>
             <span className="mx-2 text-[#a2b0b8]">·</span>
             TSCloak
           </div>
@@ -77,8 +75,8 @@ export default async function ProfileSecurityPage() {
         <div className="mx-auto max-w-5xl">
           <SecurityMfaPanel />
           <p className="mt-3 px-1 text-xs leading-5 text-[#7b8d98]">
-            Changes take effect for your ViLek sign-in account. Keep your
-            authenticator setup key private.
+            Changes take effect for your ViLek sign-in account. Keep your authenticator setup key
+            private.
           </p>
         </div>
       </div>

@@ -8,11 +8,7 @@ type WorkspacePickerHeaderProps = {
 };
 
 /** Lightweight authenticated profile header used on the Security & MFA page. */
-export function WorkspacePickerHeader({
-  firstName,
-  lastName,
-  email,
-}: WorkspacePickerHeaderProps) {
+export function WorkspacePickerHeader({ firstName, lastName, email }: WorkspacePickerHeaderProps) {
   const displayName = [firstName, lastName].filter(Boolean).join(" ") || email;
   return (
     <header className="border-b border-slate-200 bg-white">
@@ -32,9 +28,7 @@ export function WorkspacePickerHeader({
           <span>ViLek</span>
         </Link>
         <div className="min-w-0 text-right">
-          <p className="truncate text-sm font-semibold text-[#20384b]">
-            {displayName}
-          </p>
+          <p className="truncate text-sm font-semibold text-[#20384b]">{displayName}</p>
           <p className="truncate text-xs text-[#718391]">{email}</p>
         </div>
       </div>

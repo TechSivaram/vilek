@@ -38,18 +38,8 @@ export default async function DashboardSelectionPage() {
   return (
     <main className="workspace-picker-page">
       <header className="workspace-picker-header">
-        <Link
-          href="/dashboard"
-          className="workspace-picker-brand"
-          aria-label="ViLek workspaces"
-        >
-          <Image
-            src="/Branding/logo.png"
-            alt=""
-            width={92}
-            height={58}
-            priority
-          />
+        <Link href="/dashboard" className="workspace-picker-brand" aria-label="ViLek workspaces">
+          <Image src="/Branding/logo.png" alt="" width={92} height={58} priority />
           <span className="workspace-picker-wordmark">ViLek</span>
         </Link>
         <div className="workspace-picker-user">
@@ -73,13 +63,10 @@ export default async function DashboardSelectionPage() {
 
       <section className="workspace-picker-content">
         <div className="workspace-picker-intro">
-          <span className="workspace-picker-eyebrow">
-            YOUR VILEK WORKSPACES
-          </span>
+          <span className="workspace-picker-eyebrow">YOUR VILEK WORKSPACES</span>
           <h1>Which workspace would you like to enter?</h1>
           <p>
-            Choose the responsibility you want to work on. You can switch
-            workspaces at any time.
+            Choose the responsibility you want to work on. You can switch workspaces at any time.
           </p>
         </div>
 
@@ -90,8 +77,8 @@ export default async function DashboardSelectionPage() {
             </span>
             <h2>No workspace access yet</h2>
             <p>
-              Your account is signed in, but no active ViLek role has been
-              assigned. Please contact your ViLek administrator.
+              Your account is signed in, but no active ViLek role has been assigned. Please contact
+              your ViLek administrator.
             </p>
           </section>
         ) : (
@@ -102,10 +89,7 @@ export default async function DashboardSelectionPage() {
                 className={`workspace-card workspace-card--${workspace.code.toLowerCase()}`}
                 key={workspace.code}
               >
-                <span
-                  className="workspace-card-illustration"
-                  aria-hidden="true"
-                >
+                <span className="workspace-card-illustration" aria-hidden="true">
                   <Image
                     src={workspaceIllustrations[workspace.code].src}
                     alt={workspaceIllustrations[workspace.code].alt}
@@ -128,9 +112,7 @@ export default async function DashboardSelectionPage() {
                         ↗
                       </span>
                     </span>
-                    <span className="workspace-card-description">
-                      {workspace.description}
-                    </span>
+                    <span className="workspace-card-description">{workspace.description}</span>
                     <span className="workspace-card-action">
                       Enter workspace <span aria-hidden="true">→</span>
                     </span>

@@ -23,10 +23,7 @@ export const GET = withRouteGuard(
     const resource = resourceConfig;
     try {
       const rows = resourceService.listRows();
-      const options: Record<
-        string,
-        { value: string | number; label: string }[]
-      > = {};
+      const options: Record<string, { value: string | number; label: string }[]> = {};
       for (const field of resource.columns) {
         const fieldOptions = resourceService.getOptions(field);
         if (fieldOptions.length) options[field] = fieldOptions;
@@ -68,18 +65,12 @@ export const POST = withRouteGuard(
     const resource = resourceConfig;
 
     if (!resource.writable)
-      return NextResponse.json(
-        { error: "This history table is read-only." },
-        { status: 405 },
-      );
+      return NextResponse.json({ error: "This history table is read-only." }, { status: 405 });
     let body: unknown;
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
     }
     const parsedInput = createInputSchema.safeParse(body);
     if (!parsedInput.success)
@@ -93,8 +84,7 @@ export const POST = withRouteGuard(
       return NextResponse.json({ ok: true, id: result.id }, { status: 201 });
     } catch (error) {
       const message =
-        error instanceof Error &&
-        /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
+        error instanceof Error && /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
           ? "The record conflicts with a unique, validation, or relationship constraint."
           : "The record could not be saved.";
       return NextResponse.json({ error: message }, { status: 409 });

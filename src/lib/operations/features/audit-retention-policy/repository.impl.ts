@@ -2,10 +2,7 @@ import "server-only";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { auditRetentionPolicy } from "@/lib/db/schema";
-import type {
-  AuditRetentionPolicyCreateDto,
-  AuditRetentionPolicyUpdateDto,
-} from "./dto";
+import type { AuditRetentionPolicyCreateDto, AuditRetentionPolicyUpdateDto } from "./dto";
 import type { AuditRetentionPolicyRepository } from "./repository";
 
 export const AuditRetentionPolicyResourceConfig = {
@@ -30,9 +27,7 @@ export class AuditRetentionPolicyRepositoryImpl implements AuditRetentionPolicyR
       .map((row) => ({
         ...row,
         retention_label:
-          row.retention_days == null
-            ? "Keep indefinitely"
-            : `${row.retention_days} days`,
+          row.retention_days == null ? "Keep indefinitely" : `${row.retention_days} days`,
       }));
     return {
       rows,
@@ -52,8 +47,7 @@ export class AuditRetentionPolicyRepositoryImpl implements AuditRetentionPolicyR
 
   update(id: string, input: AuditRetentionPolicyUpdateDto): boolean {
     const values: Partial<typeof auditRetentionPolicy.$inferInsert> = {};
-    if (input.retention_days !== undefined)
-      values.retentionDays = input.retention_days;
+    if (input.retention_days !== undefined) values.retentionDays = input.retention_days;
     if (input.id !== undefined) values.id = input.id;
     if (!Object.keys(values).length)
       return (

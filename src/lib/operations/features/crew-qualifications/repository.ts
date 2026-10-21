@@ -1,8 +1,5 @@
 type MaintenanceOption = { value: string | number; label: string };
-import type {
-  CrewQualificationsCreateDto,
-  CrewQualificationsUpdateDto,
-} from "./dto";
+import type { CrewQualificationsCreateDto, CrewQualificationsUpdateDto } from "./dto";
 
 export interface CrewQualificationsRepository {
   listRows(): Record<string, unknown>[];

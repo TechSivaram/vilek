@@ -15,26 +15,18 @@ export const PUT = withRouteGuard({ roles: ["ADMIN"] }, async (request) => {
   if (!parsed.success)
     return NextResponse.json(
       {
-        error:
-          "Choose a currency and set maximum upload size between 1 KB and 100 MB.",
+        error: "Choose a currency and set maximum upload size between 1 KB and 100 MB.",
         details: parsed.error.flatten(),
       },
       { status: 400 },
     );
-  const { defaultCurrencyId: currencyId, maxUploadSizeBytes: size } =
-    parsed.data;
+  const { defaultCurrencyId: currencyId, maxUploadSizeBytes: size } = parsed.data;
   if (!system_settingsService.currencyExists(currencyId))
-    return NextResponse.json(
-      { error: "Selected currency does not exist." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Selected currency does not exist." }, { status: 400 });
   try {
     system_settingsService.save(currencyId, size);
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json(
-      { error: "Settings could not be saved." },
-      { status: 409 },
-    );
+    return NextResponse.json({ error: "Settings could not be saved." }, { status: 409 });
   }
 });

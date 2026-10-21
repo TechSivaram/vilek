@@ -3,8 +3,7 @@ export type CrewComplementDefaultsCreateDto = {
   designation_id: number;
   required_count: number;
 };
-export type CrewComplementDefaultsUpdateDto =
-  Partial<CrewComplementDefaultsCreateDto>;
+export type CrewComplementDefaultsUpdateDto = Partial<CrewComplementDefaultsCreateDto>;
 export type CrewComplementDefaultsResponseDto = {
   id: number | string;
   designation_id: number | string;

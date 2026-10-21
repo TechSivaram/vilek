@@ -13,10 +13,7 @@ import {
   userFormSchema as formSchema,
   userStatusFormSchema as statusSchema,
 } from "@/lib/admin/features/users/schema";
-async function requestJson<T = any>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
+async function requestJson<T = any>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, {
     ...init,
     headers: {
@@ -67,9 +64,7 @@ export function UsersAdminPage() {
   const list = useQuery<UsersListResult>({
     queryKey: ["admin-users", search, page, pageSize],
     queryFn: () =>
-      requestJson(
-        `${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`,
-      ),
+      requestJson(`${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`),
   });
 
   const save = useMutation({
@@ -119,16 +114,11 @@ export function UsersAdminPage() {
       await qc.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (cause) => {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Identity synchronization failed.",
-      );
+      setError(cause instanceof Error ? cause.message : "Identity synchronization failed.");
     },
   });
   const options = list.data?.options ?? {};
-  const busy =
-    list.isFetching || save.isPending || deactivate.isPending || sync.isPending;
+  const busy = list.isFetching || save.isPending || deactivate.isPending || sync.isPending;
   useEffect(() => {
     setPage(1);
   }, [search, pageSize]);
@@ -188,8 +178,8 @@ export function UsersAdminPage() {
           <div className="admin-eyebrow">ADMINISTRATION</div>
           <h1>Users</h1>
           <p>
-            Manage ViLek user accounts and synchronize account changes with the
-            configured identity provider.
+            Manage ViLek user accounts and synchronize account changes with the configured identity
+            provider.
           </p>
         </div>
         <div className="admin-heading-actions">
@@ -228,16 +218,9 @@ export function UsersAdminPage() {
           <div className="admin-panel-heading">
             <div>
               <h2>{editing ? "Edit " : "Add "}Users</h2>
-              <p>
-                Create the ViLek account and provision it to the configured
-                identity provider.
-              </p>
+              <p>Create the ViLek account and provision it to the configured identity provider.</p>
             </div>
-            <button
-              className="admin-icon-button"
-              type="button"
-              onClick={cancel}
-            >
+            <button className="admin-icon-button" type="button" onClick={cancel}>
               ×
             </button>
           </div>
@@ -256,8 +239,7 @@ export function UsersAdminPage() {
                   <span>Last name *</span>
                   <input {...createForm.register("lastName")} />
                   <small>
-                    The configured identity provider will send the password
-                    setup email.
+                    The configured identity provider will send the password setup email.
                   </small>
                 </label>
               </>
@@ -277,10 +259,7 @@ export function UsersAdminPage() {
                 </label>
                 <label className="admin-field">
                   <span>Identity subject</span>
-                  <input
-                    value={editing?.oidcSubject ?? "Not linked"}
-                    readOnly
-                  />
+                  <input value={editing?.oidcSubject ?? "Not linked"} readOnly />
                 </label>
                 <label className="admin-field admin-field-checkbox">
                   <input type="checkbox" {...statusForm.register("isActive")} />
@@ -289,23 +268,11 @@ export function UsersAdminPage() {
               </>
             )}
             <div className="admin-form-actions">
-              <button
-                type="button"
-                className="admin-secondary-button"
-                onClick={cancel}
-              >
+              <button type="button" className="admin-secondary-button" onClick={cancel}>
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="admin-primary-button"
-                disabled={busy}
-              >
-                {busy
-                  ? "Saving…"
-                  : creating
-                    ? "Create user & send setup email"
-                    : "Save changes"}
+              <button type="submit" className="admin-primary-button" disabled={busy}>
+                {busy ? "Saving…" : creating ? "Create user & send setup email" : "Save changes"}
               </button>
             </div>
           </form>
@@ -315,8 +282,7 @@ export function UsersAdminPage() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Records{" "}
-              <span className="admin-count-badge">{pagination.total}</span>
+              Records <span className="admin-count-badge">{pagination.total}</span>
             </h2>
             <p>
               {pagination.total
@@ -370,13 +336,9 @@ export function UsersAdminPage() {
                   </td>
                   <td key="isActive" data-label="Status">
                     {row.isActive ? (
-                      <span className="admin-status-pill is-active">
-                        Active
-                      </span>
+                      <span className="admin-status-pill is-active">Active</span>
                     ) : (
-                      <span className="admin-status-pill is-inactive">
-                        Inactive
-                      </span>
+                      <span className="admin-status-pill is-inactive">Inactive</span>
                     )}
                   </td>
                   <td data-label="Actions">
@@ -419,10 +381,7 @@ export function UsersAdminPage() {
         <div className="admin-pagination">
           <label>
             Rows per page{" "}
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-            >
+            <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -444,9 +403,7 @@ export function UsersAdminPage() {
             <button
               type="button"
               className="admin-secondary-button"
-              onClick={() =>
-                setPage((p) => Math.min(pagination.totalPages, p + 1))
-              }
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page >= pagination.totalPages || busy}
             >
               Next

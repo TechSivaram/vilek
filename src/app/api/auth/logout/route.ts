@@ -27,10 +27,7 @@ export async function POST(request: NextRequest) {
     : request.nextUrl.origin;
 
   if (origin !== expectedOrigin) {
-    return NextResponse.json(
-      { error: "Invalid expected origin" },
-      { status: 403 },
-    );
+    return NextResponse.json({ error: "Invalid expected origin" }, { status: 403 });
   }
 
   // Remove the local credential before leaving ViLek, then terminate the TSCloak

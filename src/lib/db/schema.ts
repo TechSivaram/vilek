@@ -1,12 +1,5 @@
 import { sql } from "drizzle-orm";
-import {
-  sqliteTable,
-  text,
-  integer,
-  index,
-  uniqueIndex,
-  check,
-} from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index, uniqueIndex, check } from "drizzle-orm/sqlite-core";
 
 // ViLek's finalized 21-entity schema. Dates/times are ISO-8601 text; money is
 // stored as SQLite REAL to mirror DECIMAL(18,2) until a PostgreSQL migration.
@@ -18,8 +11,7 @@ const updatedAt = (name = "updated_at") =>
   text(name)
     .notNull()
     .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`);
-const active = () =>
-  integer("is_active", { mode: "boolean" }).notNull().default(true);
+const active = () => integer("is_active", { mode: "boolean" }).notNull().default(true);
 
 export const genders = sqliteTable("Gender", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -178,11 +170,7 @@ export const flightCrew = sqliteTable(
   },
   (t) => [
     uniqueIndex("flight_crew_flight_member_uq").on(t.flightId, t.crewMemberId),
-    uniqueIndex("flight_crew_id_assignment_uq").on(
-      t.id,
-      t.flightId,
-      t.crewMemberId,
-    ),
+    uniqueIndex("flight_crew_id_assignment_uq").on(t.id, t.flightId, t.crewMemberId),
   ],
 );
 
@@ -206,10 +194,7 @@ export const crewMemberDesignations = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("crew_member_designation_pair_uq").on(
-      t.crewMemberId,
-      t.designationId,
-    ),
+    uniqueIndex("crew_member_designation_pair_uq").on(t.crewMemberId, t.designationId),
     index("crew_member_designation_eligibility_idx").on(
       t.designationId,
       t.isActive,
@@ -226,9 +211,7 @@ export const qualificationTypes = sqliteTable("Qualification_Type", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
-  expiryRequired: integer("expiry_required", { mode: "boolean" })
-    .notNull()
-    .default(true),
+  expiryRequired: integer("expiry_required", { mode: "boolean" }).notNull().default(true),
   isActive: active(),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -261,16 +244,9 @@ export const crewQualifications = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("crew_qualification_crew_type_idx").on(
-      t.crewMemberId,
-      t.qualificationTypeId,
-      t.status,
-    ),
+    index("crew_qualification_crew_type_idx").on(t.crewMemberId, t.qualificationTypeId, t.status),
     index("crew_qualification_valid_until_idx").on(t.validUntil, t.status),
-    check(
-      "crew_qualification_status_ck",
-      sql`${t.status} IN ('ACTIVE', 'SUSPENDED', 'REVOKED')`,
-    ),
+    check("crew_qualification_status_ck", sql`${t.status} IN ('ACTIVE', 'SUSPENDED', 'REVOKED')`),
     check(
       "crew_qualification_dates_ck",
       sql`${t.validUntil} IS NULL OR ${t.validUntil} >= ${t.validFrom}`,
@@ -288,9 +264,7 @@ export const designationQualificationRequirements = sqliteTable(
     qualificationTypeId: integer("qualification_type_id")
       .notNull()
       .references(() => qualificationTypes.id, { onDelete: "restrict" }),
-    isRequired: integer("is_required", { mode: "boolean" })
-      .notNull()
-      .default(true),
+    isRequired: integer("is_required", { mode: "boolean" }).notNull().default(true),
     createdAt: createdAt(),
   },
   (t) => [
@@ -316,13 +290,8 @@ export const flightCrewComplementDefaults = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("flight_crew_complement_default_designation_uq").on(
-      t.designationId,
-    ),
-    check(
-      "flight_crew_complement_default_count_ck",
-      sql`${t.requiredCount} >= 0`,
-    ),
+    uniqueIndex("flight_crew_complement_default_designation_uq").on(t.designationId),
+    check("flight_crew_complement_default_count_ck", sql`${t.requiredCount} >= 0`),
   ],
 );
 
@@ -348,29 +317,23 @@ export const flightCrewRequirements = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("flight_crew_requirement_flight_designation_uq").on(
-      t.flightId,
-      t.designationId,
-    ),
+    uniqueIndex("flight_crew_requirement_flight_designation_uq").on(t.flightId, t.designationId),
     index("flight_crew_requirement_flight_idx").on(t.flightId),
     check("flight_crew_requirement_count_ck", sql`${t.requiredCount} >= 0`),
   ],
 );
 
-export const flightOperationsSettings = sqliteTable(
-  "Flight_Operations_Setting",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-    settingKey: text("setting_key").notNull().unique(),
-    valueJson: text("value_json").notNull(),
-    description: text("description"),
-    updatedByUserId: text("updated_by_user_id").references(() => users.id, {
-      onDelete: "set null",
-    }),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-  },
-);
+export const flightOperationsSettings = sqliteTable("Flight_Operations_Setting", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  settingKey: text("setting_key").notNull().unique(),
+  valueJson: text("value_json").notNull(),
+  description: text("description"),
+  updatedByUserId: text("updated_by_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
 
 // Historical identifiers are deliberately stored as snapshots rather than
 // cascading foreign keys so audit history survives operational record changes.
@@ -424,10 +387,7 @@ export const qualificationAlerts = sqliteTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("qualification_alert_interval_uq").on(
-      t.crewQualificationId,
-      t.alertIntervalDays,
-    ),
+    uniqueIndex("qualification_alert_interval_uq").on(t.crewQualificationId, t.alertIntervalDays),
     index("qualification_alert_state_due_idx").on(t.state, t.dueAt),
     check("qualification_alert_interval_ck", sql`${t.alertIntervalDays} >= 0`),
     check(
@@ -494,10 +454,7 @@ export const auditRetentionPolicy = sqliteTable(
   },
   (t) => [
     check("audit_retention_single_row_ck", sql`${t.id} = 1`),
-    check(
-      "audit_retention_days_ck",
-      sql`${t.retentionDays} IS NULL OR ${t.retentionDays} > 0`,
-    ),
+    check("audit_retention_days_ck", sql`${t.retentionDays} IS NULL OR ${t.retentionDays} > 0`),
   ],
 );
 
@@ -531,9 +488,7 @@ export const currencies = sqliteTable(
     minorUnits: integer("minor_units").notNull().default(2),
     isActive: active(),
   },
-  (t) => [
-    check("currency_minor_units_ck", sql`${t.minorUnits} BETWEEN 0 AND 4`),
-  ],
+  (t) => [check("currency_minor_units_ck", sql`${t.minorUnits} BETWEEN 0 AND 4`)],
 );
 
 export const expenseCategories = sqliteTable("Expense_Category", {
@@ -628,9 +583,7 @@ export const claimExpenses = sqliteTable(
       .references(() => expenses.id, { onDelete: "restrict" }),
     createdAt: createdAt(),
   },
-  (t) => [
-    uniqueIndex("claim_expense_claim_expense_uq").on(t.claimId, t.expenseId),
-  ],
+  (t) => [uniqueIndex("claim_expense_claim_expense_uq").on(t.claimId, t.expenseId)],
 );
 
 export const claimComments = sqliteTable(
@@ -669,9 +622,7 @@ export const systemSettings = sqliteTable(
     defaultCurrencyId: integer("default_currency_id")
       .notNull()
       .references(() => currencies.id, { onDelete: "restrict" }),
-    maxUploadSizeBytes: integer("max_upload_size_bytes")
-      .notNull()
-      .default(10485760),
+    maxUploadSizeBytes: integer("max_upload_size_bytes").notNull().default(10485760),
     updatedAt: updatedAt(),
   },
   (t) => [
@@ -689,12 +640,7 @@ export const allowedFileTypes = sqliteTable(
       .references(() => systemSettings.id, { onDelete: "cascade" }),
     fileType: text("file_type").notNull(),
   },
-  (t) => [
-    uniqueIndex("allowed_file_type_setting_type_uq").on(
-      t.systemSettingId,
-      t.fileType,
-    ),
-  ],
+  (t) => [uniqueIndex("allowed_file_type_setting_type_uq").on(t.systemSettingId, t.fileType)],
 );
 
 export const notifications = sqliteTable(

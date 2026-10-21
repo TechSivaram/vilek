@@ -5,15 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formSchema } from "@/lib/admin/features/currencies/schema";
 import type { CurrenciesFormDto } from "@/lib/admin/features/currencies/dto";
-import type {
-  CurrenciesListRow,
-  CurrenciesListResult,
-} from "@/lib/admin/features/currencies/dto";
+import type { CurrenciesListRow, CurrenciesListResult } from "@/lib/admin/features/currencies/dto";
 
-async function requestJson<T = any>(
-  url: string,
-  init?: RequestInit,
-): Promise<T> {
+async function requestJson<T = any>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, {
     ...init,
     headers: {
@@ -58,9 +52,7 @@ export function CurrenciesAdminPage() {
   const list = useQuery<CurrenciesListResult>({
     queryKey: ["admin-currencies", search, page, pageSize],
     queryFn: () =>
-      requestJson(
-        `${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`,
-      ),
+      requestJson(`${PAGE}?q=${encodeURIComponent(search)}&page=${page}&pageSize=${pageSize}`),
   });
 
   const save = useMutation({
@@ -177,11 +169,7 @@ export function CurrenciesAdminPage() {
               <h2>{editing ? "Edit " : "Add "}Currencies</h2>
               <p>Manage supported currencies and minor-unit precision.</p>
             </div>
-            <button
-              className="admin-icon-button"
-              type="button"
-              onClick={cancel}
-            >
+            <button className="admin-icon-button" type="button" onClick={cancel}>
               ×
             </button>
           </div>
@@ -224,18 +212,10 @@ export function CurrenciesAdminPage() {
               <span>Active</span>
             </label>
             <div className="admin-form-actions">
-              <button
-                type="button"
-                className="admin-secondary-button"
-                onClick={cancel}
-              >
+              <button type="button" className="admin-secondary-button" onClick={cancel}>
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="admin-primary-button"
-                disabled={busy}
-              >
+              <button type="submit" className="admin-primary-button" disabled={busy}>
                 {busy ? "Saving…" : "Save changes"}
               </button>
             </div>
@@ -246,8 +226,7 @@ export function CurrenciesAdminPage() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Records{" "}
-              <span className="admin-count-badge">{pagination.total}</span>
+              Records <span className="admin-count-badge">{pagination.total}</span>
             </h2>
             <p>
               {pagination.total
@@ -297,13 +276,9 @@ export function CurrenciesAdminPage() {
                   </td>
                   <td key="isActive" data-label="Status">
                     {row.isActive ? (
-                      <span className="admin-status-pill is-active">
-                        Active
-                      </span>
+                      <span className="admin-status-pill is-active">Active</span>
                     ) : (
-                      <span className="admin-status-pill is-inactive">
-                        Inactive
-                      </span>
+                      <span className="admin-status-pill is-inactive">Inactive</span>
                     )}
                   </td>
                   <td data-label="Actions">
@@ -321,11 +296,7 @@ export function CurrenciesAdminPage() {
                           type="button"
                           className="admin-table-action is-danger"
                           onClick={() => {
-                            if (
-                              window.confirm(
-                                `Deactivate this currencies record?`,
-                              )
-                            )
+                            if (window.confirm(`Deactivate this currencies record?`))
                               deactivate.mutate(row);
                           }}
                           disabled={busy}
@@ -350,10 +321,7 @@ export function CurrenciesAdminPage() {
         <div className="admin-pagination">
           <label>
             Rows per page{" "}
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-            >
+            <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -375,9 +343,7 @@ export function CurrenciesAdminPage() {
             <button
               type="button"
               className="admin-secondary-button"
-              onClick={() =>
-                setPage((p) => Math.min(pagination.totalPages, p + 1))
-              }
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
               disabled={page >= pagination.totalPages || busy}
             >
               Next

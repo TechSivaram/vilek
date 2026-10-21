@@ -1,13 +1,7 @@
 import { users, roles, currencies, expenseCategories } from "@/lib/db/schema";
 
 export type FieldKind =
-  | "text"
-  | "email"
-  | "number"
-  | "datetime-local"
-  | "date"
-  | "boolean"
-  | "select";
+  "text" | "email" | "number" | "datetime-local" | "date" | "boolean" | "select";
 export type AdminField = {
   name: string;
   label: string;

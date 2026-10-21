@@ -6,8 +6,7 @@ const datetimeLocal = z
   .refine(
     (value) =>
       value === "" ||
-      (!Number.isNaN(Date.parse(value)) &&
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)),
+      (!Number.isNaN(Date.parse(value)) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)),
     "Enter a valid date and time.",
   );
 
@@ -19,14 +18,7 @@ export function makeFormSchema(fields: AdminField[]) {
     if (field.kind === "boolean") {
       schema = z.boolean();
     } else if (field.kind === "number") {
-      if (
-        [
-          "airlineId",
-          "originAirportId",
-          "destinationAirportId",
-          "userId",
-        ].includes(field.name)
-      ) {
+      if (["airlineId", "originAirportId", "destinationAirportId", "userId"].includes(field.name)) {
         schema = z.preprocess(
           (value) =>
             value === "" || value === undefined
@@ -72,16 +64,11 @@ export function makeFormSchema(fields: AdminField[]) {
       schema = z.string().trim().email("Enter a valid email address.");
     } else if (field.kind === "datetime-local") {
       schema = field.required
-        ? z
-            .string()
-            .trim()
-            .min(1, `${field.label} is required`)
-            .pipe(datetimeLocal)
+        ? z.string().trim().min(1, `${field.label} is required`).pipe(datetimeLocal)
         : z.union([z.literal(""), datetimeLocal]).optional();
     } else {
       schema = z.string().trim();
-      if (field.required)
-        schema = (schema as z.ZodString).min(1, `${field.label} is required`);
+      if (field.required) schema = (schema as z.ZodString).min(1, `${field.label} is required`);
       if (field.name === "flightNumber") {
         schema = (schema as z.ZodString)
           .min(3, "Enter a valid flight number, e.g. AI 543.")

@@ -8,10 +8,7 @@ import {
   qualificationTypes,
   users,
 } from "@/lib/db/schema";
-import type {
-  QualificationAlertsCreateDto,
-  QualificationAlertsUpdateDto,
-} from "./dto";
+import type { QualificationAlertsCreateDto, QualificationAlertsUpdateDto } from "./dto";
 import type { QualificationAlertsRepository as Repository } from "./repository";
 
 export const QualificationAlertsRepositoryImpl: Repository = {
@@ -36,10 +33,7 @@ export const QualificationAlertsRepositoryImpl: Repository = {
         crewQualifications,
         eq(qualificationAlerts.crewQualificationId, crewQualifications.id),
       )
-      .leftJoin(
-        crewMembers,
-        eq(crewQualifications.crewMemberId, crewMembers.id),
-      )
+      .leftJoin(crewMembers, eq(crewQualifications.crewMemberId, crewMembers.id))
       .leftJoin(users, eq(crewMembers.userId, users.id))
       .leftJoin(
         qualificationTypes,
@@ -64,20 +58,13 @@ export const QualificationAlertsRepositoryImpl: Repository = {
         qualification_name: qualificationTypes.name,
       })
       .from(crewQualifications)
-      .leftJoin(
-        crewMembers,
-        eq(crewQualifications.crewMemberId, crewMembers.id),
-      )
+      .leftJoin(crewMembers, eq(crewQualifications.crewMemberId, crewMembers.id))
       .leftJoin(users, eq(crewMembers.userId, users.id))
       .leftJoin(
         qualificationTypes,
         eq(crewQualifications.qualificationTypeId, qualificationTypes.id),
       )
-      .orderBy(
-        asc(users.lastName),
-        asc(users.firstName),
-        asc(qualificationTypes.name),
-      )
+      .orderBy(asc(users.lastName), asc(users.firstName), asc(qualificationTypes.name))
       .all()
       .map((row) => ({
         value: row.value,
@@ -108,8 +95,7 @@ export const QualificationAlertsRepositoryImpl: Repository = {
     if (input.due_at !== undefined) values.dueAt = input.due_at ?? "";
     if (input.state !== undefined)
       values.state = input.state == null ? "PENDING" : String(input.state);
-    if (input.generated_at !== undefined)
-      values.generatedAt = input.generated_at;
+    if (input.generated_at !== undefined) values.generatedAt = input.generated_at;
     if (input.resolved_at !== undefined) values.resolvedAt = input.resolved_at;
     if (!Object.keys(values).length)
       return (

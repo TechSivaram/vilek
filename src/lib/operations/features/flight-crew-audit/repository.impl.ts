@@ -37,19 +37,10 @@ export class FlightCrewAuditRepositoryImpl implements FlightCrewAuditRepository 
       })
       .from(flightCrewAuditEvents)
       .leftJoin(flights, eq(flightCrewAuditEvents.flightId, flights.id))
-      .leftJoin(
-        crewMembers,
-        eq(flightCrewAuditEvents.crewMemberId, crewMembers.id),
-      )
+      .leftJoin(crewMembers, eq(flightCrewAuditEvents.crewMemberId, crewMembers.id))
       .leftJoin(users, eq(crewMembers.userId, users.id))
-      .leftJoin(
-        crewDesignations,
-        eq(flightCrewAuditEvents.designationId, crewDesignations.id),
-      )
-      .orderBy(
-        desc(flightCrewAuditEvents.createdAt),
-        desc(flightCrewAuditEvents.id),
-      )
+      .leftJoin(crewDesignations, eq(flightCrewAuditEvents.designationId, crewDesignations.id))
+      .orderBy(desc(flightCrewAuditEvents.createdAt), desc(flightCrewAuditEvents.id))
       .limit(500)
       .all()
       .map((row) => ({
@@ -61,18 +52,12 @@ export class FlightCrewAuditRepositoryImpl implements FlightCrewAuditRepository 
         reason: row.reason,
         actor_email_snapshot: row.actor_email_snapshot,
         created_at: row.created_at,
-        flight_number:
-          row.flight_number_snapshot ??
-          row.flight_number_current ??
-          "Unknown flight",
+        flight_number: row.flight_number_snapshot ?? row.flight_number_current ?? "Unknown flight",
         crew_name:
           row.crew_name_snapshot ??
-          ([row.first_name, row.last_name].filter(Boolean).join(" ") ||
-            "Unknown crew member"),
+          ([row.first_name, row.last_name].filter(Boolean).join(" ") || "Unknown crew member"),
         designation_name:
-          row.designation_snapshot ??
-          row.designation_name_current ??
-          "Unknown designation",
+          row.designation_snapshot ?? row.designation_name_current ?? "Unknown designation",
       }));
     return {
       rows,

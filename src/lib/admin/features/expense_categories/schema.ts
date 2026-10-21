@@ -29,10 +29,7 @@ export const updateInputSchema: z.ZodType<ExpenseCategoriesUpdateInput> = z
   .strict();
 
 /** Runtime validator explicitly checked against the feature DTO. */
-export const formSchema: z.ZodType<
-  ExpenseCategoriesFormDto,
-  ExpenseCategoriesFormDto
-> = z
+export const formSchema: z.ZodType<ExpenseCategoriesFormDto, ExpenseCategoriesFormDto> = z
   .object({
     code: z.string().trim().min(1),
     name: z.string().trim().min(1),

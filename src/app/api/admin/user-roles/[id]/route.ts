@@ -10,16 +10,12 @@ export const DELETE = withRouteGuard(
     const { id } = await context.params;
     const parsedId = assignmentIdSchema.safeParse(id);
     if (!parsedId.success)
-      return NextResponse.json(
-        { error: "Invalid assignment ID." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid assignment ID." }, { status: 400 });
     const result = userRolesService.remove(parsedId.data);
     if (result.status === "last-admin")
       return NextResponse.json(
         {
-          error:
-            "The last active administrator role assignment cannot be removed.",
+          error: "The last active administrator role assignment cannot be removed.",
         },
         { status: 409 },
       );

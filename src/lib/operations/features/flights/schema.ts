@@ -31,13 +31,10 @@ export const formSchema: z.ZodType<FlightFormDto, FlightFormDto> = z
     isActive: z.boolean(),
   })
   .strict()
-  .refine(
-    (v) => new Date(v.scheduledArrival) > new Date(v.scheduledDeparture),
-    {
-      path: ["scheduledArrival"],
-      message: "Arrival must be later than departure.",
-    },
-  );
+  .refine((v) => new Date(v.scheduledArrival) > new Date(v.scheduledDeparture), {
+    path: ["scheduledArrival"],
+    message: "Arrival must be later than departure.",
+  });
 
 const flightListRowSchema: z.ZodType<FlightListRow> = z
   .object({
@@ -87,17 +84,17 @@ export const flightsListResponseSchema: z.ZodType<FlightsListResponseDto> = z
   })
   .strict();
 
-export const flightOptionsResponseSchema: z.ZodType<FlightOptionsResponseDto> =
-  z
-    .object({
-      options: z
-        .object({
-          airlines: z.array(flightOptionSchema),
-          airports: z.array(flightOptionSchema),
-        })
-        .strict(),
-    })
-    .strict();
+export const flightOptionsResponseSchema: z.ZodType<FlightOptionsResponseDto> = z
+  .object({
+    options: z
+      .object({
+        airlines: z.array(flightOptionSchema),
+        airports: z.array(flightOptionSchema),
+      })
+      .strict(),
+  })
+  .strict();
 
-export const flightMutationResponseSchema: z.ZodType<FlightMutationResponseDto> =
-  z.object({ ok: z.boolean() }).strict();
+export const flightMutationResponseSchema: z.ZodType<FlightMutationResponseDto> = z
+  .object({ ok: z.boolean() })
+  .strict();

@@ -2,11 +2,7 @@ import "server-only";
 
 import { NextResponse } from "next/server";
 import { getAuthorizationContext } from "@/lib/auth/guards";
-import {
-  hasAnyVilekRole,
-  hasVilekPermission,
-  type VilekPermission,
-} from "@/lib/auth/permissions";
+import { hasAnyVilekRole, hasVilekPermission, type VilekPermission } from "@/lib/auth/permissions";
 
 type GuardOptions = {
   /** Any one listed local role grants access. */
@@ -53,23 +49,15 @@ export function withRouteGuard<C extends RouteContext = RouteContext>(
         : new URL(request.url).origin;
 
       if (origin !== expectedOrigin) {
-        return NextResponse.json(
-          { error: "Invalid expected origin" },
-          { status: 403 },
-        );
+        return NextResponse.json({ error: "Invalid expected origin" }, { status: 403 });
       }
     }
 
-    if (
-      options.roles?.length &&
-      !hasAnyVilekRole(auth.roleCodes, options.roles)
-    ) {
+    if (options.roles?.length && !hasAnyVilekRole(auth.roleCodes, options.roles)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     if (
-      options.permissions?.some(
-        (permission) => !hasVilekPermission(auth.roleCodes, permission),
-      )
+      options.permissions?.some((permission) => !hasVilekPermission(auth.roleCodes, permission))
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }

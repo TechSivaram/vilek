@@ -1,8 +1,5 @@
 import "server-only";
-import type {
-  CrewQualificationsCreateDto,
-  CrewQualificationsUpdateDto,
-} from "./dto";
+import type { CrewQualificationsCreateDto, CrewQualificationsUpdateDto } from "./dto";
 import { CrewQualificationsRepositoryImpl } from "./repository.impl";
 
 export const CrewQualificationsService = {

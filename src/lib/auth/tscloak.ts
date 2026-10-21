@@ -13,15 +13,12 @@ import { users } from "@/lib/db/schema";
 
 export const ACCESS_TOKEN_COOKIE = "vilek_access_token";
 const OIDC_TX_COOKIE = "vilek_oidc_transaction";
-const issuer = (
-  process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com"
-).replace(/\/$/, "");
+const issuer = (process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com").replace(/\/$/, "");
 const clientId = process.env.TSCLOAK_CLIENT_ID ?? "";
 const clientSecret = process.env.TSCLOAK_CLIENT_SECRET ?? "";
 const audience = process.env.TSCLOAK_ACCESS_TOKEN_AUDIENCE ?? clientId;
 const redirectUri =
-  process.env.TSCLOAK_REDIRECT_URI ??
-  "http://localhost:3001/api/auth/callback/tscloak";
+  process.env.TSCLOAK_REDIRECT_URI ?? "http://localhost:3001/api/auth/callback/tscloak";
 const postLogoutRedirectUri =
   process.env.TSCLOAK_POST_LOGOUT_REDIRECT_URI ?? "http://localhost:3001/login";
 const secureCookies = process.env.NODE_ENV === "production";
@@ -76,13 +73,11 @@ function parseJwt(token: string) {
   };
 }
 async function getDiscovery(): Promise<Discovery> {
-  if (discoveryCache && discoveryCache.expires > Date.now())
-    return discoveryCache.value;
+  if (discoveryCache && discoveryCache.expires > Date.now()) return discoveryCache.value;
   const response = await fetch(`${issuer}/.well-known/openid-configuration`, {
     cache: "no-store",
   });
-  if (!response.ok)
-    throw new Error(`TSCloak discovery failed (${response.status})`);
+  if (!response.ok) throw new Error(`TSCloak discovery failed (${response.status})`);
   const value = (await response.json()) as Discovery;
   if (
     value.issuer !== issuer ||
@@ -97,8 +92,7 @@ async function getDiscovery(): Promise<Discovery> {
 async function getJwks(uri: string): Promise<Jwk[]> {
   if (jwksCache && jwksCache.expires > Date.now()) return jwksCache.value;
   const response = await fetch(uri, { cache: "no-store" });
-  if (!response.ok)
-    throw new Error(`TSCloak JWKS request failed (${response.status})`);
+  if (!response.ok) throw new Error(`TSCloak JWKS request failed (${response.status})`);
   const body = (await response.json()) as { keys?: Jwk[] };
   if (!Array.isArray(body.keys)) throw new Error("TSCloak JWKS is invalid");
   jwksCache = { expires: Date.now() + 5 * 60_000, value: body.keys };
@@ -135,29 +129,16 @@ async function verifyJwt(
     key: jwk as unknown as import("node:crypto").JsonWebKey,
     format: "jwk",
   });
-  if (
-    !verifySignature(
-      "RSA-SHA256",
-      Buffer.from(parsed.signingInput),
-      publicKey,
-      parsed.signature,
-    )
-  )
+  if (!verifySignature("RSA-SHA256", Buffer.from(parsed.signingInput), publicKey, parsed.signature))
     throw new Error("Invalid token signature");
   const c = parsed.claims;
   const now = Math.floor(Date.now() / 1000);
   const audiences = Array.isArray(c.aud) ? c.aud : [c.aud];
   if (c.iss !== issuer) throw new Error("Invalid token issuer");
-  if (!audiences.includes(expectedAudience))
-    throw new Error("Invalid token audience");
-  if (typeof c.exp !== "number" || c.exp <= now)
-    throw new Error("Token expired or missing exp");
-  if (typeof c.nbf === "number" && c.nbf > now + 30)
-    throw new Error("Token is not yet valid");
-  if (
-    expectedNonce &&
-    (typeof c.nonce !== "string" || !safeEqual(c.nonce, expectedNonce))
-  )
+  if (!audiences.includes(expectedAudience)) throw new Error("Invalid token audience");
+  if (typeof c.exp !== "number" || c.exp <= now) throw new Error("Token expired or missing exp");
+  if (typeof c.nbf === "number" && c.nbf > now + 30) throw new Error("Token is not yet valid");
+  if (expectedNonce && (typeof c.nonce !== "string" || !safeEqual(c.nonce, expectedNonce)))
     throw new Error("Invalid OIDC nonce");
   return c;
 }
@@ -168,16 +149,12 @@ export async function createLoginRedirect() {
   const nonce = randomToken();
   const verifier = randomToken(48);
   const challenge = base64url(
-    Buffer.from(
-      await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
-    ),
+    Buffer.from(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier))),
   );
   const jar = await cookies();
   jar.set(
     OIDC_TX_COOKIE,
-    base64url(
-      JSON.stringify({ state, nonce, verifier, createdAt: Date.now() }),
-    ),
+    base64url(JSON.stringify({ state, nonce, verifier, createdAt: Date.now() })),
     {
       ...cookieBase,
       maxAge: 10 * 60,
@@ -213,8 +190,7 @@ export async function completeLogin(code: string, state: string) {
   if (Date.now() - tx.createdAt > 10 * 60_000 || !safeEqual(tx.state, state))
     throw new Error("OIDC state validation failed");
   const discovery = await getDiscovery();
-  const authMethod =
-    process.env.TSCLOAK_TOKEN_AUTH_METHOD ?? "client_secret_post";
+  const authMethod = process.env.TSCLOAK_TOKEN_AUTH_METHOD ?? "client_secret_post";
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     code,
@@ -233,9 +209,7 @@ export async function completeLogin(code: string, state: string) {
     body.set("client_id", clientId);
     body.set("client_secret", clientSecret);
   } else {
-    throw new Error(
-      "TSCLOAK_TOKEN_AUTH_METHOD must be client_secret_post or client_secret_basic",
-    );
+    throw new Error("TSCLOAK_TOKEN_AUTH_METHOD must be client_secret_post or client_secret_basic");
   }
   const tokenResponse = await fetch(discovery.token_endpoint, {
     method: "POST",
@@ -262,11 +236,7 @@ export async function completeLogin(code: string, state: string) {
   }
   await verifyJwt(tokens.id_token, discovery.jwks_uri, clientId, tx.nonce);
   // The access token must be a signed JWT with an audience explicitly intended for ViLek.
-  const accessClaims = await verifyJwt(
-    tokens.access_token,
-    discovery.jwks_uri,
-    audience,
-  );
+  const accessClaims = await verifyJwt(tokens.access_token, discovery.jwks_uri, audience);
   if (typeof accessClaims.sub !== "string" || !accessClaims.sub)
     throw new Error("Access token has no subject");
   // Keep below the common per-cookie size ceiling; never split or truncate tokens.
@@ -287,8 +257,7 @@ export async function completeLogin(code: string, state: string) {
   });
 }
 export async function getValidatedAccessToken(tokenOverride?: string) {
-  const token =
-    tokenOverride ?? (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value;
+  const token = tokenOverride ?? (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value;
   if (!token) return null;
   try {
     const discovery = await getDiscovery();
@@ -305,12 +274,7 @@ export async function getLocalAuthenticatedUser(tokenOverride?: string) {
   const [user] = db
     .select()
     .from(users)
-    .where(
-      and(
-        eq(users.oidcSubject, validated.claims.sub as string),
-        eq(users.isActive, true),
-      ),
-    )
+    .where(and(eq(users.oidcSubject, validated.claims.sub as string), eq(users.isActive, true)))
     .limit(1)
     .all();
   if (!user) return null;

@@ -2,13 +2,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 type Obj = Record<string, unknown>;
-function PageHeading({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+function PageHeading({ title, description }: { title: string; description: string }) {
   return (
     <section className="admin-page-heading">
       <div>
@@ -113,17 +107,10 @@ export function UserRoleAssignments() {
             <p>Duplicate assignments are rejected by the database.</p>
           </div>
         </div>
-        <form
-          className="admin-record-form admin-assignment-form"
-          onSubmit={assign}
-        >
+        <form className="admin-record-form admin-assignment-form" onSubmit={assign}>
           <label className="admin-field">
             <span>User *</span>
-            <select
-              required
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            >
+            <select required value={userId} onChange={(e) => setUserId(e.target.value)}>
               <option value="">Choose a user…</option>
               {data.options.users.map((u) => (
                 <option
@@ -135,25 +122,15 @@ export function UserRoleAssignments() {
           </label>
           <label className="admin-field">
             <span>Role *</span>
-            <select
-              required
-              value={roleId}
-              onChange={(e) => setRoleId(e.target.value)}
-            >
+            <select required value={roleId} onChange={(e) => setRoleId(e.target.value)}>
               <option value="">Choose a role…</option>
               {data.options.roles.map((r) => (
-                <option
-                  key={String(r.id)}
-                  value={String(r.id)}
-                >{`${r.code} — ${r.name}`}</option>
+                <option key={String(r.id)} value={String(r.id)}>{`${r.code} — ${r.name}`}</option>
               ))}
             </select>
           </label>
           <div className="admin-form-actions">
-            <button
-              className="admin-primary-button"
-              disabled={busy || !userId || !roleId}
-            >
+            <button className="admin-primary-button" disabled={busy || !userId || !roleId}>
               Assign role
             </button>
           </div>
@@ -163,8 +140,7 @@ export function UserRoleAssignments() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Current assignments{" "}
-              <span className="admin-count-badge">{data.rows.length}</span>
+              Current assignments <span className="admin-count-badge">{data.rows.length}</span>
             </h2>
             <p>Changes apply immediately to ViLek authorization.</p>
           </div>
@@ -242,11 +218,7 @@ export function SystemSettingsManager() {
       if (!r.ok) throw new Error(d.error || "Could not load settings.");
       setSettings(d.settings);
       setCurrencies(d.currencyOptions || []);
-      setCurrency(
-        String(
-          d.settings?.defaultCurrencyId ?? d.currencyOptions?.[0]?.id ?? "",
-        ),
-      );
+      setCurrency(String(d.settings?.defaultCurrencyId ?? d.currencyOptions?.[0]?.id ?? ""));
       setSize(String(d.settings?.maxUploadSizeBytes ?? 10485760));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load settings.");
@@ -300,11 +272,7 @@ export function SystemSettingsManager() {
         <form className="admin-record-form" onSubmit={save}>
           <label className="admin-field">
             <span>Default currency *</span>
-            <select
-              required
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-            >
+            <select required value={currency} onChange={(e) => setCurrency(e.target.value)}>
               <option value="">Choose currency…</option>
               {currencies.map((c) => (
                 <option key={String(c.id)} value={String(c.id)}>
@@ -327,15 +295,11 @@ export function SystemSettingsManager() {
               onChange={(e) => setSize(e.target.value)}
             />
             <small>
-              Allowed range: 1 KB to 100 MB. Upload API enforcement must use
-              this setting too.
+              Allowed range: 1 KB to 100 MB. Upload API enforcement must use this setting too.
             </small>
           </label>
           <div className="admin-form-actions">
-            <button
-              className="admin-primary-button"
-              disabled={busy || !currency}
-            >
+            <button className="admin-primary-button" disabled={busy || !currency}>
               {busy ? "Saving…" : "Save settings"}
             </button>
           </div>
@@ -418,9 +382,7 @@ export function FileTypesManager() {
         description="Manage file extensions allowed by the deployment policy."
       />
       <Notice message={message} error={error} />
-      {notice && (
-        <div className="admin-alert admin-alert-warning">{notice}</div>
-      )}
+      {notice && <div className="admin-alert admin-alert-warning">{notice}</div>}
       <section className="admin-panel admin-editor">
         <div className="admin-panel-heading">
           <div>
@@ -440,10 +402,7 @@ export function FileTypesManager() {
             />
           </label>
           <div className="admin-form-actions">
-            <button
-              className="admin-primary-button"
-              disabled={busy || !settingId}
-            >
+            <button className="admin-primary-button" disabled={busy || !settingId}>
               Add extension
             </button>
           </div>
@@ -453,8 +412,7 @@ export function FileTypesManager() {
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Allowed extensions{" "}
-              <span className="admin-count-badge">{rows.length}</span>
+              Allowed extensions <span className="admin-count-badge">{rows.length}</span>
             </h2>
             <p>These records are stored in the database.</p>
           </div>
@@ -513,9 +471,7 @@ export function IdentityProviderPanel() {
       if (!r.ok) throw new Error(d.error || "Could not load provider status.");
       setData(d);
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Could not load provider status.",
-      );
+      setError(e instanceof Error ? e.message : "Could not load provider status.");
     }
   }, []);
   useEffect(() => {
@@ -540,14 +496,11 @@ export function IdentityProviderPanel() {
           <div>
             <h2>TSCloak integration</h2>
             <p>
-              Configuration presence only; this page does not expose client
-              secrets or assert live health.
+              Configuration presence only; this page does not expose client secrets or assert live
+              health.
             </p>
           </div>
-          <button
-            className="admin-secondary-button"
-            onClick={() => void load()}
-          >
+          <button className="admin-secondary-button" onClick={() => void load()}>
             Refresh
           </button>
         </div>
@@ -557,12 +510,8 @@ export function IdentityProviderPanel() {
               <span>{label}</span>
               <strong>
                 {typeof value === "boolean" ? (
-                  <span
-                    className={`admin-status-pill ${value ? "is-active" : "is-inactive"}`}
-                  >
-                    {value
-                      ? "Configured / enabled"
-                      : "Not configured / disabled"}
+                  <span className={`admin-status-pill ${value ? "is-active" : "is-inactive"}`}>
+                    {value ? "Configured / enabled" : "Not configured / disabled"}
                   </span>
                 ) : (
                   String(value)
@@ -572,10 +521,9 @@ export function IdentityProviderPanel() {
           ))}
         </div>
         <div className="admin-alert admin-alert-warning">
-          SCIM sync reconciles existing local account links only when a
-          placeholder subject is present. Verify SCIM resource IDs match OIDC
-          sub claims before using automated identity linking. Local ViLek roles
-          are preserved.
+          SCIM sync reconciles existing local account links only when a placeholder subject is
+          present. Verify SCIM resource IDs match OIDC sub claims before using automated identity
+          linking. Local ViLek roles are preserved.
         </div>
       </section>
     </>
@@ -593,9 +541,7 @@ export function AuditLogPanel() {
         setRows(d.rows || []);
         setNotice(d.notice || "");
       })
-      .catch((e) =>
-        setError(e instanceof Error ? e.message : "Could not load outbox."),
-      );
+      .catch((e) => setError(e instanceof Error ? e.message : "Could not load outbox."));
   }, []);
   return (
     <>
@@ -604,15 +550,12 @@ export function AuditLogPanel() {
         description="Inspect the available audit outbox events; this is not a complete audit trail."
       />
       <Notice message="" error={error} />
-      <div className="admin-alert admin-alert-warning">
-        {notice || "Loading event scope…"}
-      </div>
+      <div className="admin-alert admin-alert-warning">{notice || "Loading event scope…"}</div>
       <section className="admin-panel admin-records-panel">
         <div className="admin-record-toolbar">
           <div>
             <h2>
-              Recent outbox events{" "}
-              <span className="admin-count-badge">{rows.length}</span>
+              Recent outbox events <span className="admin-count-badge">{rows.length}</span>
             </h2>
             <p>Latest 200 records, newest first.</p>
           </div>
@@ -637,9 +580,7 @@ export function AuditLogPanel() {
                     {String(r.entityType)} / {String(r.entityId)}
                   </td>
                   <td data-label="Event">{String(r.eventType)}</td>
-                  <td data-label="Actor">
-                    {String(r.actorUserId ?? "System/unknown")}
-                  </td>
+                  <td data-label="Actor">{String(r.actorUserId ?? "System/unknown")}</td>
                   <td data-label="Delivery">
                     {r.processedAt
                       ? `Processed ${String(r.processedAt)}`
@@ -680,9 +621,7 @@ export function OperationsPanel() {
         if (!r.ok) throw new Error(d.error || "Could not load operations.");
         setData(d);
       })
-      .catch((e) =>
-        setError(e instanceof Error ? e.message : "Could not load operations."),
-      );
+      .catch((e) => setError(e instanceof Error ? e.message : "Could not load operations."));
   }, [refresh]);
   return (
     <>
@@ -709,14 +648,11 @@ export function OperationsPanel() {
           <div>
             <h2>Recent operations</h2>
             <p>
-              Latest outbox records only; retry controls are not exposed without
-              a worker implementation.
+              Latest outbox records only; retry controls are not exposed without a worker
+              implementation.
             </p>
           </div>
-          <button
-            className="admin-secondary-button"
-            onClick={() => setRefresh((x) => x + 1)}
-          >
+          <button className="admin-secondary-button" onClick={() => setRefresh((x) => x + 1)}>
             Refresh
           </button>
         </div>
@@ -737,16 +673,10 @@ export function OperationsPanel() {
                   <td data-label="Created">{String(r.createdAt ?? "—")}</td>
                   <td data-label="Event">{String(r.eventType)}</td>
                   <td data-label="Status">
-                    {r.processedAt
-                      ? "Processed"
-                      : r.lastError
-                        ? String(r.lastError)
-                        : "Pending"}
+                    {r.processedAt ? "Processed" : r.lastError ? String(r.lastError) : "Pending"}
                   </td>
                   <td data-label="Attempts">{String(r.attemptCount ?? 0)}</td>
-                  <td data-label="Next attempt">
-                    {String(r.nextAttemptAt ?? "—")}
-                  </td>
+                  <td data-label="Next attempt">{String(r.nextAttemptAt ?? "—")}</td>
                 </tr>
               ))}
               {data && !data.rows.length && (

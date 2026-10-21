@@ -24,9 +24,7 @@ export function WorkspaceSwitcher({
   } | null>(null);
   const pathname = usePathname();
   const workspaces = getWorkspacesForRoles(roleCodes);
-  const current = workspaces.find(
-    (workspace) => workspace.code === currentRole,
-  );
+  const current = workspaces.find((workspace) => workspace.code === currentRole);
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -36,10 +34,7 @@ export function WorkspaceSwitcher({
       const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
       const width = Math.min(390, window.innerWidth - 24);
-      const left = Math.max(
-        12,
-        Math.min(rect.right - width, window.innerWidth - width - 12),
-      );
+      const left = Math.max(12, Math.min(rect.right - width, window.innerWidth - width - 12));
       const estimatedHeight = Math.min(500, window.innerHeight - 24);
       const top =
         rect.bottom + 8 + estimatedHeight > window.innerHeight
@@ -60,11 +55,7 @@ export function WorkspaceSwitcher({
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (
-        !rootRef.current?.contains(target) &&
-        !menuRef.current?.contains(target)
-      )
-        setOpen(false);
+      if (!rootRef.current?.contains(target) && !menuRef.current?.contains(target)) setOpen(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -117,9 +108,7 @@ export function WorkspaceSwitcher({
                 width: menuPosition.width,
               }}
             >
-              <div className="workspace-switcher__menu-heading">
-                SWITCH WORKSPACE
-              </div>
+              <div className="workspace-switcher__menu-heading">SWITCH WORKSPACE</div>
               {workspaces.map((workspace) => {
                 const active = workspace.code === currentRole;
                 return (
@@ -140,15 +129,10 @@ export function WorkspaceSwitcher({
                     </span>
                     <span className="workspace-switcher__item-copy">
                       <strong>{workspace.name}</strong>
-                      <small>
-                        {active ? "Current workspace" : workspace.description}
-                      </small>
+                      <small>{active ? "Current workspace" : workspace.description}</small>
                     </span>
                     {active ? (
-                      <span
-                        className="workspace-switcher__check"
-                        aria-hidden="true"
-                      >
+                      <span className="workspace-switcher__check" aria-hidden="true">
                         ✓
                       </span>
                     ) : null}

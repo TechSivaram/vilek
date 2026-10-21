@@ -17,20 +17,13 @@ export function GlobalLoadingOverlay() {
     // Show the global loader for every browser request to an application API,
     // including lazy-loaded detail requests and APIs that do not use React Query.
     const originalFetch = window.fetch.bind(window);
-    window.fetch = async (
-      ...args: Parameters<typeof fetch>
-    ): Promise<Response> => {
+    window.fetch = async (...args: Parameters<typeof fetch>): Promise<Response> => {
       const request = args[0];
       const rawUrl =
-        typeof request === "string" || request instanceof URL
-          ? String(request)
-          : request.url;
+        typeof request === "string" || request instanceof URL ? String(request) : request.url;
       let isApiRequest = false;
       try {
-        isApiRequest = new URL(
-          rawUrl,
-          window.location.origin,
-        ).pathname.startsWith("/api/");
+        isApiRequest = new URL(rawUrl, window.location.origin).pathname.startsWith("/api/");
       } catch {
         isApiRequest = rawUrl.startsWith("/api/");
       }
@@ -53,12 +46,7 @@ export function GlobalLoadingOverlay() {
   if (fetching + mutating + manualRequests === 0) return null;
 
   return (
-    <div
-      className="global-loading-overlay"
-      role="status"
-      aria-live="polite"
-      aria-label="Loading"
-    >
+    <div className="global-loading-overlay" role="status" aria-live="polite" aria-label="Loading">
       <div className="global-loading-card">
         <span className="global-loading-spinner" aria-hidden="true" />
         <span>Loading…</span>

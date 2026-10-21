@@ -7,13 +7,9 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 
 const configured = process.env.DATABASE_URL ?? "file:./data/vilek.db";
 if (!configured.startsWith("file:"))
-  throw new Error(
-    "DATABASE_URL must use file:./path/to/database.db for SQLite.",
-  );
+  throw new Error("DATABASE_URL must use file:./path/to/database.db for SQLite.");
 const filePath = configured.slice(5);
-const absolutePath = path.isAbsolute(filePath)
-  ? filePath
-  : path.resolve(process.cwd(), filePath);
+const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
 fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
 
 const sqlite = new Database(absolutePath);
@@ -40,10 +36,7 @@ try {
   if (violations.length > 0) {
     const details = violations
       .slice(0, 10)
-      .map(
-        (item) =>
-          `${item.table} row ${item.rowid ?? "?"} -> ${item.parent} (fk ${item.fkid})`,
-      )
+      .map((item) => `${item.table} row ${item.rowid ?? "?"} -> ${item.parent} (fk ${item.fkid})`)
       .join("; ");
     throw new Error(
       `Migration completed but SQLite foreign_key_check found ${violations.length} violation(s): ${details}`,

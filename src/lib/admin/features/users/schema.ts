@@ -21,9 +21,7 @@ const createShape = {
   lastName: z.string().trim().min(1).max(100),
 };
 
-export const createInputSchema: z.ZodType<UsersCreateInput> = z
-  .object(createShape)
-  .strict();
+export const createInputSchema: z.ZodType<UsersCreateInput> = z.object(createShape).strict();
 export const updateInputSchema: z.ZodType<UsersUpdateInput> = z
   .object(createShape)
   .partial()
@@ -36,7 +34,6 @@ export const userFormSchema: z.ZodType<UsersFormDto, UsersFormDto> = z
     lastName: z.string().trim().min(1),
   })
   .strict();
-export const userStatusFormSchema: z.ZodType<
-  UsersStatusFormDto,
-  UsersStatusFormDto
-> = z.object({ isActive: z.boolean() }).strict();
+export const userStatusFormSchema: z.ZodType<UsersStatusFormDto, UsersStatusFormDto> = z
+  .object({ isActive: z.boolean() })
+  .strict();

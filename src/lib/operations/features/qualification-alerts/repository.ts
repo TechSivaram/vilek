@@ -1,8 +1,5 @@
 type MaintenanceOption = { value: string | number; label: string };
-import type {
-  QualificationAlertsCreateDto,
-  QualificationAlertsUpdateDto,
-} from "./dto";
+import type { QualificationAlertsCreateDto, QualificationAlertsUpdateDto } from "./dto";
 
 export interface QualificationAlertsRepository {
   listRows(): Record<string, unknown>[];

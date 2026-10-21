@@ -55,8 +55,7 @@ const fieldLabels: Record<string, string> = {
   setting_description: "Description",
 };
 const humanize = (key: string) =>
-  fieldLabels[key] ??
-  key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  fieldLabels[key] ?? key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 const emptyValue = (key: string) =>
   ["is_active", "expiry_required", "is_required"].includes(key)
     ? "1"
@@ -110,10 +109,9 @@ export function CrewDesignationAssignmentsPage() {
   const columns = useMemo(() => data?.columns ?? [], [data]);
   const displayColumns = useMemo(
     () =>
-      (
-        data?.displayColumns ??
-        (data?.rows?.[0] ? Object.keys(data.rows[0]) : [])
-      ).filter((k) => !["id", "record_id"].includes(k)),
+      (data?.displayColumns ?? (data?.rows?.[0] ? Object.keys(data.rows[0]) : [])).filter(
+        (k) => !["id", "record_id"].includes(k),
+      ),
     [data],
   );
   const label = "Crew designation assignments";
@@ -130,17 +128,10 @@ export function CrewDesignationAssignmentsPage() {
       )
     : rows;
   const pageCount = Math.max(1, Math.ceil(filteredRows.length / pageSize));
-  const visibleRows = filteredRows.slice(
-    (page - 1) * pageSize,
-    page * pageSize,
-  );
+  const visibleRows = filteredRows.slice((page - 1) * pageSize, page * pageSize);
   function edit(row: Record<string, unknown>) {
     setEditingId(row.id as string | number);
-    setForm(
-      Object.fromEntries(
-        columns.map((c) => [c, row[c] == null ? "" : String(row[c])]),
-      ),
-    );
+    setForm(Object.fromEntries(columns.map((c) => [c, row[c] == null ? "" : String(row[c])])));
     setNotice("");
     setError("");
     setFormOpen(true);
@@ -182,20 +173,15 @@ export function CrewDesignationAssignmentsPage() {
               : v;
       }
       const endpoint = "/api/operations/crew-designation-assignments";
-      const r = await fetch(
-        editingId === null ? endpoint : `${endpoint}/${editingId}`,
-        {
-          method: editingId === null ? "POST" : "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        },
-      );
+      const r = await fetch(editingId === null ? endpoint : `${endpoint}/${editingId}`, {
+        method: editingId === null ? "POST" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error ?? "Save failed.");
       setNotice(
-        editingId === null
-          ? "Record created successfully."
-          : "Changes saved successfully.",
+        editingId === null ? "Record created successfully." : "Changes saved successfully.",
       );
       setForm({});
       setEditingId(null);
@@ -215,8 +201,8 @@ export function CrewDesignationAssignmentsPage() {
           <div className="admin-eyebrow">FLIGHT OPERATIONS · CONFIGURATION</div>
           <h1>Operational data &amp; settings</h1>
           <p>
-            Manage crew eligibility, qualifications, complement planning,
-            operational rules, and audit history.
+            Manage crew eligibility, qualifications, complement planning, operational rules, and
+            audit history.
           </p>
         </div>
       </header>
@@ -251,10 +237,7 @@ export function CrewDesignationAssignmentsPage() {
                     ? `Add ${label.toLowerCase()}`
                     : `Edit ${label.toLowerCase()}`}
                 </h2>
-                <p>
-                  Choose linked records by name. Existing values are preselected
-                  when editing.
-                </p>
+                <p>Choose linked records by name. Existing values are preselected when editing.</p>
               </div>
               <button
                 type="button"
@@ -299,32 +282,19 @@ export function CrewDesignationAssignmentsPage() {
                     {data?.options?.[c] ? (
                       <select
                         value={form[c] ?? ""}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
-                        <option value="">
-                          Select {humanize(c).toLowerCase()}
-                        </option>
+                        <option value="">Select {humanize(c).toLowerCase()}</option>
                         {data.options[c].map((option) => (
-                          <option
-                            key={String(option.value)}
-                            value={String(option.value)}
-                          >
+                          <option key={String(option.value)} value={String(option.value)}>
                             {option.label}
                           </option>
                         ))}
                       </select>
-                    ) : [
-                        "is_active",
-                        "expiry_required",
-                        "is_required",
-                      ].includes(c) ? (
+                    ) : ["is_active", "expiry_required", "is_required"].includes(c) ? (
                       <select
                         value={form[c] ?? "1"}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
                         <option value="1">Yes / Active</option>
                         <option value="0">No / Inactive</option>
@@ -332,9 +302,7 @@ export function CrewDesignationAssignmentsPage() {
                     ) : c === "status" ? (
                       <select
                         value={form[c] ?? "ACTIVE"}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
                         <option value="ACTIVE">Active</option>
                         <option value="EXPIRED">Expired</option>
@@ -344,34 +312,23 @@ export function CrewDesignationAssignmentsPage() {
                     ) : c === "state" ? (
                       <select
                         value={form[c] ?? "PENDING"}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
                         <option value="PENDING">Pending</option>
                         <option value="RESOLVED">Resolved</option>
                         <option value="DISMISSED">Dismissed</option>
                       </select>
-                    ) : [
-                        "notes",
-                        "description",
-                        "reason",
-                        "value_json",
-                      ].includes(c) ? (
+                    ) : ["notes", "description", "reason", "value_json"].includes(c) ? (
                       <textarea
                         rows={c === "value_json" ? 4 : 2}
                         value={form[c] ?? ""}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       />
                     ) : (
                       <input
                         value={form[c] ?? ""}
                         type={
-                          c.startsWith("valid_") ||
-                          c === "due_at" ||
-                          c === "cutoff_at"
+                          c.startsWith("valid_") || c === "due_at" || c === "cutoff_at"
                             ? "date"
                             : c === "retention_days" ||
                                 c.includes("count") ||
@@ -380,9 +337,7 @@ export function CrewDesignationAssignmentsPage() {
                               ? "number"
                               : "text"
                         }
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       />
                     )}
                   </label>
@@ -395,11 +350,7 @@ export function CrewDesignationAssignmentsPage() {
                 disabled={saving}
                 className="admin-button-primary ops-action-button ops-button-primary"
               >
-                {saving
-                  ? "Saving…"
-                  : editingId === null
-                    ? "Create record"
-                    : "Save changes"}
+                {saving ? "Saving…" : editingId === null ? "Create record" : "Save changes"}
               </button>
               <button
                 type="button"
@@ -474,9 +425,7 @@ export function CrewDesignationAssignmentsPage() {
         {loading ? (
           <p>Loading records…</p>
         ) : !data || !filteredRows.length ? (
-          <p>
-            {searchTerm ? "No records match your search." : "No records found."}
-          </p>
+          <p>{searchTerm ? "No records match your search." : "No records found."}</p>
         ) : (
           <>
             <div className="ops-table-wrap">
@@ -494,16 +443,10 @@ export function CrewDesignationAssignmentsPage() {
                     <tr key={String(row.id ?? i)}>
                       {displayColumns.map((k) => (
                         <td key={k}>
-                          {row[k] === null ||
-                          row[k] === undefined ||
-                          row[k] === ""
+                          {row[k] === null || row[k] === undefined || row[k] === ""
                             ? "—"
                             : typeof row[k] === "number" &&
-                                [
-                                  "is_active",
-                                  "expiry_required",
-                                  "is_required",
-                                ].includes(k)
+                                ["is_active", "expiry_required", "is_required"].includes(k)
                               ? row[k] === 1
                                 ? "Yes"
                                 : "No"
@@ -528,24 +471,15 @@ export function CrewDesignationAssignmentsPage() {
             </div>
             <div className="ops-mobile-records">
               {visibleRows.map((row, i) => (
-                <article
-                  className="ops-mobile-record"
-                  key={String(row.id ?? i)}
-                >
+                <article className="ops-mobile-record" key={String(row.id ?? i)}>
                   {displayColumns.map((k) => (
                     <div className="ops-mobile-field" key={k}>
                       <span>{humanize(k)}</span>
                       <strong>
-                        {row[k] === null ||
-                        row[k] === undefined ||
-                        row[k] === ""
+                        {row[k] === null || row[k] === undefined || row[k] === ""
                           ? "—"
                           : typeof row[k] === "number" &&
-                              [
-                                "is_active",
-                                "expiry_required",
-                                "is_required",
-                              ].includes(k)
+                              ["is_active", "expiry_required", "is_required"].includes(k)
                             ? row[k] === 1
                               ? "Yes"
                               : "No"

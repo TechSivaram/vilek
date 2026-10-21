@@ -11,8 +11,5 @@ export interface DesignationQualificationRequirementsRepository {
     displayColumns?: string[];
   };
   create(input: DesignationQualificationRequirementsCreateDto): string;
-  update(
-    id: string,
-    input: DesignationQualificationRequirementsUpdateDto,
-  ): boolean;
+  update(id: string, input: DesignationQualificationRequirementsUpdateDto): boolean;
 }

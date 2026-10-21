@@ -21,9 +21,7 @@ const createShape = {
   isActive: z.boolean(),
 };
 
-export const createInputSchema: z.ZodType<CurrenciesCreateInput> = z
-  .object(createShape)
-  .strict();
+export const createInputSchema: z.ZodType<CurrenciesCreateInput> = z.object(createShape).strict();
 export const updateInputSchema: z.ZodType<CurrenciesUpdateInput> = z
   .object(createShape)
   .partial()

@@ -1,10 +1,7 @@
 import "server-only";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import {
-  crewDesignations,
-  flightCrewComplementDefaults,
-} from "@/lib/db/schema";
+import { crewDesignations, flightCrewComplementDefaults } from "@/lib/db/schema";
 import type {
   CrewComplementDefaultsCreateDto,
   CrewComplementDefaultsUpdateDto,
@@ -49,12 +46,9 @@ export class CrewComplementDefaultsRepositoryImpl implements CrewComplementDefau
     return String(row.id);
   }
   update(id: string, input: CrewComplementDefaultsUpdateDto): boolean {
-    const values: Partial<typeof flightCrewComplementDefaults.$inferInsert> =
-      {};
-    if (input.designation_id !== undefined)
-      values.designationId = input.designation_id;
-    if (input.required_count !== undefined)
-      values.requiredCount = input.required_count;
+    const values: Partial<typeof flightCrewComplementDefaults.$inferInsert> = {};
+    if (input.designation_id !== undefined) values.designationId = input.designation_id;
+    if (input.required_count !== undefined) values.requiredCount = input.required_count;
     if (!Object.keys(values).length)
       return (
         db

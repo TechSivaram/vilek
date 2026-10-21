@@ -37,8 +37,7 @@ export const crew_membersRepository = {
       isActive: crewMembers.isActive,
     };
     const sortColumn = sortColumns[sortKey] ?? crewMembers.badgeNumber;
-    const ordering =
-      input.direction === "desc" ? desc(sortColumn) : asc(sortColumn);
+    const ordering = input.direction === "desc" ? desc(sortColumn) : asc(sortColumn);
     const rows = db
       .select({
         id: crewMembers.id,

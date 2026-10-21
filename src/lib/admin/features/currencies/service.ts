@@ -1,10 +1,6 @@
 import "server-only";
 import { currenciesRepository } from "./repository";
-import type {
-  CurrenciesListQuery,
-  CurrenciesCreateInput,
-  CurrenciesUpdateInput,
-} from "./dto";
+import type { CurrenciesListQuery, CurrenciesCreateInput, CurrenciesUpdateInput } from "./dto";
 export const currenciesService = {
   list(query: CurrenciesListQuery) {
     return currenciesRepository.list(query);

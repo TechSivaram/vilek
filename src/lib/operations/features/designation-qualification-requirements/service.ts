@@ -12,25 +12,17 @@ import {
 
 const repository = new DesignationQualificationRequirementsRepositoryImpl();
 
-function mapRow(
-  value: unknown,
-): DesignationQualificationRequirementsResponseDto {
-  const row =
-    value && typeof value === "object"
-      ? (value as Record<string, unknown>)
-      : {};
+function mapRow(value: unknown): DesignationQualificationRequirementsResponseDto {
+  const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
   return {
     id: Number(row.id),
     designation_id: Number(row.designation_id),
     qualification_type_id: Number(row.qualification_type_id),
     is_required: Number(row.is_required),
     created_at: row.created_at == null ? null : String(row.created_at),
-    designation_name:
-      row.designation_name == null ? null : String(row.designation_name),
-    qualification_name:
-      row.qualification_name == null ? null : String(row.qualification_name),
-    requirement_type:
-      row.requirement_type == null ? null : String(row.requirement_type),
+    designation_name: row.designation_name == null ? null : String(row.designation_name),
+    qualification_name: row.qualification_name == null ? null : String(row.qualification_name),
+    requirement_type: row.requirement_type == null ? null : String(row.requirement_type),
   };
 }
 
@@ -44,8 +36,7 @@ export const designationQualificationRequirementsService = {
       writable: DesignationQualificationRequirementsResourceConfig.writable,
       columns: DesignationQualificationRequirementsResourceConfig.columns,
       displayColumns:
-        result.displayColumns ??
-        DesignationQualificationRequirementsResourceConfig.columns.slice(),
+        result.displayColumns ?? DesignationQualificationRequirementsResourceConfig.columns.slice(),
       rows: result.rows.map(mapRow),
       options: result.options,
     };
@@ -53,10 +44,7 @@ export const designationQualificationRequirementsService = {
   create(input: DesignationQualificationRequirementsCreateDto): string {
     return repository.create(input);
   },
-  update(
-    id: string,
-    input: DesignationQualificationRequirementsUpdateDto,
-  ): boolean {
+  update(id: string, input: DesignationQualificationRequirementsUpdateDto): boolean {
     return repository.update(id, input);
   },
 };

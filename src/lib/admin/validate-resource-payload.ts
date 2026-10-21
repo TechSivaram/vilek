@@ -12,29 +12,18 @@ export function validateResourcePayload(
   if (!body || typeof body !== "object" || Array.isArray(body))
     return { ok: false, error: "Expected a JSON object." };
   const objectResult = z.record(z.string(), z.unknown()).safeParse(body);
-  if (!objectResult.success)
-    return { ok: false, error: "Expected a JSON object." };
+  if (!objectResult.success) return { ok: false, error: "Expected a JSON object." };
   const input = objectResult.data;
   const values: Record<string, unknown> = {};
   for (const field of config.fields) {
-    if (field.readOnly || (mode === "update" && !(field.name in input)))
-      continue;
+    if (field.readOnly || (mode === "update" && !(field.name in input))) continue;
     let value = input[field.name];
     if (typeof value === "string") value = value.trim();
-    if (field.kind === "boolean")
-      value = value === true || value === 1 || value === "true";
-    if (
-      field.kind === "number" &&
-      value !== "" &&
-      value !== null &&
-      value !== undefined
-    )
+    if (field.kind === "boolean") value = value === true || value === 1 || value === "true";
+    if (field.kind === "number" && value !== "" && value !== null && value !== undefined)
       value = Number(value);
     if ((value === "" || value === undefined) && !field.required) continue;
-    if (
-      field.required &&
-      (value === "" || value === null || value === undefined)
-    )
+    if (field.required && (value === "" || value === null || value === undefined))
       return { ok: false, error: `${field.label} is required.` };
     if (value !== undefined && value !== null) {
       const fieldSchema =
@@ -59,21 +48,12 @@ export function validateResourcePayload(
   if (mode === "update" && !Object.keys(values).length)
     return { ok: false, error: "No editable fields supplied." };
   if (resource === "flights") {
-    const idFields = [
-      "airlineId",
-      "originAirportId",
-      "destinationAirportId",
-    ] as const;
+    const idFields = ["airlineId", "originAirportId", "destinationAirportId"] as const;
     for (const name of idFields) {
       if (!(name in values)) continue;
       const value = values[name];
-      if (
-        typeof value !== "number" ||
-        !Number.isSafeInteger(value) ||
-        value <= 0
-      ) {
-        const label =
-          config.fields.find((field) => field.name === name)?.label ?? name;
+      if (typeof value !== "number" || !Number.isSafeInteger(value) || value <= 0) {
+        const label = config.fields.find((field) => field.name === name)?.label ?? name;
         return { ok: false, error: `${label} must be selected.` };
       }
     }
@@ -101,23 +81,13 @@ export function validateResourcePayload(
       const value = values[name];
       if (typeof value !== "string" || !value.trim()) return null;
       const timestamp = Date.parse(value);
-      if (!Number.isFinite(timestamp))
-        throw new Error(`${label} must be a valid date and time.`);
+      if (!Number.isFinite(timestamp)) throw new Error(`${label} must be a valid date and time.`);
       return timestamp;
     };
     try {
-      const scheduledDeparture = validateDate(
-        "scheduledDeparture",
-        "Scheduled departure",
-      );
-      const scheduledArrival = validateDate(
-        "scheduledArrival",
-        "Scheduled arrival",
-      );
-      const actualDeparture = validateDate(
-        "actualDeparture",
-        "Actual departure",
-      );
+      const scheduledDeparture = validateDate("scheduledDeparture", "Scheduled departure");
+      const scheduledArrival = validateDate("scheduledArrival", "Scheduled arrival");
+      const actualDeparture = validateDate("actualDeparture", "Actual departure");
       const actualArrival = validateDate("actualArrival", "Actual arrival");
       if (
         scheduledDeparture !== null &&
@@ -129,11 +99,7 @@ export function validateResourcePayload(
           error: "Scheduled arrival must be later than scheduled departure.",
         };
       }
-      if (
-        actualDeparture !== null &&
-        actualArrival !== null &&
-        actualDeparture >= actualArrival
-      ) {
+      if (actualDeparture !== null && actualArrival !== null && actualDeparture >= actualArrival) {
         return {
           ok: false,
           error: "Actual arrival must be later than actual departure.",
@@ -142,10 +108,7 @@ export function validateResourcePayload(
     } catch (error) {
       return {
         ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Enter valid date and time values.",
+        error: error instanceof Error ? error.message : "Enter valid date and time values.",
       };
     }
   }

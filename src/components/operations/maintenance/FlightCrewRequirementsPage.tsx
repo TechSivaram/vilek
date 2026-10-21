@@ -55,8 +55,7 @@ const fieldLabels: Record<string, string> = {
   setting_description: "Description",
 };
 const humanize = (key: string) =>
-  fieldLabels[key] ??
-  key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  fieldLabels[key] ?? key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 const emptyValue = (key: string) =>
   ["is_active", "expiry_required", "is_required"].includes(key)
     ? "1"
@@ -80,9 +79,7 @@ export function FlightCrewRequirementsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
-  const [collapsedFlights, setCollapsedFlights] = useState<Set<string>>(
-    new Set(),
-  );
+  const [collapsedFlights, setCollapsedFlights] = useState<Set<string>>(new Set());
   const [requirementsByFlight, setRequirementsByFlight] = useState<
     Record<string, Record<string, unknown>[]>
   >({});
@@ -95,10 +92,9 @@ export function FlightCrewRequirementsPage() {
       try {
         const params = new URLSearchParams({ view: "flights" });
         if (search.trim()) params.set("q", search.trim());
-        const r = await fetch(
-          `/api/operations/flight-crew-requirements?${params.toString()}`,
-          { cache: "no-store" },
-        );
+        const r = await fetch(`/api/operations/flight-crew-requirements?${params.toString()}`, {
+          cache: "no-store",
+        });
         const j = await r.json();
         if (!r.ok) throw new Error(j.error ?? "Unable to load flights.");
         setData({ key: selected, ...j });
@@ -151,9 +147,7 @@ export function FlightCrewRequirementsPage() {
     if (aMissing !== bMissing) return aMissing ? 1 : -1;
     return (
       safeB - safeA ||
-      String(a.airline_name ?? "").localeCompare(
-        String(b.airline_name ?? ""),
-      ) ||
+      String(a.airline_name ?? "").localeCompare(String(b.airline_name ?? "")) ||
       String(a.flight_number ?? "").localeCompare(String(b.flight_number ?? ""))
     );
   });
@@ -174,11 +168,7 @@ export function FlightCrewRequirementsPage() {
       next.delete(key);
       return next;
     });
-    if (
-      requirementsByFlight[key] !== undefined ||
-      flightId === undefined ||
-      flightId === null
-    )
+    if (requirementsByFlight[key] !== undefined || flightId === undefined || flightId === null)
       return;
     setLoadingFlights((current) => new Set(current).add(key));
     try {
@@ -187,20 +177,13 @@ export function FlightCrewRequirementsPage() {
         { cache: "no-store" },
       );
       const j = await r.json();
-      if (!r.ok)
-        throw new Error(
-          j.error ?? "Unable to load this flight's crew requirements.",
-        );
+      if (!r.ok) throw new Error(j.error ?? "Unable to load this flight's crew requirements.");
       setRequirementsByFlight((current) => ({
         ...current,
         [key]: j.rows ?? [],
       }));
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "Unable to load this flight's crew requirements.",
-      );
+      setError(e instanceof Error ? e.message : "Unable to load this flight's crew requirements.");
       setCollapsedFlights((current) => new Set(current).add(key));
     } finally {
       setLoadingFlights((current) => {
@@ -211,8 +194,7 @@ export function FlightCrewRequirementsPage() {
     }
   }
   const displayDateTime = (value: unknown) => {
-    if (value === null || value === undefined || value === "")
-      return "Time not set";
+    if (value === null || value === undefined || value === "") return "Time not set";
     const date = new Date(String(value));
     return Number.isNaN(date.getTime())
       ? String(value)
@@ -226,11 +208,7 @@ export function FlightCrewRequirementsPage() {
   };
   function edit(row: Record<string, unknown>) {
     setEditingId(row.id as string | number);
-    setForm(
-      Object.fromEntries(
-        columns.map((c) => [c, row[c] == null ? "" : String(row[c])]),
-      ),
-    );
+    setForm(Object.fromEntries(columns.map((c) => [c, row[c] == null ? "" : String(row[c])])));
     setNotice("");
     setError("");
     setFormOpen(true);
@@ -247,8 +225,7 @@ export function FlightCrewRequirementsPage() {
   }
   function flightKey(row: Record<string, unknown>) {
     return String(
-      row.flight_id ??
-        `${groupLabel(row)}-${flightLabel(row)}-${row.flight_route ?? ""}`,
+      row.flight_id ?? `${groupLabel(row)}-${flightLabel(row)}-${row.flight_route ?? ""}`,
     );
   }
   async function save() {
@@ -281,20 +258,15 @@ export function FlightCrewRequirementsPage() {
               : v;
       }
       const endpoint = "/api/operations/flight-crew-requirements";
-      const r = await fetch(
-        editingId === null ? endpoint : `${endpoint}/${editingId}`,
-        {
-          method: editingId === null ? "POST" : "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        },
-      );
+      const r = await fetch(editingId === null ? endpoint : `${endpoint}/${editingId}`, {
+        method: editingId === null ? "POST" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error ?? "Save failed.");
       setNotice(
-        editingId === null
-          ? "Record created successfully."
-          : "Changes saved successfully.",
+        editingId === null ? "Record created successfully." : "Changes saved successfully.",
       );
       setForm({});
       setEditingId(null);
@@ -314,8 +286,8 @@ export function FlightCrewRequirementsPage() {
           <div className="admin-eyebrow">FLIGHT OPERATIONS · CONFIGURATION</div>
           <h1>Operational data &amp; settings</h1>
           <p>
-            Manage crew eligibility, qualifications, complement planning,
-            operational rules, and audit history.
+            Manage crew eligibility, qualifications, complement planning, operational rules, and
+            audit history.
           </p>
         </div>
       </header>
@@ -350,10 +322,7 @@ export function FlightCrewRequirementsPage() {
                     ? `Add ${label.toLowerCase()}`
                     : `Edit ${label.toLowerCase()}`}
                 </h2>
-                <p>
-                  Choose linked records by name. Existing values are preselected
-                  when editing.
-                </p>
+                <p>Choose linked records by name. Existing values are preselected when editing.</p>
               </div>
               <button
                 type="button"
@@ -410,32 +379,19 @@ export function FlightCrewRequirementsPage() {
                     ) : data?.options?.[c] ? (
                       <select
                         value={form[c] ?? ""}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
-                        <option value="">
-                          Select {humanize(c).toLowerCase()}
-                        </option>
+                        <option value="">Select {humanize(c).toLowerCase()}</option>
                         {data.options[c].map((option) => (
-                          <option
-                            key={String(option.value)}
-                            value={String(option.value)}
-                          >
+                          <option key={String(option.value)} value={String(option.value)}>
                             {option.label}
                           </option>
                         ))}
                       </select>
-                    ) : [
-                        "is_active",
-                        "expiry_required",
-                        "is_required",
-                      ].includes(c) ? (
+                    ) : ["is_active", "expiry_required", "is_required"].includes(c) ? (
                       <select
                         value={form[c] ?? "1"}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
                         <option value="1">Yes / Active</option>
                         <option value="0">No / Inactive</option>
@@ -443,9 +399,7 @@ export function FlightCrewRequirementsPage() {
                     ) : c === "status" ? (
                       <select
                         value={form[c] ?? "ACTIVE"}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
                         <option value="ACTIVE">Active</option>
                         <option value="EXPIRED">Expired</option>
@@ -455,34 +409,23 @@ export function FlightCrewRequirementsPage() {
                     ) : c === "state" ? (
                       <select
                         value={form[c] ?? "PENDING"}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       >
                         <option value="PENDING">Pending</option>
                         <option value="RESOLVED">Resolved</option>
                         <option value="DISMISSED">Dismissed</option>
                       </select>
-                    ) : [
-                        "notes",
-                        "description",
-                        "reason",
-                        "value_json",
-                      ].includes(c) ? (
+                    ) : ["notes", "description", "reason", "value_json"].includes(c) ? (
                       <textarea
                         rows={c === "value_json" ? 4 : 2}
                         value={form[c] ?? ""}
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       />
                     ) : (
                       <input
                         value={form[c] ?? ""}
                         type={
-                          c.startsWith("valid_") ||
-                          c === "due_at" ||
-                          c === "cutoff_at"
+                          c.startsWith("valid_") || c === "due_at" || c === "cutoff_at"
                             ? "date"
                             : c === "retention_days" ||
                                 c.includes("count") ||
@@ -491,9 +434,7 @@ export function FlightCrewRequirementsPage() {
                               ? "number"
                               : "text"
                         }
-                        onChange={(e) =>
-                          setForm((o) => ({ ...o, [c]: e.target.value }))
-                        }
+                        onChange={(e) => setForm((o) => ({ ...o, [c]: e.target.value }))}
                       />
                     )}
                   </label>
@@ -506,11 +447,7 @@ export function FlightCrewRequirementsPage() {
                 disabled={saving}
                 className="admin-button-primary ops-action-button ops-button-primary"
               >
-                {saving
-                  ? "Saving…"
-                  : editingId === null
-                    ? "Create record"
-                    : "Save changes"}
+                {saving ? "Saving…" : editingId === null ? "Create record" : "Save changes"}
               </button>
               <button
                 type="button"
@@ -574,11 +511,7 @@ export function FlightCrewRequirementsPage() {
         {loading ? (
           <p>Searching flights…</p>
         ) : !data || !rows.length ? (
-          <p>
-            {searchTerm.trim()
-              ? "No flights match your search."
-              : "No flights found."}
-          </p>
+          <p>{searchTerm.trim() ? "No flights match your search." : "No flights found."}</p>
         ) : (
           <>
             <div className="ops-table-wrap">
@@ -599,8 +532,7 @@ export function FlightCrewRequirementsPage() {
                         `${groupLabel(flight)}-${flightLabel(flight)}-${flight.flight_route ?? ""}`,
                     );
                     const previous = visibleRows[i - 1];
-                    const newAirline =
-                      !previous || groupLabel(previous) !== groupLabel(flight);
+                    const newAirline = !previous || groupLabel(previous) !== groupLabel(flight);
                     const collapsed = collapsedFlights.has(key);
                     const loaded = requirementsByFlight[key] !== undefined;
                     const requirements = requirementsByFlight[key] ?? [];
@@ -617,13 +549,9 @@ export function FlightCrewRequirementsPage() {
                               type="button"
                               className="ops-flight-toggle"
                               aria-expanded={!collapsed}
-                              onClick={() =>
-                                void toggleFlight(key, flight.flight_id)
-                              }
+                              onClick={() => void toggleFlight(key, flight.flight_id)}
                             >
-                              <span className="ops-chevron">
-                                {collapsed ? "▸" : "▾"}
-                              </span>
+                              <span className="ops-chevron">{collapsed ? "▸" : "▾"}</span>
                               <strong>Flight {flightLabel(flight)}</strong>
                             </button>
                           </td>
@@ -637,9 +565,7 @@ export function FlightCrewRequirementsPage() {
                                   ? `${String(flight.requirement_count)} configured`
                                   : "None configured"}
                                 {loadingFlights.has(key) && (
-                                  <small className="ops-loading-indicator">
-                                    Loading…
-                                  </small>
+                                  <small className="ops-loading-indicator">Loading…</small>
                                 )}
                               </span>
                               {data.writable && (
@@ -660,15 +586,9 @@ export function FlightCrewRequirementsPage() {
                               {loadingFlights.has(key) ? (
                                 <p>Loading crew requirements…</p>
                               ) : !loaded ? (
-                                <p>
-                                  Expand this flight to load its crew
-                                  requirements.
-                                </p>
+                                <p>Expand this flight to load its crew requirements.</p>
                               ) : !requirements.length ? (
-                                <p>
-                                  No crew requirements configured for this
-                                  flight yet.
-                                </p>
+                                <p>No crew requirements configured for this flight yet.</p>
                               ) : (
                                 <div className="ops-child-grid-wrap">
                                   <table className="ops-child-grid">
@@ -682,9 +602,7 @@ export function FlightCrewRequirementsPage() {
                                     </thead>
                                     <tbody>
                                       {requirements.map((row, ri) => (
-                                        <tr
-                                          key={String(row.id ?? `${key}-${ri}`)}
-                                        >
+                                        <tr key={String(row.id ?? `${key}-${ri}`)}>
                                           <td>
                                             <strong>
                                               {String(
@@ -694,9 +612,7 @@ export function FlightCrewRequirementsPage() {
                                               )}
                                             </strong>
                                           </td>
-                                          <td>
-                                            {String(row.required_count ?? "—")}
-                                          </td>
+                                          <td>{String(row.required_count ?? "—")}</td>
                                           <td className="ops-child-reason">
                                             {row.reason !== null &&
                                             row.reason !== undefined &&
@@ -737,17 +653,14 @@ export function FlightCrewRequirementsPage() {
                     `${groupLabel(flight)}-${flightLabel(flight)}-${flight.flight_route ?? ""}`,
                 );
                 const previous = visibleRows[i - 1];
-                const newAirline =
-                  !previous || groupLabel(previous) !== groupLabel(flight);
+                const newAirline = !previous || groupLabel(previous) !== groupLabel(flight);
                 const collapsed = collapsedFlights.has(key);
                 const loaded = requirementsByFlight[key] !== undefined;
                 const requirements = requirementsByFlight[key] ?? [];
                 return (
                   <div key={key}>
                     {newAirline && (
-                      <h3 className="ops-mobile-group">
-                        Airline: {groupLabel(flight)}
-                      </h3>
+                      <h3 className="ops-mobile-group">Airline: {groupLabel(flight)}</h3>
                     )}
                     <article className="ops-flight-mobile-card">
                       <button
@@ -756,18 +669,15 @@ export function FlightCrewRequirementsPage() {
                         aria-expanded={!collapsed}
                         onClick={() => void toggleFlight(key, flight.flight_id)}
                       >
-                        <span className="ops-chevron">
-                          {collapsed ? "▸" : "▾"}
-                        </span>
+                        <span className="ops-chevron">{collapsed ? "▸" : "▾"}</span>
                         <span>
                           <strong>
                             Flight {flightLabel(flight)} ·{" "}
                             {String(flight.flight_route ?? "Route not set")}
                           </strong>
                           <small>
-                            Departure:{" "}
-                            {displayDateTime(flight.scheduled_departure)} ·
-                            Arrival: {displayDateTime(flight.scheduled_arrival)}
+                            Departure: {displayDateTime(flight.scheduled_departure)} · Arrival:{" "}
+                            {displayDateTime(flight.scheduled_arrival)}
                           </small>
                         </span>
                       </button>
@@ -777,9 +687,7 @@ export function FlightCrewRequirementsPage() {
                             ? `${String(flight.requirement_count)} configured`
                             : "None configured"}
                           {loadingFlights.has(key) && (
-                            <small className="ops-loading-indicator">
-                              Loading…
-                            </small>
+                            <small className="ops-loading-indicator">Loading…</small>
                           )}
                         </span>
                         {data.writable && (
@@ -797,14 +705,9 @@ export function FlightCrewRequirementsPage() {
                           {loadingFlights.has(key) ? (
                             <p>Loading crew requirements…</p>
                           ) : !loaded ? (
-                            <p>
-                              Expand this flight to load its crew requirements.
-                            </p>
+                            <p>Expand this flight to load its crew requirements.</p>
                           ) : !requirements.length ? (
-                            <p>
-                              No crew requirements configured for this flight
-                              yet.
-                            </p>
+                            <p>No crew requirements configured for this flight yet.</p>
                           ) : (
                             requirements.map((row, ri) => (
                               <article
@@ -820,15 +723,12 @@ export function FlightCrewRequirementsPage() {
                                     )}
                                   </strong>
                                   <span>
-                                    Required crew count:{" "}
-                                    {String(row.required_count ?? "—")}
+                                    Required crew count: {String(row.required_count ?? "—")}
                                   </span>
                                   {row.reason !== null &&
                                     row.reason !== undefined &&
                                     row.reason !== "" && (
-                                      <small>
-                                        Reason: {String(row.reason)}
-                                      </small>
+                                      <small>Reason: {String(row.reason)}</small>
                                     )}
                                 </div>
                                 {data.writable && (

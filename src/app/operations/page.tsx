@@ -9,8 +9,7 @@ const sections = [
     href: "/operations/flights",
     icon: "✈",
     title: "Flights",
-    description:
-      "Create and maintain scheduled flights, routes, and operational timing.",
+    description: "Create and maintain scheduled flights, routes, and operational timing.",
     group: "operations",
     tag: "Scheduling",
   },
@@ -18,8 +17,7 @@ const sections = [
     href: "/operations/flight-crew",
     icon: "♧",
     title: "Flight crew",
-    description:
-      "Assign eligible crew members and designations to scheduled flights.",
+    description: "Assign eligible crew members and designations to scheduled flights.",
     group: "operations",
     tag: "Assignments",
   },
@@ -94,8 +92,8 @@ export default function FlightOperationsDashboardPage() {
           </div>
           <h1>Flight Operations</h1>
           <p>
-            Plan and manage flights, coordinate crew assignments, and maintain
-            the operational reference data your team relies on.
+            Plan and manage flights, coordinate crew assignments, and maintain the operational
+            reference data your team relies on.
           </p>
         </div>
         <div className="ops-hero-mark" aria-hidden="true">
@@ -126,10 +124,7 @@ export default function FlightOperationsDashboardPage() {
         <div className="ops-section-heading">
           <div>
             <h2 id="ops-reference-title">Reference data</h2>
-            <p>
-              Keep the shared records behind operational planning accurate and
-              consistent.
-            </p>
+            <p>Keep the shared records behind operational planning accurate and consistent.</p>
           </div>
           <span className="ops-section-count">3 WORKSPACES</span>
         </div>
@@ -146,9 +141,7 @@ export default function FlightOperationsDashboardPage() {
         <div className="ops-section-heading">
           <div>
             <h2 id="ops-config-title">Configuration &amp; oversight</h2>
-            <p>
-              Manage eligibility rules, operational settings, and audit history.
-            </p>
+            <p>Manage eligibility rules, operational settings, and audit history.</p>
           </div>
         </div>
         <div className="ops-card-grid ops-card-grid-config">

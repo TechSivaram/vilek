@@ -16,9 +16,7 @@ export const metadata: Metadata = {
     "A calmer way for flight crews to track expenses, receipts, and reimbursement claims.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>

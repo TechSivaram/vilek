@@ -1,20 +1,11 @@
 import "server-only";
-import type {
-  AuditExportsRowDto,
-  AuditExportsCollectionResponseDto,
-} from "./dto";
-import {
-  AuditExportsResourceConfig,
-  AuditExportsRepositoryImpl,
-} from "./repository.impl";
+import type { AuditExportsRowDto, AuditExportsCollectionResponseDto } from "./dto";
+import { AuditExportsResourceConfig, AuditExportsRepositoryImpl } from "./repository.impl";
 
 const repository = new AuditExportsRepositoryImpl();
 
 function mapRow(value: unknown): AuditExportsRowDto {
-  const r =
-    value && typeof value === "object"
-      ? (value as Record<string, unknown>)
-      : {};
+  const r = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
   return {
     id: String(r.id ?? ""),
     actor_user_id: r.actor_user_id == null ? null : String(r.actor_user_id),

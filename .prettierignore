@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+.drizzle/
+*.db
+*.sqlite
+*.sqlite3
+package-lock.json

@@ -1,8 +1,5 @@
 import "server-only";
-import type {
-  QualificationAlertsCreateDto,
-  QualificationAlertsUpdateDto,
-} from "./dto";
+import type { QualificationAlertsCreateDto, QualificationAlertsUpdateDto } from "./dto";
 import { QualificationAlertsRepositoryImpl } from "./repository.impl";
 
 export const QualificationAlertsService = {

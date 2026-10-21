@@ -25,8 +25,7 @@ export class DesignationQualificationRequirementsRepositoryImpl implements Desig
       .select({
         id: designationQualificationRequirements.id,
         designation_id: designationQualificationRequirements.designationId,
-        qualification_type_id:
-          designationQualificationRequirements.qualificationTypeId,
+        qualification_type_id: designationQualificationRequirements.qualificationTypeId,
         is_required: designationQualificationRequirements.isRequired,
         created_at: designationQualificationRequirements.createdAt,
         designation_name: crewDesignations.name,
@@ -35,17 +34,11 @@ export class DesignationQualificationRequirementsRepositoryImpl implements Desig
       .from(designationQualificationRequirements)
       .leftJoin(
         crewDesignations,
-        eq(
-          designationQualificationRequirements.designationId,
-          crewDesignations.id,
-        ),
+        eq(designationQualificationRequirements.designationId, crewDesignations.id),
       )
       .leftJoin(
         qualificationTypes,
-        eq(
-          designationQualificationRequirements.qualificationTypeId,
-          qualificationTypes.id,
-        ),
+        eq(designationQualificationRequirements.qualificationTypeId, qualificationTypes.id),
       )
       .orderBy(
         asc(crewDesignations.name),
@@ -77,27 +70,19 @@ export class DesignationQualificationRequirementsRepositoryImpl implements Desig
       .values({
         designationId: input.designation_id,
         qualificationTypeId: input.qualification_type_id,
-        isRequired:
-          input.is_required === undefined ? true : Boolean(input.is_required),
+        isRequired: input.is_required === undefined ? true : Boolean(input.is_required),
       })
       .returning({ id: designationQualificationRequirements.id })
       .get();
     return String(created.id);
   }
 
-  update(
-    id: string,
-    input: DesignationQualificationRequirementsUpdateDto,
-  ): boolean {
-    const values: Partial<
-      typeof designationQualificationRequirements.$inferInsert
-    > = {};
-    if (input.designation_id !== undefined)
-      values.designationId = input.designation_id;
+  update(id: string, input: DesignationQualificationRequirementsUpdateDto): boolean {
+    const values: Partial<typeof designationQualificationRequirements.$inferInsert> = {};
+    if (input.designation_id !== undefined) values.designationId = input.designation_id;
     if (input.qualification_type_id !== undefined)
       values.qualificationTypeId = input.qualification_type_id;
-    if (input.is_required !== undefined)
-      values.isRequired = Boolean(input.is_required);
+    if (input.is_required !== undefined) values.isRequired = Boolean(input.is_required);
     if (!Object.keys(values).length)
       return (
         db
