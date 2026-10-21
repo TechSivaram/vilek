@@ -68,7 +68,7 @@ export default async function ProfileSecurityPage() {
           <div className="rounded-lg border border-[#dfe7eb] bg-white px-4 py-3 text-sm text-[#607583]">
             <span className="font-semibold text-[#20384b]">Identity provider</span>
             <span className="mx-2 text-[#a2b0b8]">·</span>
-            TSCloak
+            identity provider
           </div>
         </header>
 

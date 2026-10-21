@@ -4,6 +4,7 @@ import { z } from "zod";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import { usersService } from "@/lib/admin/features/users/service";
 
+import { getScimAccessToken, getScimBaseUrl } from "@/lib/identity-provider/scim";
 export const dynamic = "force-dynamic";
 type ScimUser = {
   id?: string;
@@ -19,70 +20,9 @@ function requiredEnv(name: string) {
   if (!value) throw new Error(`${name} is not configured.`);
   return value;
 }
-async function getScimToken(issuer: string) {
-  const clientId = requiredEnv("TSCLOAK_SCIM_CLIENT_ID");
-  const clientSecret = requiredEnv("TSCLOAK_SCIM_CLIENT_SECRET");
-
-  if (clientId !== requiredEnv("TSCLOAK_CLIENT_ID")) {
-    throw new Error("TSCLOAK_SCIM_CLIENT_ID must match TSCLOAK_CLIENT_ID for this deployment.");
-  }
-
-  const method = (process.env.TSCLOAK_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post").toLowerCase();
-  const form = new URLSearchParams({
-    grant_type: "client_credentials",
-    scope: "scim",
-  });
-  const headers = new Headers({
-    "content-type": "application/x-www-form-urlencoded",
-    accept: "application/json",
-  });
-
-  if (method === "client_secret_post") {
-    form.set("client_id", clientId);
-    form.set("client_secret", clientSecret);
-  } else if (method === "client_secret_basic") {
-    headers.set(
-      "authorization",
-      `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
-    );
-  } else {
-    throw new Error(
-      "TSCLOAK_SCIM_TOKEN_AUTH_METHOD must be client_secret_post or client_secret_basic.",
-    );
-  }
-
-  const response = await fetch(`${issuer}/token`, {
-    method: "POST",
-    headers,
-    body: form,
-    cache: "no-store",
-    signal: AbortSignal.timeout(15000),
-  });
-  const body: unknown = await response.json().catch(() => ({}));
-  const tokenResult = z
-    .object({
-      access_token: z.string().optional(),
-      scope: z.string().optional(),
-      error_description: z.string().optional(),
-      error: z.string().optional(),
-    })
-    .safeParse(body);
-
-  if (!response.ok || !tokenResult.success || !tokenResult.data.access_token) {
-    const detail = tokenResult.success
-      ? (tokenResult.data.error_description ?? tokenResult.data.error ?? "no access token returned")
-      : "identity provider returned an invalid token response";
-    throw new Error(`TSCloak token request failed (HTTP ${response.status}): ${detail}`);
-  }
-
-  if (tokenResult.data.scope && !tokenResult.data.scope.split(/\s+/).includes("scim")) {
-    throw new Error("TSCloak returned a token without the scim scope.");
-  }
-
-  return tokenResult.data.access_token;
-}
 
 async function listScimUsers(issuer: string, token: string): Promise<ScimUser[]> {
+  const scimBaseUrl = getScimBaseUrl(issuer);
   const users: ScimUser[] = [];
   const pageSize = 100;
   let startIndex = 1;
@@ -90,7 +30,7 @@ async function listScimUsers(issuer: string, token: string): Promise<ScimUser[]>
   // SCIM list endpoints may paginate; read all pages so local accounts are not
   // silently skipped once the provider has more than one page of identities.
   for (let page = 0; page < 100; page += 1) {
-    const url = new URL(`${issuer}/scim/v2/Users`);
+    const url = new URL(`${scimBaseUrl}/Users`);
     url.searchParams.set("startIndex", String(startIndex));
     url.searchParams.set("count", String(pageSize));
 
@@ -141,7 +81,7 @@ async function listScimUsers(issuer: string, token: string): Promise<ScimUser[]>
       const detail = parsed.success
         ? (parsed.data.detail ?? parsed.data.message ?? "expected a SCIM Resources list")
         : "identity provider returned an invalid SCIM list response";
-      throw new Error(`TSCloak SCIM list failed (HTTP ${response.status}): ${detail}`);
+      throw new Error(`identity provider SCIM list failed (HTTP ${response.status}): ${detail}`);
     }
 
     const pageUsers = parsed.data.Resources;
@@ -155,22 +95,23 @@ async function listScimUsers(issuer: string, token: string): Promise<ScimUser[]>
     startIndex += pageUsers.length;
   }
 
-  throw new Error("TSCloak SCIM list exceeded the 100-page safety limit.");
+  throw new Error("identity provider SCIM list exceeded the 100-page safety limit.");
 }
 
 export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () => {
   try {
-    if (process.env.TSCLOAK_SCIM_ENABLED !== "true") {
+    if (process.env.IDP_SCIM_ENABLED !== "true") {
       return NextResponse.json(
         {
-          error: "SCIM sync is disabled. Set TSCLOAK_SCIM_ENABLED=true to enable it.",
+          error: "SCIM sync is disabled. Set IDP_SCIM_ENABLED=true to enable it.",
         },
         { status: 503 },
       );
     }
 
-    const issuer = requiredEnv("TSCLOAK_ISSUER").replace(/\/$/, "");
-    const token = await getScimToken(issuer);
+    const issuer = requiredEnv("IDP_ISSUER").replace(/\/$/, "");
+    const scimBaseUrl = getScimBaseUrl(issuer);
+    const token = await getScimAccessToken(issuer);
     const providerUsers = await listScimUsers(issuer, token);
     let created = 0;
     let matched = 0;
@@ -247,7 +188,7 @@ export const POST = withRouteGuard({ roles: ["ADMIN"] }, async () => {
       inactiveAtProvider,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "TSCloak sync failed.";
+    const message = error instanceof Error ? error.message : "Identity provider sync failed.";
     return NextResponse.json({ error: message }, { status: 502 });
   }
 });

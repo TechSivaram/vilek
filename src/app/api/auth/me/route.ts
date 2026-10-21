@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLocalAuthenticatedUser } from "@/lib/auth/tscloak";
+import { getLocalAuthenticatedUser } from "@/lib/auth/oidc";
 
 export const runtime = "nodejs";
 

@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { roles, userRoles } from "@/lib/db/schema";
-import { getLocalAuthenticatedUser } from "@/lib/auth/tscloak";
+import { getLocalAuthenticatedUser } from "@/lib/auth/oidc";
 import { hasAnyVilekRole, hasVilekPermission, type VilekPermission } from "@/lib/auth/permissions";
 
 export type AuthenticatedContext = NonNullable<
@@ -13,7 +13,7 @@ export type AuthenticatedContext = NonNullable<
   roleCodes: string[];
 };
 
-/** Validates the TSCloak access token and resolves an active local ViLek user
+/** Validates the identity provider access token and resolves an active local ViLek user
  * plus that user's active local role assignments. */
 export async function getAuthorizationContext(
   tokenOverride?: string,

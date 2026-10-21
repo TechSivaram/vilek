@@ -1,6 +1,6 @@
 # ViLek authentication and route authorization
 
-ViLek uses TSCloak to authenticate identity. Application authorization is based only on active local ViLek `User_Role` assignments and active `Role` records. Do not trust role claims supplied by TSCloak for ViLek access decisions.
+ViLek uses identity provider to authenticate identity. Application authorization is based only on active local ViLek `User_Role` assignments and active `Role` records. Do not trust role claims supplied by identity provider for ViLek access decisions.
 
 ## Shared helpers
 

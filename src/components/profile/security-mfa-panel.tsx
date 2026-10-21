@@ -200,7 +200,7 @@ export function SecurityMfaPanel() {
         {status?.enabled ? (
           <>
             <p className="mt-5 rounded-lg border border-[#ccebd7] bg-[#f1fbf4] p-4 text-sm leading-6 text-[#286341]">
-              Your authenticator is configured. TSCloak verifies your second factor during
+              Your authenticator is configured. identity provider verifies your second factor during
               authentication.
               {status.enrolledAt
                 ? ` Enrolled ${new Date(status.enrolledAt).toLocaleString()}.`
@@ -278,7 +278,8 @@ export function SecurityMfaPanel() {
               )}
               {!showDisableForm && (
                 <p className="mt-2 text-xs leading-5 text-[#7a8d94]">
-                  Disabling MFA removes the second-factor requirement from your TSCloak account.
+                  Disabling MFA removes the second-factor requirement from your identity provider
+                  account.
                 </p>
               )}
             </div>
@@ -306,7 +307,7 @@ export function SecurityMfaPanel() {
           <div className="grid gap-6 p-6 md:grid-cols-[200px_1fr]">
             {qrCode ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-[#e2e9ed] bg-[#f9fbfa] p-4">
-                {/* TSCloak returns this image during the authenticated enrollment flow. */}
+                {/* identity provider returns this image during the authenticated enrollment flow. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={qrCode}
@@ -319,7 +320,7 @@ export function SecurityMfaPanel() {
               </div>
             ) : (
               <div className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-[#cbd9de] bg-[#f9fbfa] p-4 text-center text-sm text-[#5d7181]">
-                TSCloak did not return a QR image. Use the setup key or URI instead.
+                identity provider did not return a QR image. Use the setup key or URI instead.
               </div>
             )}
             <div className="space-y-4">

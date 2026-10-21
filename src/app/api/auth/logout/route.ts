@@ -3,7 +3,7 @@ import {
   clearAuthCookies,
   createLogoutRedirectUrl,
   getLocalAuthenticatedUser,
-} from "@/lib/auth/tscloak";
+} from "@/lib/auth/oidc";
 
 export const runtime = "nodejs";
 
@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid expected origin" }, { status: 403 });
   }
 
-  // Remove the local credential before leaving ViLek, then terminate the TSCloak
+  // Remove the local credential before leaving ViLek, then terminate the identity provider
   // browser session through its RP-initiated session-end endpoint.
   await clearAuthCookies();
-  return NextResponse.redirect(createLogoutRedirectUrl(), 303);
+  return NextResponse.redirect(await createLogoutRedirectUrl(), 303);
 }

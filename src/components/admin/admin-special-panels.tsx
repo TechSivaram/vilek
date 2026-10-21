@@ -97,7 +97,7 @@ export function UserRoleAssignments() {
     <>
       <PageHeading
         title="User Role Assignments"
-        description="Assign local ViLek roles to existing users. These assignments are not sourced from TSCloak."
+        description="Assign local ViLek roles to existing users. These assignments are not sourced from identity provider."
       />
       <Notice message={message} error={error} />
       <section className="admin-panel admin-editor">
@@ -482,19 +482,22 @@ export function IdentityProviderPanel() {
     ["OIDC client ID", data?.clientId ?? "Not configured"],
     ["SCIM provisioning enabled", data?.scimEnabled],
     ["SCIM credentials configured", data?.scimCredentialsConfigured],
-    ["SCIM client matches OIDC client", data?.scimClientMatchesOidc],
+    ["SCIM base URL", data?.scimBaseUrl ?? "Defaults to issuer + /scim/v2"],
+    ["SCIM token URL override", data?.scimTokenUrl ?? "Defaults to issuer + /token"],
+    ["Password setup capability configured", data?.passwordSetupConfigured],
+    ["MFA capability configured", data?.mfaConfigured],
   ];
   return (
     <>
       <PageHeading
         title="Identity Provider"
-        description="Review safe TSCloak OIDC and SCIM configuration metadata. Secrets are never returned to the browser."
+        description="Review safe identity provider OIDC and SCIM configuration metadata. Secrets are never returned to the browser."
       />
       <Notice message="" error={error} />
       <section className="admin-panel">
         <div className="admin-panel-heading">
           <div>
-            <h2>TSCloak integration</h2>
+            <h2>identity provider integration</h2>
             <p>
               Configuration presence only; this page does not expose client secrets or assert live
               health.
@@ -521,9 +524,10 @@ export function IdentityProviderPanel() {
           ))}
         </div>
         <div className="admin-alert admin-alert-warning">
-          SCIM sync reconciles existing local account links only when a placeholder subject is
-          present. Verify SCIM resource IDs match OIDC sub claims before using automated identity
-          linking. Local ViLek roles are preserved.
+          ViLek stores one external identifier in oidc_subject. SCIM resource IDs and OIDC sub
+          claims may differ: first-login linking requires a verified email claim, and SCIM updates
+          resolve the remote resource by email. Keep provider emails unique and stable. Local ViLek
+          roles are preserved during SCIM synchronization.
         </div>
       </section>
     </>

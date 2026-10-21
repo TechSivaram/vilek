@@ -1,13 +1,12 @@
 import "server-only";
 
 import { NextResponse } from "next/server";
-import { getLocalAuthenticatedUser, getValidatedAccessToken, getIssuer } from "@/lib/auth/tscloak";
+import { getLocalAuthenticatedUser, getValidatedAccessToken } from "@/lib/auth/oidc";
 
-const MFA_PATH = "/api/mfa";
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
-/** Validates the ViLek session and proxies a user-scoped request to TSCloak.
- * The user's own TSCloak access token is used; client-credentials tokens are
+/** Validates the ViLek session and proxies a user-scoped request to identity provider.
+ * The user's own identity provider access token is used; client-credentials tokens are
  * deliberately never used for personal MFA operations. */
 export async function proxyMfaRequest(
   request: Request,
@@ -41,22 +40,32 @@ export async function proxyMfaRequest(
     }
   }
 
+  if (!process.env.IDP_MFA_BASE_URL?.trim()) {
+    return NextResponse.json(
+      { error: "The configured identity provider does not expose an MFA endpoint." },
+      { status: 501 },
+    );
+  }
+
   let upstream: Response;
   try {
-    upstream = await fetch(`${getIssuer()}${MFA_PATH}${upstreamPath}`, {
-      method,
-      headers: {
-        authorization: `Bearer ${validated.token}`,
-        accept: "application/json",
-        ...(method === "POST" ? { "content-type": "application/json" } : {}),
+    upstream = await fetch(
+      `${(process.env.IDP_MFA_BASE_URL?.trim() || "").replace(/\/$/, "")}${upstreamPath}`,
+      {
+        method,
+        headers: {
+          authorization: `Bearer ${validated.token}`,
+          accept: "application/json",
+          ...(method === "POST" ? { "content-type": "application/json" } : {}),
+        },
+        ...(body !== undefined ? { body } : {}),
+        cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
       },
-      ...(body !== undefined ? { body } : {}),
-      cache: "no-store",
-      signal: AbortSignal.timeout(15_000),
-    });
+    );
   } catch {
     return NextResponse.json(
-      { error: "Unable to reach TSCloak MFA service. Please try again." },
+      { error: "Unable to reach the configured identity provider MFA service. Please try again." },
       { status: 502 },
     );
   }
@@ -67,7 +76,7 @@ export async function proxyMfaRequest(
     try {
       responseBody = JSON.parse(responseText);
     } catch {
-      responseBody = { error: "TSCloak returned an invalid response" };
+      responseBody = { error: "identity provider returned an invalid response" };
     }
   }
   return NextResponse.json(responseBody, {

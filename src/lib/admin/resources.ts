@@ -27,7 +27,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
   users: {
     title: "Users",
     description:
-      "Local ViLek identities linked to TSCloak. Identity synchronization never changes local role assignments.",
+      "Local ViLek identities linked to identity provider. Identity synchronization never changes local role assignments.",
     table: users,
     search: ["email", "firstName", "lastName", "oidcSubject"],
     canCreate: true,
@@ -40,7 +40,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
       { name: "lastName", label: "Last name", kind: "text", readOnly: true },
       {
         name: "oidcSubject",
-        label: "TSCloak subject",
+        label: "identity provider subject",
         kind: "text",
         readOnly: true,
       },
@@ -50,7 +50,7 @@ export const resourceConfigs: Record<string, ResourceConfig> = {
   roles: {
     title: "Role Management",
     description:
-      "Manage the predefined local ViLek roles. Permission grants remain defined by application policy code; TSCloak roles are separate.",
+      "Manage the predefined local ViLek roles. Permission grants remain defined by application policy code; identity provider roles are separate.",
     table: roles,
     search: ["code", "name", "description"],
     canCreate: false,

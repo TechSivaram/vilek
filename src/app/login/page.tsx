@@ -10,7 +10,7 @@ export default async function LoginPage({ searchParams }: Props) {
         <p className="login-brand">VILEK · CREW EXPENSES</p>
         <h1 className="login-title">Sign in to ViLek</h1>
         <p className="login-description">
-          Continue securely with your organization identity through TSCloak.
+          Continue securely with your organization identity through identity provider.
         </p>
         {loggedOut === "1" ? (
           <p role="status" className="login-notice login-notice--success">
@@ -23,7 +23,7 @@ export default async function LoginPage({ searchParams }: Props) {
           </p>
         ) : null}
         <a href="/api/auth/login" className="login-button">
-          Continue with TSCloak
+          Continue with identity provider
         </a>
         <p className="login-footnote">
           Access is granted only to users provisioned and authorized in ViLek.

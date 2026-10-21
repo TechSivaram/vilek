@@ -36,7 +36,7 @@ import {
 } from "./schema";
 
 /**
- * ViLek demo seed data. TSCloak demo identities are provisioned through SCIM first;
+ * ViLek demo seed data. identity provider demo identities are provisioned through SCIM first;
  * local role assignments and all application data remain in ViLek's own database.
  * Safe to re-run: SCIM users are matched by email and local reference rows ignore conflicts.
  * All names/emails are fictional; no real receipts or personal data are used.
@@ -125,12 +125,10 @@ function requiredEnv(name: string): string {
 }
 
 async function fetchScimToken(): Promise<string> {
-  const issuer = (process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com").replace(/\/$/, "");
-  const clientId = requiredEnv("TSCLOAK_SCIM_CLIENT_ID");
-  const clientSecret = requiredEnv("TSCLOAK_SCIM_CLIENT_SECRET");
-  const authMethod = (
-    process.env.TSCLOAK_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post"
-  ).toLowerCase();
+  const issuer = (process.env.IDP_ISSUER ?? "https://oidc.onrender.com").replace(/\/$/, "");
+  const clientId = requiredEnv("IDP_SCIM_CLIENT_ID");
+  const clientSecret = requiredEnv("IDP_SCIM_CLIENT_SECRET");
+  const authMethod = (process.env.IDP_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post").toLowerCase();
   const form = new URLSearchParams({
     grant_type: "client_credentials",
     scope: "scim",
@@ -147,7 +145,7 @@ async function fetchScimToken(): Promise<string> {
     form.set("client_secret", clientSecret);
   } else {
     throw new Error(
-      "TSCLOAK_SCIM_TOKEN_AUTH_METHOD must be client_secret_post or client_secret_basic.",
+      "IDP_SCIM_TOKEN_AUTH_METHOD must be client_secret_post or client_secret_basic.",
     );
   }
 
@@ -160,11 +158,11 @@ async function fetchScimToken(): Promise<string> {
   const body = (await response.json().catch(() => ({}))) as TokenResponse;
   if (!response.ok || !body.access_token) {
     throw new Error(
-      `TSCloak SCIM token request failed (HTTP ${response.status}): ${body.error_description ?? body.error ?? "no access_token returned"}`,
+      `identity provider SCIM token request failed (HTTP ${response.status}): ${body.error_description ?? body.error ?? "no access_token returned"}`,
     );
   }
   if (body.scope && !body.scope.split(/\s+/).includes("scim")) {
-    throw new Error("TSCloak returned a token without the required scim scope.");
+    throw new Error("identity provider returned a token without the required scim scope.");
   }
   return body.access_token;
 }
@@ -190,26 +188,26 @@ async function listScimUsers(issuer: string, token: string): Promise<ScimUser[]>
   };
   if (!response.ok || !Array.isArray(body.Resources)) {
     throw new Error(
-      `TSCloak SCIM user-list request failed (HTTP ${response.status}): ${body.detail ?? body.message ?? "expected SCIM ListResponse.Resources"}`,
+      `identity provider SCIM user-list request failed (HTTP ${response.status}): ${body.detail ?? body.message ?? "expected SCIM ListResponse.Resources"}`,
     );
   }
   return body.Resources;
 }
 
 async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
-  if (process.env.TSCLOAK_SCIM_ENABLED !== "true") {
+  if (process.env.IDP_SCIM_ENABLED !== "true") {
     throw new Error(
-      "SCIM provisioning is disabled. Set TSCLOAK_SCIM_ENABLED=true to intentionally provision demo users in hosted TSCloak.",
+      "SCIM provisioning is disabled. Set IDP_SCIM_ENABLED=true to intentionally provision demo users in hosted identity provider.",
     );
   }
-  const issuer = (process.env.TSCLOAK_ISSUER ?? "https://tscloak.onrender.com").replace(/\/$/, "");
-  const scimClientId = requiredEnv("TSCLOAK_SCIM_CLIENT_ID");
-  const oidcClientId = requiredEnv("TSCLOAK_CLIENT_ID");
-  // TSCloak provisions users into the client context represented by the SCIM token.
+  const issuer = (process.env.IDP_ISSUER ?? "https://oidc.onrender.com").replace(/\/$/, "");
+  const scimClientId = requiredEnv("IDP_SCIM_CLIENT_ID");
+  const oidcClientId = requiredEnv("IDP_CLIENT_ID");
+  // identity provider provisions users into the client context represented by the SCIM token.
   // Keep SCIM and interactive login on the same client so these users belong to ViLek.
   if (oidcClientId !== scimClientId) {
     throw new Error(
-      "TSCLOAK_SCIM_CLIENT_ID must match TSCLOAK_CLIENT_ID: TSCloak scopes SCIM-provisioned users to the client used to obtain the token.",
+      "IDP_SCIM_CLIENT_ID must match IDP_CLIENT_ID: identity provider scopes SCIM-provisioned users to the client used to obtain the token.",
     );
   }
 
@@ -227,9 +225,9 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
           accept: "application/scim+json, application/json",
           "content-type": "application/scim+json",
         },
-        // Matches TSCloak's documented ScimUserDto exactly. This endpoint
+        // Matches identity provider's documented ScimUserDto exactly. This endpoint
         // rejects `schemas`; its DTO has no password field, so credentials
-        // must be set separately through TSCloak's supported credential flow.
+        // must be set separately through identity provider's supported credential flow.
         body: JSON.stringify({
           userName: username,
           name: { givenName: person.firstName, familyName: person.lastName },
@@ -254,11 +252,11 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
         );
         if (!match)
           throw new Error(
-            `TSCloak reports a username conflict for ${person.email}, but the user could not be found in the SCIM list.`,
+            `identity provider reports a username conflict for ${person.email}, but the user could not be found in the SCIM list.`,
           );
       } else if (!response.ok || !created.id) {
         throw new Error(
-          `TSCloak SCIM create failed for ${person.email} (HTTP ${response.status}): ${created.detail ?? created.message ?? created.error ?? "no SCIM user id returned"}`,
+          `identity provider SCIM create failed for ${person.email} (HTTP ${response.status}): ${created.detail ?? created.message ?? created.error ?? "no SCIM user id returned"}`,
         );
       } else {
         match = created;
@@ -267,15 +265,15 @@ async function provisionDemoUsersThroughScim(): Promise<Map<string, string>> {
       }
     }
     if (!match?.id)
-      throw new Error(`TSCloak SCIM response for ${person.email} did not include an id.`);
+      throw new Error(`identity provider SCIM response for ${person.email} did not include an id.`);
     if (match.active === false) {
       throw new Error(
-        `The existing TSCloak identity ${person.email} is inactive; refusing to silently reactivate it during seeding.`,
+        `The existing identity provider identity ${person.email} is inactive; refusing to silently reactivate it during seeding.`,
       );
     }
     ids.set(person.email.toLowerCase(), match.id);
   }
-  console.log(`TSCloak SCIM ready: ${ids.size} demo identities found or provisioned.`);
+  console.log(`identity provider SCIM ready: ${ids.size} demo identities found or provisioned.`);
   return ids;
 }
 
@@ -1406,13 +1404,13 @@ async function main() {
   seedFlightOperationsDemoData();
   console.log("ViLek realistic demo data seeded successfully.");
   console.log(
-    "TSCloak SCIM identities were provisioned/matched; SCIM IDs are stored separately from OIDC subjects.",
+    "identity provider SCIM identities were provisioned/matched; SCIM IDs are stored separately from OIDC subjects.",
   );
   console.log(
     "Demo emails use the reserved .test domain; these are fictional local-development records.",
   );
   console.log(
-    "SCIM creates identity records, not guaranteed login passwords. Set credentials through TSCloak's supported admin/credential workflow.",
+    "SCIM creates identity records, not guaranteed login passwords. Set credentials through identity provider's supported admin/credential workflow.",
   );
 }
 

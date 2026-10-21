@@ -101,7 +101,7 @@ export default function AdminDashboard() {
               <span className="admin-action-icon">⌘</span>
               <span>
                 <strong>Identity provider</strong>
-                <small>View TSCloak integration information</small>
+                <small>View identity provider integration information</small>
               </span>
               <b>→</b>
             </Link>

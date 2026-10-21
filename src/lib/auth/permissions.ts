@@ -1,7 +1,7 @@
 import "server-only";
 
 /** Local ViLek authorization vocabulary. These are application permissions,
- * not roles or scopes issued by TSCloak. Keep this mapping conservative. */
+ * not roles or scopes issued by identity provider. Keep this mapping conservative. */
 export const VILEK_PERMISSIONS = [
   "ADMIN_DASHBOARD_VIEW",
   "USER_READ",

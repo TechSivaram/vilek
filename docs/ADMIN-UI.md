@@ -7,7 +7,7 @@ The shared admin shell uses a desktop sidebar with collapse-to-icon-rail support
 ## Implemented routes
 
 - `/admin` — live database counts and navigation.
-- `/admin/users` — list/search local users, inspect OIDC linkage, activate/deactivate accounts, and request safe TSCloak SCIM reconciliation.
+- `/admin/users` — list/search local users, inspect OIDC linkage, activate/deactivate accounts, and request safe identity provider SCIM reconciliation.
 - `/admin/roles` — update the predefined local role descriptions/names and active state. Role codes and permission grants are not editable in the UI; permission grants remain defined in `src/lib/auth/permissions.ts`.
 - `/admin/user-roles` — assign/remove local roles. The API prevents removal/deactivation of the last active administrator.
 - `/admin/identity-provider` — read-only safe configuration metadata; no secrets are returned and no live health is inferred.
@@ -29,7 +29,7 @@ Admin data APIs live under `src/app/api/admin/`. Each handler uses `withRouteGua
 
 ## Important scope and limitations
 
-- TSCloak sync uses client-credentials SCIM access on the server. It matches provider users to existing local users by email and only replaces explicitly marked placeholder `oidcSubject` values. It does not create local users or change local roles. Confirm the provider's SCIM resource ID equals the OIDC `sub` before relying on automated relinking.
+- identity provider sync uses client-credentials SCIM access on the server. It matches provider users to existing local users by email and only replaces explicitly marked placeholder `oidcSubject` values. It does not create local users or change local roles. Confirm the provider's SCIM resource ID equals the OIDC `sub` before relying on automated relinking.
 - Role permissions are still code-defined; this UI does not edit the permission matrix or create arbitrary permission-bearing roles.
 - File extensions are stored as policy configuration. Any future upload handler must enforce both the configured extension allowlist and upload size on the server; this repository bundle does not implement an expense-document upload endpoint.
 - `Audit_Outbox` is an outbox, not a comprehensive audit history. The audit page does not claim otherwise, and this implementation does not add audit events for every admin mutation.

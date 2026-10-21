@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createLoginRedirect } from "@/lib/auth/tscloak";
+import { createLoginRedirect } from "@/lib/auth/oidc";
 
 export const runtime = "nodejs";
 

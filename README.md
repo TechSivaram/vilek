@@ -63,12 +63,12 @@ ViLek is a full-stack web application for flight-crew operations and expense/cla
 
 ### 🖥️ User interface
 
-- `/login` — sign in through the configured TSCloak OpenID Connect provider.
+- `/login` — sign in through the configured identity provider OpenID Connect provider.
 - `/` — requires a locally authenticated ViLek user and shows summary counts, recent expenses, and recent claims from SQLite.
 - `/admin` — ADMIN-only overview with live record counts and links to management pages.
 - `/admin/users` — local users, account active state, OIDC linkage, and guarded SCIM reconciliation.
 - `/admin/roles` and `/admin/user-roles` — manage predefined roles and local role assignments.
-- `/admin/identity-provider` — read-only, non-secret TSCloak configuration summary.
+- `/admin/identity-provider` — read-only, non-secret identity provider configuration summary.
 - `/admin/crew-members`, `/admin/crew-designations`, `/admin/airlines`, `/admin/airports`, `/admin/flights` — manage operational reference records.
 - `/admin/expense-categories`, `/admin/currencies` — manage finance reference records.
 - `/admin/settings`, `/admin/file-types` — configure the default currency, maximum upload size, and permitted file extensions.
@@ -83,7 +83,7 @@ All application endpoints are Next.js App Router Route Handlers under `src/app/a
 | Endpoint                                                                                                          | Methods           | Purpose                                                                                                                                       |
 | ----------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/api/auth/login`                                                                                                 | `GET`             | Start OIDC sign-in.                                                                                                                           |
-| `/api/auth/callback/tscloak`                                                                                      | `GET`             | Complete the TSCloak callback and establish the local session cookie.                                                                         |
+| `/api/auth/callback/oidc`                                                                                         | `GET`             | Complete the identity provider callback and establish the local session cookie.                                                               |
 | `/api/auth/me`                                                                                                    | `GET`             | Return the current authenticated local identity.                                                                                              |
 | `/api/auth/logout`                                                                                                | `POST`            | Clear ViLek authentication cookies and sign out locally.                                                                                      |
 | `/api/admin/{airlines,airports,crew-designations,crew-members,currencies,expense-categories,flights,roles,users}` | `GET`, `POST`     | Protected resource collection handlers; supported writes depend on the resource and its validation rules.                                     |
@@ -91,7 +91,7 @@ All application endpoints are Next.js App Router Route Handlers under `src/app/a
 | `/api/admin/flights/options`                                                                                      | `GET`             | Return options used by flight administration.                                                                                                 |
 | `/api/admin/user-roles`                                                                                           | `GET`, `POST`     | List and assign local roles.                                                                                                                  |
 | `/api/admin/user-roles/[id]`                                                                                      | `DELETE`          | Remove a local role assignment, subject to administrator safeguards.                                                                          |
-| `/api/admin/users/sync`                                                                                           | `POST`            | Reconcile eligible existing local accounts with TSCloak SCIM identities.                                                                      |
+| `/api/admin/users/sync`                                                                                           | `POST`            | Reconcile eligible existing local accounts with identity provider SCIM identities.                                                            |
 | `/api/admin/system-settings`                                                                                      | `GET`, `PUT`      | Read or update system settings.                                                                                                               |
 | `/api/admin/file-types`                                                                                           | `GET`, `POST`     | List or allow a file extension.                                                                                                               |
 | `/api/admin/file-types/[id]`                                                                                      | `DELETE`          | Remove an allowed file extension.                                                                                                             |
@@ -111,7 +111,7 @@ Admin APIs are protected independently of page/layout protection. They use the s
 flowchart LR
     B["✈️ Crew / Admin"] --> UI["Next.js App Router<br/>React interface"]
     UI -->|HTTPS| API["Route Handlers<br/>Auth · Admin API"]
-    API --> AUTH["TSCloak<br/>OIDC · optional SCIM"]
+    API --> AUTH["identity provider<br/>OIDC · optional SCIM"]
     API --> APP["Feature services<br/>DTOs · Zod · repositories"]
     APP --> ORM["Drizzle ORM"]
     ORM --> DB[("SQLite<br/>better-sqlite3")]
@@ -124,17 +124,17 @@ flowchart LR
     class DB,DATA storage
 ```
 
-| Concern            | Implementation                                                               |
-| ------------------ | ---------------------------------------------------------------------------- |
-| Web framework      | Next.js 16 App Router                                                        |
-| UI/runtime         | React 19, TypeScript                                                         |
-| Styling            | Tailwind CSS 4 plus application CSS                                          |
-| Database           | SQLite through `better-sqlite3`                                              |
-| ORM and migrations | Drizzle ORM and Drizzle Kit                                                  |
-| Runtime validation | Zod                                                                          |
-| Admin data access  | Feature DTOs, schemas, services, repositories, and Route Handlers            |
-| Identity           | TSCloak using OIDC; optional SCIM for guarded account reconciliation/seeding |
-| UI data/forms      | TanStack Query and React Hook Form on relevant admin pages                   |
+| Concern            | Implementation                                                                         |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| Web framework      | Next.js 16 App Router                                                                  |
+| UI/runtime         | React 19, TypeScript                                                                   |
+| Styling            | Tailwind CSS 4 plus application CSS                                                    |
+| Database           | SQLite through `better-sqlite3`                                                        |
+| ORM and migrations | Drizzle ORM and Drizzle Kit                                                            |
+| Runtime validation | Zod                                                                                    |
+| Admin data access  | Feature DTOs, schemas, services, repositories, and Route Handlers                      |
+| Identity           | identity provider using OIDC; optional SCIM for guarded account reconciliation/seeding |
+| UI data/forms      | TanStack Query and React Hook Form on relevant admin pages                             |
 
 Database access is server-only. `src/lib/db/client.ts` opens the SQLite connection, turns on foreign-key enforcement and WAL mode, and exports the typed Drizzle client. Feature code is organized under `src/lib/admin/features/`; UI and HTTP routes are under `src/components/` and `src/app/`.
 
@@ -205,7 +205,7 @@ flowchart LR
 
 ## 🔐 Authentication and authorization
 
-TSCloak authenticates the person; ViLek authorizes the person. The application resolves the OIDC subject to a local `User`, then obtains active local role assignments from `User_Role` and `Role`. TSCloak role claims are not used for ViLek authorization.
+identity provider authenticates the person; ViLek authorizes the person. The application resolves the OIDC subject to a local `User`, then obtains active local role assignments from `User_Role` and `Role`. identity provider role claims are not used for ViLek authorization.
 
 | Local role                  | Current permission scope                                                |
 | --------------------------- | ----------------------------------------------------------------------- |
@@ -224,7 +224,7 @@ OIDC access tokens are held in an HttpOnly cookie; production cookies are Secure
 These describe current code and documented decisions, not guarantees about future infrastructure.
 
 1. **Assignment-scoped expense ownership.** The crew member's designation belongs to a particular `Flight_Crew` assignment. Expenses and claims reference that assignment, avoiding ambiguous or duplicated flight/person context.
-2. **Separate identity from application access.** TSCloak verifies identity; local user records and local role assignments determine ViLek permissions. External identity synchronization does not assign application roles.
+2. **Separate identity from application access.** identity provider verifies identity; local user records and local role assignments determine ViLek permissions. External identity synchronization does not assign application roles.
 3. **Local permissions stay code-defined.** Role-to-permission mapping is deliberately conservative and reviewable in code, rather than configurable as an editable permission matrix.
 4. **SQLite is the active database.** The initial deployment uses a local SQLite file, `better-sqlite3`, and Drizzle. The active adapter explicitly rejects non-`file:` database URLs; PostgreSQL portability is not currently implemented.
 5. **Prefer preserving operational history.** Admin “delete” actions deactivate master data where historical references matter; foreign-key delete rules add another layer of protection.
@@ -240,7 +240,7 @@ These describe current code and documented decisions, not guarantees about futur
 ### ✅ Prerequisites
 
 - Node.js and npm (use a Node.js version compatible with the installed Next.js release).
-- Access to a TSCloak OIDC client for interactive login.
+- Access to a identity provider OIDC client for interactive login.
 
 SQLite is embedded; a separate database server is not required.
 
@@ -254,30 +254,30 @@ Create `.env` in the repository root. At minimum, for local database access and 
 
 ```dotenv
 DATABASE_URL=file:./data/vilek.db
-TSCLOAK_ISSUER=https://tscloak.onrender.com
-TSCLOAK_CLIENT_ID=your-vilek-client-id
-TSCLOAK_CLIENT_SECRET=your-vilek-client-secret
-TSCLOAK_REDIRECT_URI=http://localhost:3001/api/auth/callback/tscloak
-TSCLOAK_POST_LOGOUT_REDIRECT_URI=http://localhost:3001/login
+IDP_ISSUER=https://oidc.onrender.com
+IDP_CLIENT_ID=your-vilek-client-id
+IDP_CLIENT_SECRET=your-vilek-client-secret
+IDP_REDIRECT_URI=http://localhost:3001/api/auth/callback/oidc
+IDP_POST_LOGOUT_REDIRECT_URI=http://localhost:3001/login
 VILEK_BASE_URL=http://localhost:3001
 ```
 
 `DATABASE_URL` defaults to `file:./data/vilek.db`. Relative file paths are resolved from the process working directory. Keep credentials private; `.env*` files are excluded by `.gitignore`.
 
-| Variable                                               | Purpose                                                                                                                               |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                                         | SQLite file URL; non-`file:` URLs are rejected.                                                                                       |
-| `TSCLOAK_ISSUER`                                       | OIDC issuer URL; defaults to `https://tscloak.onrender.com`. Must match the issuer in provider tokens.                                |
-| `TSCLOAK_CLIENT_ID`, `TSCLOAK_CLIENT_SECRET`           | OIDC client credentials.                                                                                                              |
-| `TSCLOAK_ACCESS_TOKEN_AUDIENCE`                        | Expected token audience; defaults to the client ID.                                                                                   |
-| `TSCLOAK_REDIRECT_URI`                                 | Registered OIDC callback; defaults to the local port 3001 callback.                                                                   |
-| `TSCLOAK_POST_LOGOUT_REDIRECT_URI`                     | Local post-logout redirect; defaults to `http://localhost:3001/login`.                                                                |
-| `TSCLOAK_SCOPES`                                       | OIDC scopes; defaults to `openid profile email`.                                                                                      |
-| `TSCLOAK_TOKEN_AUTH_METHOD`                            | OIDC token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`.                                             |
-| `VILEK_BASE_URL`                                       | Public application base URL for login/callback and expected browser origin; set it to the deployed HTTPS origin in production.        |
-| `TSCLOAK_SCIM_ENABLED`                                 | Must be exactly `true` to enable the SCIM sync/seed operations.                                                                       |
-| `TSCLOAK_SCIM_CLIENT_ID`, `TSCLOAK_SCIM_CLIENT_SECRET` | Credentials for the SCIM client-credentials flow. The documented seed setup requires the SCIM client ID to match `TSCLOAK_CLIENT_ID`. |
-| `TSCLOAK_SCIM_TOKEN_AUTH_METHOD`                       | SCIM token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`.                                             |
+| Variable                                       | Purpose                                                                                                                           |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                 | SQLite file URL; non-`file:` URLs are rejected.                                                                                   |
+| `IDP_ISSUER`                                   | OIDC issuer URL; defaults to `https://oidc.onrender.com`. Must match the issuer in provider tokens.                               |
+| `IDP_CLIENT_ID`, `IDP_CLIENT_SECRET`           | OIDC client credentials.                                                                                                          |
+| `IDP_ACCESS_TOKEN_AUDIENCE`                    | Expected token audience; defaults to the client ID.                                                                               |
+| `IDP_REDIRECT_URI`                             | Registered OIDC callback; defaults to the local port 3001 callback.                                                               |
+| `IDP_POST_LOGOUT_REDIRECT_URI`                 | Local post-logout redirect; defaults to `http://localhost:3001/login`.                                                            |
+| `IDP_SCOPES`                                   | OIDC scopes; defaults to `openid profile email`.                                                                                  |
+| `IDP_TOKEN_AUTH_METHOD`                        | OIDC token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`.                                         |
+| `VILEK_BASE_URL`                               | Public application base URL for login/callback and expected browser origin; set it to the deployed HTTPS origin in production.    |
+| `IDP_SCIM_ENABLED`                             | Must be exactly `true` to enable the SCIM sync/seed operations.                                                                   |
+| `IDP_SCIM_CLIENT_ID`, `IDP_SCIM_CLIENT_SECRET` | Credentials for the SCIM client-credentials flow. The documented seed setup requires the SCIM client ID to match `IDP_CLIENT_ID`. |
+| `IDP_SCIM_TOKEN_AUTH_METHOD`                   | SCIM token endpoint auth method: `client_secret_post` (default) or `client_secret_basic`.                                         |
 
 Register the callback URI and post-logout URI with the identity provider. In production, also configure the public base URL and HTTPS redirects; do not deploy with the local defaults.
 
@@ -312,7 +312,7 @@ npm run build
 
 ### ⚠️ Demo seed warning
 
-`npm run db:seed` is not a local-only fixture command: it contacts the configured TSCloak SCIM API before writing seed data. It refuses to run unless `TSCLOAK_SCIM_ENABLED=true` and valid SCIM credentials are supplied. Use a test identity provider only, and review [SCIM-SEEDING.md](./SCIM-SEEDING.md) before running it. The script provisions fictional `.test` identities, creates local role/reference/demo records, and never sets passwords. Confirm the provider's SCIM resource `id` is the same value as the OIDC `sub` before relying on the subject mapping.
+`npm run db:seed` is not a local-only fixture command: it contacts the configured identity provider SCIM API before writing seed data. It refuses to run unless `IDP_SCIM_ENABLED=true` and valid SCIM credentials are supplied. Use a test identity provider only, and review [SCIM-SEEDING.md](./SCIM-SEEDING.md) before running it. The script provisions fictional `.test` identities, creates local role/reference/demo records, and never sets passwords. Confirm the provider's SCIM resource `id` is the same value as the OIDC `sub` before relying on the subject mapping.
 
 ## ☁️ Migrations and deployment
 
@@ -339,7 +339,7 @@ src/
     admin/               Shared admin shell and feature pages
   lib/
     admin/features/      DTOs, Zod schemas, services, repositories
-    auth/                TSCloak token handling and local authorization
+    auth/                identity provider token handling and local authorization
     db/                  SQLite connection, Drizzle schema, migrate, seed
 drizzle/                 Versioned SQL migrations
 docs/                    Implementation, auth, UI, and contract notes

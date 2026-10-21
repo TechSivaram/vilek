@@ -2,56 +2,16 @@ import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import { updateInputSchema } from "@/lib/admin/features/users/schema";
 import { usersService } from "@/lib/admin/features/users/service";
+import {
+  findScimResourceIdByEmail,
+  getScimAccessToken,
+  getScimBaseUrl,
+} from "@/lib/identity-provider/scim";
 type Ctx = { params: Promise<{ id: string }> };
 function requiredEnv(name: string) {
   const value = process.env[name]?.trim();
   if (!value) throw new Error(`${name} is not configured.`);
   return value;
-}
-
-async function getScimToken(issuer: string) {
-  const clientId = requiredEnv("TSCLOAK_SCIM_CLIENT_ID");
-  const clientSecret = requiredEnv("TSCLOAK_SCIM_CLIENT_SECRET");
-  if (clientId !== requiredEnv("TSCLOAK_CLIENT_ID"))
-    throw new Error("SCIM client ID must match the configured OIDC client ID.");
-  const method = (process.env.TSCLOAK_SCIM_TOKEN_AUTH_METHOD ?? "client_secret_post").toLowerCase();
-  const form = new URLSearchParams({
-    grant_type: "client_credentials",
-    scope: "scim",
-  });
-  const headers = new Headers({
-    "content-type": "application/x-www-form-urlencoded",
-    accept: "application/json",
-  });
-  if (method === "client_secret_post") {
-    form.set("client_id", clientId);
-    form.set("client_secret", clientSecret);
-  } else if (method === "client_secret_basic")
-    headers.set(
-      "authorization",
-      `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
-    );
-  else
-    throw new Error(
-      "TSCLOAK_SCIM_TOKEN_AUTH_METHOD must be client_secret_post or client_secret_basic.",
-    );
-  const response = await fetch(`${issuer}/token`, {
-    method: "POST",
-    headers,
-    body: form,
-    cache: "no-store",
-    signal: AbortSignal.timeout(15000),
-  });
-  const body = (await response.json().catch(() => ({}))) as {
-    access_token?: string;
-    error_description?: string;
-    error?: string;
-  };
-  if (!response.ok || !body.access_token)
-    throw new Error(
-      `Identity provider token request failed (HTTP ${response.status}): ${body.error_description ?? body.error ?? "no access token returned"}`,
-    );
-  return body.access_token;
 }
 
 export const PATCH = withRouteGuard(
@@ -90,7 +50,7 @@ export const PATCH = withRouteGuard(
         { status: 409 },
       );
     }
-    if (process.env.TSCLOAK_SCIM_ENABLED !== "true")
+    if (process.env.IDP_SCIM_ENABLED !== "true")
       return NextResponse.json(
         {
           error: "Identity-provider synchronization is disabled; no local changes were saved.",
@@ -98,8 +58,17 @@ export const PATCH = withRouteGuard(
         { status: 503 },
       );
     try {
-      const issuer = requiredEnv("TSCLOAK_ISSUER").replace(/\/$/, "");
-      const token = await getScimToken(issuer);
+      const issuer = requiredEnv("IDP_ISSUER").replace(/\/$/, "");
+      const scimBaseUrl = getScimBaseUrl(issuer);
+      const token = await getScimAccessToken(issuer);
+      const scimResourceId = await findScimResourceIdByEmail(scimBaseUrl, token, current.email);
+      if (!scimResourceId)
+        return NextResponse.json(
+          {
+            error: "Could not find the SCIM resource for this user by email; no changes were made.",
+          },
+          { status: 409 },
+        );
       const operations = Object.entries(parsed.data).flatMap(([key, value]) => {
         if (key === "isActive") return [{ op: "replace", path: "active", value }];
         if (key === "email")
@@ -113,23 +82,20 @@ export const PATCH = withRouteGuard(
           { error: "No supported identity-provider fields were supplied." },
           { status: 400 },
         );
-      const response = await fetch(
-        `${issuer}/scim/v2/Users/${encodeURIComponent(current.oidcSubject)}`,
-        {
-          method: "PATCH",
-          headers: {
-            authorization: `Bearer ${token}`,
-            "content-type": "application/scim+json",
-            accept: "application/scim+json, application/json",
-          },
-          body: JSON.stringify({
-            schemas: ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-            Operations: operations,
-          }),
-          cache: "no-store",
-          signal: AbortSignal.timeout(15000),
+      const response = await fetch(`${scimBaseUrl}/Users/${encodeURIComponent(scimResourceId)}`, {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "content-type": "application/scim+json",
+          accept: "application/scim+json, application/json",
         },
-      );
+        body: JSON.stringify({
+          schemas: ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+          Operations: operations,
+        }),
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000),
+      });
       const responseBody = (await response.json().catch(() => ({}))) as {
         detail?: string;
         message?: string;
@@ -195,32 +161,39 @@ export const DELETE = withRouteGuard(
           { status: 409 },
         );
       }
-      if (process.env.TSCLOAK_SCIM_ENABLED !== "true")
+      if (process.env.IDP_SCIM_ENABLED !== "true")
         return NextResponse.json(
           {
             error: "Identity-provider synchronization is disabled; the user was not deactivated.",
           },
           { status: 503 },
         );
-      const issuer = requiredEnv("TSCLOAK_ISSUER").replace(/\/$/, "");
-      const token = await getScimToken(issuer);
-      const response = await fetch(
-        `${issuer}/scim/v2/Users/${encodeURIComponent(current.oidcSubject)}`,
-        {
-          method: "PATCH",
-          headers: {
-            authorization: `Bearer ${token}`,
-            "content-type": "application/scim+json",
-            accept: "application/scim+json, application/json",
+      const issuer = requiredEnv("IDP_ISSUER").replace(/\/$/, "");
+      const scimBaseUrl = getScimBaseUrl(issuer);
+      const token = await getScimAccessToken(issuer);
+      const scimResourceId = await findScimResourceIdByEmail(scimBaseUrl, token, current.email);
+      if (!scimResourceId)
+        return NextResponse.json(
+          {
+            error:
+              "Could not find the SCIM resource for this user by email; the account was not deactivated.",
           },
-          body: JSON.stringify({
-            schemas: ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-            Operations: [{ op: "replace", path: "active", value: false }],
-          }),
-          cache: "no-store",
-          signal: AbortSignal.timeout(15000),
+          { status: 409 },
+        );
+      const response = await fetch(`${scimBaseUrl}/Users/${encodeURIComponent(scimResourceId)}`, {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "content-type": "application/scim+json",
+          accept: "application/scim+json, application/json",
         },
-      );
+        body: JSON.stringify({
+          schemas: ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
+          Operations: [{ op: "replace", path: "active", value: false }],
+        }),
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000),
+      });
       const responseBody = (await response.json().catch(() => ({}))) as {
         detail?: string;
         message?: string;
