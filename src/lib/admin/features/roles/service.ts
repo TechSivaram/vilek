@@ -1,14 +1,14 @@
 import "server-only";
 import { rolesRepository } from "./repository";
-import type { RolesListQuery } from "./dto";
+import type { RolesListQuery, RolesCreateInput, RolesUpdateInput } from "./dto";
 export const rolesService = {
   list(query: RolesListQuery) {
     return rolesRepository.list(query);
   },
-  create(values: Record<string, unknown>) {
+  create(values: RolesCreateInput) {
     return rolesRepository.create(values);
   },
-  update(id: string | number, values: Record<string, unknown>) {
+  update(id: string | number, values: RolesUpdateInput) {
     return rolesRepository.update(id, values);
   },
   deactivate(id: string | number) {

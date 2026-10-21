@@ -1,68 +1,14 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { getMaintenanceDb } from "@/lib/operations/maintenance";
+import { auditexportsService } from "@/lib/operations/features/audit-exports/service";
 
 export const dynamic = "force-dynamic";
-const resourceConfig = {
-  table: "Audit_Export_Event",
-  label: "Audit export history",
-  id: "id",
-  writable: false,
-  required: [],
-  columns: [],
-} as const;
-
 export const GET = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (_request: Request) => {
-    const name = "audit-exports";
-    const resource = resourceConfig;
-
-    const sqlite = getMaintenanceDb();
     try {
-      const projections: Record<
-        string,
-        { sql: string; displayColumns: string[] }
-      > = {
-        "audit-exports": {
-          sql: `SELECT a.id, a.actor_user_id, a.format, a.row_count, a.created_at, u.email AS actor_email FROM Audit_Export_Event a LEFT JOIN User u ON u.id=a.actor_user_id ORDER BY a.created_at DESC LIMIT 500`,
-          displayColumns: [
-            "id",
-            "actor_email",
-            "format",
-            "row_count",
-            "created_at",
-          ],
-        },
-      };
-      const projection = projections[name];
-      const rows = projection
-        ? sqlite.prepare(projection.sql).all()
-        : sqlite
-            .prepare(
-              `SELECT * FROM "${resource.table}" ORDER BY "${resource.id}" DESC LIMIT 500`,
-            )
-            .all();
-      const options: Record<
-        string,
-        { value: string | number; label: string }[]
-      > = {};
-      const optionQueries: Record<string, string> = {};
-      for (const field of resource.columns)
-        if (optionQueries[field])
-          options[field] = sqlite.prepare(optionQueries[field]).all() as {
-            value: string | number;
-            label: string;
-          }[];
-      return NextResponse.json({
-        resource: name,
-        label: resource.label,
-        writable: resource.writable,
-        columns: resource.columns,
-        displayColumns: projection?.displayColumns,
-        rows,
-        options,
-      });
+      const result = auditexportsService.list();
+      return NextResponse.json(result);
     } catch (error) {
       console.error("Operations maintenance query failed", error);
       return NextResponse.json(
@@ -72,82 +18,15 @@ export const GET = withRouteGuard(
         },
         { status: 500 },
       );
-    } finally {
-      sqlite.close();
     }
   },
 );
 
 export const POST = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
-  async (request: Request) => {
-    const name = "audit-exports";
-    const resource = resourceConfig;
-
-    if (!resource.writable)
-      return NextResponse.json(
-        { error: "This history table is read-only." },
-        { status: 405 },
-      );
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON body." },
-        { status: 400 },
-      );
-    }
-    if (!body || typeof body !== "object" || Array.isArray(body))
-      return NextResponse.json(
-        { error: "Expected a JSON object." },
-        { status: 400 },
-      );
-    const input = body as Record<string, unknown>;
-    const keys = Object.keys(input);
-    if (
-      keys.some((key) => !(resource.columns as readonly string[]).includes(key))
-    )
-      return NextResponse.json(
-        { error: "One or more fields are not editable for this resource." },
-        { status: 400 },
-      );
-    if (
-      resource.required.some(
-        (key) =>
-          input[key] === undefined || input[key] === null || input[key] === "",
-      )
-    )
-      return NextResponse.json(
-        { error: `Required fields: ${resource.required.join(", ")}.` },
-        { status: 400 },
-      );
-    const sqlite = getMaintenanceDb();
-    try {
-      const insertValues: Record<string, unknown> = { ...input };
-
-      const insertKeys = Object.keys(insertValues);
-      const cols = insertKeys.map((key) => `"${key}"`).join(", ");
-      const marks = insertKeys.map(() => "?").join(", ");
-      const values = insertKeys.map((key) =>
-        insertValues[key] === "" ? null : insertValues[key],
-      );
-      const result = sqlite
-        .prepare(`INSERT INTO "${resource.table}" (${cols}) VALUES (${marks})`)
-        .run(...(values as (string | number | bigint | null)[]));
-      return NextResponse.json(
-        { ok: true, id: result.lastInsertRowid.toString() },
-        { status: 201 },
-      );
-    } catch (error) {
-      const message =
-        error instanceof Error &&
-        /UNIQUE|CHECK|FOREIGN KEY|NOT NULL/i.test(error.message)
-          ? "The record conflicts with a unique, validation, or relationship constraint."
-          : "The record could not be saved.";
-      return NextResponse.json({ error: message }, { status: 409 });
-    } finally {
-      sqlite.close();
-    }
-  },
+  async (_request: Request) =>
+    NextResponse.json(
+      { error: "This history table is read-only." },
+      { status: 405 },
+    ),
 );

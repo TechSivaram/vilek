@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { flightCrewRepository } from "@/lib/operations/flight-crew";
+import { flightCrewService } from "@/lib/operations/features/flight-crew/service";
+import { removeFlightCrewSchema } from "@/lib/operations/features/flight-crew/schema";
 
 type Context = { params: Promise<{ id: string }> };
 export const DELETE = withRouteGuard(
@@ -17,17 +17,14 @@ export const DELETE = withRouteGuard(
         { status: 400 },
       );
     }
-    const parsed = z
-      .object({ reason: z.string().trim().min(5).max(500) })
-      .strict()
-      .safeParse(body);
+    const parsed = removeFlightCrewSchema.safeParse(body);
     if (!parsed.success)
       return NextResponse.json(
         { error: "Enter a removal reason (at least 5 characters)." },
         { status: 400 },
       );
     try {
-      const result = flightCrewRepository.remove(id, parsed.data.reason, {
+      const result = flightCrewService.remove(id, parsed.data, {
         id: auth.user.id,
         email: auth.user.email,
       });

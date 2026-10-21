@@ -1,10 +1,9 @@
 import { z } from "zod";
-import type { ListQueryParams } from "./dto";
+import type { UpdateSystemSettingsDto } from "./dto";
 
-export const listQuerySchema: z.ZodType<ListQueryParams> = z.object({
-  q: z.string().trim().max(200).optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(10),
-  sort: z.string().trim().max(80).optional(),
-  direction: z.enum(["asc", "desc"]).default("asc"),
-});
+export const updateSystemSettingsSchema: z.ZodType<UpdateSystemSettingsDto> = z
+  .object({
+    defaultCurrencyId: z.coerce.number().int().min(1),
+    maxUploadSizeBytes: z.coerce.number().int().min(1024).max(104857600),
+  })
+  .strict();

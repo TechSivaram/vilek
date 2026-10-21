@@ -1,23 +1,14 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { getMaintenanceDb } from "@/lib/operations/maintenance";
+import { flightOperationsSettingsService } from "@/lib/operations/features/flight-operations-settings/service";
+import { updateInputSchema } from "@/lib/operations/features/flight-operations-settings/schema";
 
 export const dynamic = "force-dynamic";
-const resourceConfig = {
-  table: "Flight_Operations_Setting",
-  label: "Flight Operations settings",
-  id: "id",
-  writable: true,
-  required: ["setting_key", "value_json"],
-  columns: ["setting_key", "value_json", "description"],
-} as const;
-
 export const PATCH = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (request: Request, context: { params: Promise<{ id: string }> }) => {
     const { id: routeId } = await context.params;
-    const name = "flight-operations-settings";
-    const resource = resourceConfig;
+    const resource = flightOperationsSettingsService.config;
 
     if (!resource.writable)
       return NextResponse.json(
@@ -33,38 +24,20 @@ export const PATCH = withRouteGuard(
         { status: 400 },
       );
     }
-    if (!body || typeof body !== "object" || Array.isArray(body))
-      return NextResponse.json(
-        { error: "Expected an object containing id and fields." },
-        { status: 400 },
-      );
-    const input = body as Record<string, unknown>;
     const id = routeId;
-    const values = { ...input };
-    delete values.id;
     if (id === undefined || id === null || id === "")
       return NextResponse.json(
         { error: "Record id is required." },
         { status: 400 },
       );
+    const parsedInput = updateInputSchema.safeParse(body);
+    if (!parsedInput.success)
+      return NextResponse.json(
+        { error: "Invalid input.", details: parsedInput.error.flatten() },
+        { status: 400 },
+      );
+    const values = parsedInput.data;
     const keys = Object.keys(values);
-    if (
-      !keys.length ||
-      keys.some((key) => !(resource.columns as readonly string[]).includes(key))
-    )
-      return NextResponse.json(
-        { error: "Provide editable fields only." },
-        { status: 400 },
-      );
-    if (
-      resource.required.some(
-        (key) => values[key] === "" || values[key] === null,
-      )
-    )
-      return NextResponse.json(
-        { error: `Required fields: ${resource.required.join(", ")}.` },
-        { status: 400 },
-      );
     if (values.value_json !== undefined) {
       try {
         JSON.parse(String(values.value_json));
@@ -75,21 +48,9 @@ export const PATCH = withRouteGuard(
         );
       }
     }
-    const sqlite = getMaintenanceDb();
     try {
-      const set = keys.map((key) => `"${key}" = ?`).join(", ");
-      const params = keys.map((key) =>
-        values[key] === "" ? null : values[key],
-      );
-      const result = sqlite
-        .prepare(
-          `UPDATE "${resource.table}" SET ${set}, updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE "${resource.id}" = ?`,
-        )
-        .run(
-          ...(params as (string | number | bigint | null)[]),
-          id as string | number,
-        );
-      return result.changes
+      const updated = flightOperationsSettingsService.update(id, values);
+      return updated
         ? NextResponse.json({ ok: true })
         : NextResponse.json({ error: "Record not found." }, { status: 404 });
     } catch {
@@ -100,8 +61,6 @@ export const PATCH = withRouteGuard(
         },
         { status: 409 },
       );
-    } finally {
-      sqlite.close();
     }
   },
 );

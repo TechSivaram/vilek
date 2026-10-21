@@ -1,6 +1,6 @@
 import "server-only";
 import { usersRepository } from "./repository";
-import type { UsersListQuery } from "./dto";
+import type { UsersListQuery, UsersCreateInput, UsersUpdateInput } from "./dto";
 export const usersService = {
   list(query: UsersListQuery) {
     return usersRepository.list(query);
@@ -34,10 +34,10 @@ export const usersService = {
   relinkIdentity(userId: string, subject: string) {
     return usersRepository.relinkIdentity(userId, subject);
   },
-  create(values: Record<string, unknown>) {
+  create(values: UsersCreateInput) {
     return usersRepository.create(values);
   },
-  update(id: string | number, values: Record<string, unknown>) {
+  update(id: string | number, values: UsersUpdateInput) {
     return usersRepository.update(id, values);
   },
   deactivate(id: string | number) {

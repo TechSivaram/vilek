@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import { system_settingsService } from "@/lib/admin/features/system_settings/service";
+import { updateSystemSettingsSchema } from "@/lib/admin/features/system_settings/schema";
 export const dynamic = "force-dynamic";
 export const GET = withRouteGuard({ roles: ["ADMIN"] }, async () =>
   NextResponse.json({
@@ -9,26 +10,19 @@ export const GET = withRouteGuard({ roles: ["ADMIN"] }, async () =>
   }),
 );
 export const PUT = withRouteGuard({ roles: ["ADMIN"] }, async (request) => {
-  const body = (await request.json().catch(() => null)) as {
-    defaultCurrencyId?: unknown;
-    maxUploadSizeBytes?: unknown;
-  } | null;
-  const currencyId = Number(body?.defaultCurrencyId);
-  const size = Number(body?.maxUploadSizeBytes);
-  if (
-    !Number.isInteger(currencyId) ||
-    currencyId < 1 ||
-    !Number.isInteger(size) ||
-    size < 1024 ||
-    size > 104857600
-  )
+  const body: unknown = await request.json().catch(() => null);
+  const parsed = updateSystemSettingsSchema.safeParse(body);
+  if (!parsed.success)
     return NextResponse.json(
       {
         error:
           "Choose a currency and set maximum upload size between 1 KB and 100 MB.",
+        details: parsed.error.flatten(),
       },
       { status: 400 },
     );
+  const { defaultCurrencyId: currencyId, maxUploadSizeBytes: size } =
+    parsed.data;
   if (!system_settingsService.currencyExists(currencyId))
     return NextResponse.json(
       { error: "Selected currency does not exist." },

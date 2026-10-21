@@ -1,23 +1,14 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { getMaintenanceDb } from "@/lib/operations/maintenance";
+import { auditRetentionPolicyService } from "@/lib/operations/features/audit-retention-policy/service";
+import { updateInputSchema } from "@/lib/operations/features/audit-retention-policy/schema";
 
 export const dynamic = "force-dynamic";
-const resourceConfig = {
-  table: "Audit_Retention_Policy",
-  label: "Audit retention policy",
-  id: "id",
-  writable: true,
-  required: ["id"],
-  columns: ["id", "retention_days"],
-} as const;
-
 export const PATCH = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (request: Request, context: { params: Promise<{ id: string }> }) => {
     const { id: routeId } = await context.params;
-    const name = "audit-retention-policy";
-    const resource = resourceConfig;
+    const resource = auditRetentionPolicyService.config;
 
     if (!resource.writable)
       return NextResponse.json(
@@ -33,53 +24,22 @@ export const PATCH = withRouteGuard(
         { status: 400 },
       );
     }
-    if (!body || typeof body !== "object" || Array.isArray(body))
-      return NextResponse.json(
-        { error: "Expected an object containing id and fields." },
-        { status: 400 },
-      );
-    const input = body as Record<string, unknown>;
     const id = routeId;
-    const values = { ...input };
-    delete values.id;
     if (id === undefined || id === null || id === "")
       return NextResponse.json(
         { error: "Record id is required." },
         { status: 400 },
       );
-    const keys = Object.keys(values);
-    if (
-      !keys.length ||
-      keys.some((key) => !(resource.columns as readonly string[]).includes(key))
-    )
+    const parsedInput = updateInputSchema.safeParse(body);
+    if (!parsedInput.success)
       return NextResponse.json(
-        { error: "Provide editable fields only." },
+        { error: "Invalid input.", details: parsedInput.error.flatten() },
         { status: 400 },
       );
-    if (
-      resource.required.some(
-        (key) => values[key] === "" || values[key] === null,
-      )
-    )
-      return NextResponse.json(
-        { error: `Required fields: ${resource.required.join(", ")}.` },
-        { status: 400 },
-      );
-    const sqlite = getMaintenanceDb();
+    const values = parsedInput.data;
     try {
-      const set = keys.map((key) => `"${key}" = ?`).join(", ");
-      const params = keys.map((key) =>
-        values[key] === "" ? null : values[key],
-      );
-      const result = sqlite
-        .prepare(
-          `UPDATE "${resource.table}" SET ${set} WHERE "${resource.id}" = ?`,
-        )
-        .run(
-          ...(params as (string | number | bigint | null)[]),
-          id as string | number,
-        );
-      return result.changes
+      const updated = auditRetentionPolicyService.update(id, values);
+      return updated
         ? NextResponse.json({ ok: true })
         : NextResponse.json({ error: "Record not found." }, { status: 404 });
     } catch {
@@ -90,8 +50,6 @@ export const PATCH = withRouteGuard(
         },
         { status: 409 },
       );
-    } finally {
-      sqlite.close();
     }
   },
 );

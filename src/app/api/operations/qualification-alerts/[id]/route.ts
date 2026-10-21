@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { getMaintenanceDb } from "@/lib/operations/maintenance";
+import type { QualificationAlertsUpdateDto } from "@/lib/operations/features/qualification-alerts/dto";
+import { QualificationAlertsService } from "@/lib/operations/features/qualification-alerts/service";
+import {
+  createInputSchema,
+  updateInputSchema,
+} from "@/lib/operations/features/qualification-alerts/schema";
 
 export const dynamic = "force-dynamic";
 const resourceConfig = {
@@ -40,53 +45,25 @@ export const PATCH = withRouteGuard(
         { status: 400 },
       );
     }
-    if (!body || typeof body !== "object" || Array.isArray(body))
-      return NextResponse.json(
-        { error: "Expected an object containing id and fields." },
-        { status: 400 },
-      );
-    const input = body as Record<string, unknown>;
     const id = routeId;
-    const values = { ...input };
-    delete values.id;
     if (id === undefined || id === null || id === "")
       return NextResponse.json(
         { error: "Record id is required." },
         { status: 400 },
       );
-    const keys = Object.keys(values);
-    if (
-      !keys.length ||
-      keys.some((key) => !(resource.columns as readonly string[]).includes(key))
-    )
+    const parsedInput = updateInputSchema.safeParse(body);
+    if (!parsedInput.success)
       return NextResponse.json(
-        { error: "Provide editable fields only." },
+        { error: "Invalid input.", details: parsedInput.error.flatten() },
         { status: 400 },
       );
-    if (
-      resource.required.some(
-        (key) => values[key] === "" || values[key] === null,
-      )
-    )
-      return NextResponse.json(
-        { error: `Required fields: ${resource.required.join(", ")}.` },
-        { status: 400 },
-      );
-    const sqlite = getMaintenanceDb();
+    const values = parsedInput.data as Record<string, unknown>;
     try {
-      const set = keys.map((key) => `"${key}" = ?`).join(", ");
-      const params = keys.map((key) =>
-        values[key] === "" ? null : values[key],
+      const updated = QualificationAlertsService.update(
+        id,
+        values as unknown as QualificationAlertsUpdateDto,
       );
-      const result = sqlite
-        .prepare(
-          `UPDATE "${resource.table}" SET ${set} WHERE "${resource.id}" = ?`,
-        )
-        .run(
-          ...(params as (string | number | bigint | null)[]),
-          id as string | number,
-        );
-      return result.changes
+      return updated
         ? NextResponse.json({ ok: true })
         : NextResponse.json({ error: "Record not found." }, { status: 404 });
     } catch {
@@ -97,8 +74,6 @@ export const PATCH = withRouteGuard(
         },
         { status: 409 },
       );
-    } finally {
-      sqlite.close();
     }
   },
 );

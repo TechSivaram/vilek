@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { getMaintenanceDb } from "@/lib/operations/maintenance";
+import type { CrewQualificationsCreateDto } from "@/lib/operations/features/crew-qualifications/dto";
+import { CrewQualificationsService } from "@/lib/operations/features/crew-qualifications/service";
+import { CrewQualificationsService } from "@/lib/operations/features/crew-qualifications/service";
+import {
+  createInputSchema,
+  updateInputSchema,
+} from "@/lib/operations/features/crew-qualifications/schema";
 
 export const dynamic = "force-dynamic";
 const resourceConfig = {
@@ -26,55 +32,33 @@ export const GET = withRouteGuard(
     const name = "crew-qualifications";
     const resource = resourceConfig;
 
-    const sqlite = getMaintenanceDb();
     try {
-      const projections: Record<
-        string,
-        { sql: string; displayColumns: string[] }
-      > = {
-        "crew-qualifications": {
-          sql: `SELECT q.id, q.crew_member_id, q.qualification_type_id, q.valid_from, q.valid_until, q.status, q.replaced_by_id, q.notes, q.created_at, trim(coalesce(u.first_name,'') || ' ' || coalesce(u.last_name,'')) || CASE WHEN cm.badge_number IS NOT NULL AND cm.badge_number <> '' THEN ' (' || cm.badge_number || ')' ELSE '' END AS crew_display, qt.name AS qualification_name FROM Crew_Qualification q LEFT JOIN Crew_Member cm ON cm.id=q.crew_member_id LEFT JOIN User u ON u.id=cm.user_id LEFT JOIN Qualification_Type qt ON qt.id=q.qualification_type_id ORDER BY q.created_at DESC LIMIT 500`,
-          displayColumns: [
-            "id",
-            "crew_display",
-            "qualification_name",
-            "valid_from",
-            "valid_until",
-            "status",
-            "notes",
-            "created_at",
-          ],
-        },
-      };
-      const projection = projections[name];
-      const rows = projection
-        ? sqlite.prepare(projection.sql).all()
-        : sqlite
-            .prepare(
-              `SELECT * FROM "${resource.table}" ORDER BY "${resource.id}" DESC LIMIT 500`,
-            )
-            .all();
+      const rows = CrewQualificationsService.listRows();
+      const displayColumns = [
+        "id",
+        "crew_display",
+        "qualification_name",
+        "valid_from",
+        "valid_until",
+        "status",
+        "notes",
+        "created_at",
+      ];
       const options: Record<
         string,
         { value: string | number; label: string }[]
       > = {};
-      const optionQueries: Record<string, string> = {
-        crew_member_id: `SELECT cm.id AS value, trim(coalesce(u.first_name,'') || ' ' || coalesce(u.last_name,'')) || CASE WHEN cm.badge_number IS NOT NULL AND cm.badge_number <> '' THEN ' (' || cm.badge_number || ')' ELSE '' END AS label FROM Crew_Member cm LEFT JOIN User u ON u.id=cm.user_id ORDER BY label`,
-        qualification_type_id: `SELECT id AS value, name AS label FROM Qualification_Type WHERE is_active=1 ORDER BY name`,
-        replaced_by_id: `SELECT q.id AS value, trim(coalesce(u.first_name,'') || ' ' || coalesce(u.last_name,'')) || ' — ' || qt.name || ' (' || q.valid_from || ')' AS label FROM Crew_Qualification q LEFT JOIN Crew_Member cm ON cm.id=q.crew_member_id LEFT JOIN User u ON u.id=cm.user_id LEFT JOIN Qualification_Type qt ON qt.id=q.qualification_type_id ORDER BY label`,
-      };
-      for (const field of resource.columns)
-        if (optionQueries[field])
-          options[field] = sqlite.prepare(optionQueries[field]).all() as {
-            value: string | number;
-            label: string;
-          }[];
+
+      for (const field of resource.columns) {
+        const fieldOptions = CrewQualificationsService.getOptions(field);
+        if (fieldOptions.length) options[field] = fieldOptions;
+      }
       return NextResponse.json({
         resource: name,
         label: resource.label,
         writable: resource.writable,
         columns: resource.columns,
-        displayColumns: projection?.displayColumns,
+        displayColumns,
         rows,
         options,
       });
@@ -87,8 +71,6 @@ export const GET = withRouteGuard(
         },
         { status: 500 },
       );
-    } finally {
-      sqlite.close();
     }
   },
 );
@@ -113,47 +95,20 @@ export const POST = withRouteGuard(
         { status: 400 },
       );
     }
-    if (!body || typeof body !== "object" || Array.isArray(body))
+    const parsedInput = createInputSchema.safeParse(body);
+    if (!parsedInput.success)
       return NextResponse.json(
-        { error: "Expected a JSON object." },
+        { error: "Invalid input.", details: parsedInput.error.flatten() },
         { status: 400 },
       );
-    const input = body as Record<string, unknown>;
-    const keys = Object.keys(input);
-    if (
-      keys.some((key) => !(resource.columns as readonly string[]).includes(key))
-    )
-      return NextResponse.json(
-        { error: "One or more fields are not editable for this resource." },
-        { status: 400 },
-      );
-    if (
-      resource.required.some(
-        (key) =>
-          input[key] === undefined || input[key] === null || input[key] === "",
-      )
-    )
-      return NextResponse.json(
-        { error: `Required fields: ${resource.required.join(", ")}.` },
-        { status: 400 },
-      );
-    const sqlite = getMaintenanceDb();
+    const input = parsedInput.data as Record<string, unknown>;
     try {
       const insertValues: Record<string, unknown> = { ...input };
       if (!insertValues.id) insertValues.id = crypto.randomUUID();
-      const insertKeys = Object.keys(insertValues);
-      const cols = insertKeys.map((key) => `"${key}"`).join(", ");
-      const marks = insertKeys.map(() => "?").join(", ");
-      const values = insertKeys.map((key) =>
-        insertValues[key] === "" ? null : insertValues[key],
+      const result = CrewQualificationsService.create(
+        insertValues as unknown as CrewQualificationsCreateDto,
       );
-      const result = sqlite
-        .prepare(`INSERT INTO "${resource.table}" (${cols}) VALUES (${marks})`)
-        .run(...(values as (string | number | bigint | null)[]));
-      return NextResponse.json(
-        { ok: true, id: result.lastInsertRowid.toString() },
-        { status: 201 },
-      );
+      return NextResponse.json({ ok: true, id: result.id }, { status: 201 });
     } catch (error) {
       const message =
         error instanceof Error &&
@@ -161,8 +116,6 @@ export const POST = withRouteGuard(
           ? "The record conflicts with a unique, validation, or relationship constraint."
           : "The record could not be saved.";
       return NextResponse.json({ error: message }, { status: 409 });
-    } finally {
-      sqlite.close();
     }
   },
 );

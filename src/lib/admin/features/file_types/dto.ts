@@ -1,25 +1,3 @@
-export type FileTypesListQuery = {
-  search?: string;
-  page?: number;
-  pageSize?: number;
-  sort?: string;
-  direction?: "asc" | "desc";
-};
-export type FileTypesListResult<T> = {
-  rows: T[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-    totalPages: number;
-  };
-};
-
-/** URL query contract validated by the feature schema. */
-export type ListQueryParams = {
-  q?: string;
-  page: number;
-  pageSize: number;
-  sort?: string;
-  direction: "asc" | "desc";
-};
+/** Request/response contracts for allowed file extensions. */
+export type CreateFileTypeDto = { fileType: string };
+export type FileTypeDto = { id: number; fileType: string };

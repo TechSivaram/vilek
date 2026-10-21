@@ -1,28 +1,17 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { withRouteGuard } from "@/lib/auth/route-protection";
-import { flightCrewRepository } from "@/lib/operations/flight-crew";
+import { flightCrewService } from "@/lib/operations/features/flight-crew/service";
+import {
+  listFlightCrewQuerySchema,
+  createFlightCrewSchema,
+} from "@/lib/operations/features/flight-crew/schema";
 
 export const dynamic = "force-dynamic";
-
-const listQuerySchema = z.object({
-  flightId: z.string().optional(),
-  q: z.string().trim().max(200).optional(),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(10),
-});
-const createSchema = z
-  .object({
-    flightId: z.string().min(1),
-    crewMemberId: z.string().min(1),
-    designationId: z.number().int().positive(),
-  })
-  .strict();
 
 export const GET = withRouteGuard(
   { roles: ["FLIGHT_OPERATIONS_MANAGER"] },
   async (request: Request) => {
-    const parsed = listQuerySchema.safeParse(
+    const parsed = listFlightCrewQuerySchema.safeParse(
       Object.fromEntries(new URL(request.url).searchParams),
     );
     if (!parsed.success)
@@ -31,24 +20,9 @@ export const GET = withRouteGuard(
         { status: 400 },
       );
     if (parsed.data.flightId) {
-      return NextResponse.json({
-        rows: flightCrewRepository.manifest(parsed.data.flightId),
-      });
+      return NextResponse.json(flightCrewService.list(parsed.data));
     }
-    const result = flightCrewRepository.listFlights({
-      search: parsed.data.q,
-      page: parsed.data.page,
-      pageSize: parsed.data.pageSize,
-    });
-    return NextResponse.json({
-      rows: result.rows,
-      pagination: {
-        page: parsed.data.page,
-        pageSize: parsed.data.pageSize,
-        total: result.total,
-        totalPages: Math.max(1, Math.ceil(result.total / parsed.data.pageSize)),
-      },
-    });
+    return NextResponse.json(flightCrewService.list(parsed.data));
   },
 );
 
@@ -64,7 +38,7 @@ export const POST = withRouteGuard(
         { status: 400 },
       );
     }
-    const parsed = createSchema.safeParse(body);
+    const parsed = createFlightCrewSchema.safeParse(body);
     if (!parsed.success)
       return NextResponse.json(
         {
@@ -74,7 +48,7 @@ export const POST = withRouteGuard(
         { status: 400 },
       );
     try {
-      flightCrewRepository.create(parsed.data, {
+      flightCrewService.create(parsed.data, {
         id: auth.user.id,
         email: auth.user.email,
       });
