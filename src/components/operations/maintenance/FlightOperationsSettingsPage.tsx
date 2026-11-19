@@ -54,6 +54,56 @@ const fieldLabels: Record<string, string> = {
   cutoff_at: "Cutoff date",
   setting_description: "Description",
 };
+
+const operationalSettingLabels: Record<string, string> = {
+  minimum_rest_minutes: "Minimum rest between duties",
+  minimum_turnaround_minutes: "Minimum turnaround time",
+  qualification_alert_intervals_days: "Qualification expiry alert intervals",
+  release_buffer_minutes: "Post-arrival release buffer",
+  reporting_buffer_minutes: "Pre-departure reporting buffer",
+};
+
+const operationalSettingDescriptions: Record<string, string> = {
+  minimum_rest_minutes: "Minimum rest period required between crew duties.",
+  minimum_turnaround_minutes: "Minimum connection turnaround time between flight duties.",
+  qualification_alert_intervals_days: "Days before qualification expiry when alerts should be raised.",
+  release_buffer_minutes: "Additional time after scheduled arrival before crew release.",
+  reporting_buffer_minutes: "Time before scheduled departure when crew must report.",
+};
+
+function getOperationalSettingValueLabel(settingKey: string, rawValue: unknown): string {
+  if (rawValue === null || rawValue === undefined || rawValue === "") return "—";
+
+  let parsed: unknown = rawValue;
+  if (typeof rawValue === "string") {
+    try {
+      parsed = JSON.parse(rawValue);
+    } catch {
+      parsed = rawValue;
+    }
+  }
+
+  if (settingKey === "qualification_alert_intervals_days" && Array.isArray(parsed)) {
+    const days = parsed.map((value) => String(value));
+    return `${days.join(", ")} ${days.length === 1 ? "day" : "days"}`;
+  }
+
+  if (
+    ["minimum_rest_minutes", "minimum_turnaround_minutes", "release_buffer_minutes", "reporting_buffer_minutes"].includes(settingKey) &&
+    (typeof parsed === "number" || (typeof parsed === "string" && /^\\d+(?:\\.\\d+)?$/.test(parsed)))
+  ) {
+    const minutes = Number(parsed);
+    const hours = minutes / 60;
+    const hoursLabel =
+      Number.isInteger(hours) ? `${hours} ${hours === 1 ? "hour" : "hours"}` : `${hours.toFixed(1)} hours`;
+    return `${minutes} minutes (${hoursLabel})`;
+  }
+
+  if (Array.isArray(parsed)) return parsed.join(", ");
+  if (typeof parsed === "object" && parsed !== null) return JSON.stringify(parsed);
+  return String(parsed);
+}
+
 const humanize = (key: string) =>
   fieldLabels[key] ?? key.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 const emptyValue = (key: string) =>
@@ -151,6 +201,9 @@ export function FlightOperationsSettingsPage() {
     try {
       const body: Record<string, unknown> = {};
       for (const c of columns) {
+        // A setting key identifies the configuration record and must not be
+        // changed when editing an existing record.
+        if (editingId !== null && c === "setting_key") continue;
         const v = form[c] ?? "";
         if (v !== "")
           body[c] =
@@ -326,7 +379,13 @@ export function FlightOperationsSettingsPage() {
                       />
                     ) : (
                       <input
-                        value={form[c] ?? ""}
+                        value={
+                          editingId !== null && c === "setting_key"
+                            ? operationalSettingLabels[form[c] ?? ""] ?? form[c] ?? ""
+                            : form[c] ?? ""
+                        }
+                        readOnly={editingId !== null && c === "setting_key"}
+                        aria-readonly={editingId !== null && c === "setting_key"}
                         type={
                           c.startsWith("valid_") || c === "due_at" || c === "cutoff_at"
                             ? "date"
@@ -443,14 +502,20 @@ export function FlightOperationsSettingsPage() {
                     <tr key={String(row.id ?? i)}>
                       {displayColumns.map((k) => (
                         <td key={k}>
-                          {row[k] === null || row[k] === undefined || row[k] === ""
-                            ? "—"
-                            : typeof row[k] === "number" &&
-                                ["is_active", "expiry_required", "is_required"].includes(k)
-                              ? row[k] === 1
-                                ? "Yes"
-                                : "No"
-                              : String(row[k])}
+                          {selected === "flight-operations-settings" && k === "setting"
+                            ? operationalSettingLabels[String(row.setting_key ?? row.setting ?? "")] ?? String(row.setting ?? row.setting_key ?? "—")
+                            : selected === "flight-operations-settings" && k === "value_json"
+                              ? getOperationalSettingValueLabel(String(row.setting_key ?? ""), row[k])
+                              : selected === "flight-operations-settings" && (k === "setting_description" || k === "description")
+                                ? operationalSettingDescriptions[String(row.setting_key ?? "")] ?? String(row[k] ?? "—")
+                                : row[k] === null || row[k] === undefined || row[k] === ""
+                                  ? "—"
+                                  : typeof row[k] === "number" &&
+                                      ["is_active", "expiry_required", "is_required"].includes(k)
+                                    ? row[k] === 1
+                                      ? "Yes"
+                                      : "No"
+                                    : String(row[k])}
                         </td>
                       ))}
                       {data.writable && (
@@ -592,6 +657,11 @@ export function FlightOperationsSettingsPage() {
           background: #fff;
           color: #1b2938;
           font: inherit;
+        }
+        .ops-form-grid input[readonly] {
+          background: #f1f4f6;
+          color: #526579;
+          cursor: not-allowed;
         }
         .ops-form-grid input:focus,
         .ops-form-grid textarea:focus,
