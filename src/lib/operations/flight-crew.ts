@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, countDistinct, desc, eq, inArray, like, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, countDistinct, desc, eq, inArray, like, or, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { db } from "@/lib/db";
 import {
@@ -13,6 +13,9 @@ import {
   qualificationTypes,
   flightCrew,
   flightCrewAuditEvents,
+  flightCrewComplementDefaults,
+  flightCrewRequirements,
+  flightOperationsSettings,
   flights,
   users,
 } from "@/lib/db/schema";
@@ -113,6 +116,101 @@ export const flightCrewRepository = {
       total,
     };
   },
+
+  complementSummary(flightId: string) {
+    const defaults = db
+      .select({
+        designationId: flightCrewComplementDefaults.designationId,
+        designationName: crewDesignations.name,
+        requiredCount: flightCrewComplementDefaults.requiredCount,
+      })
+      .from(flightCrewComplementDefaults)
+      .innerJoin(
+        crewDesignations,
+        eq(flightCrewComplementDefaults.designationId, crewDesignations.id),
+      )
+      .all();
+
+    const overrides = db
+      .select({
+        designationId: flightCrewRequirements.designationId,
+        designationName: crewDesignations.name,
+        requiredCount: flightCrewRequirements.requiredCount,
+      })
+      .from(flightCrewRequirements)
+      .innerJoin(
+        crewDesignations,
+        eq(flightCrewRequirements.designationId, crewDesignations.id),
+      )
+      .where(eq(flightCrewRequirements.flightId, flightId))
+      .all();
+
+    const assigned = db
+      .select({
+        designationId: flightCrew.designationId,
+        assignedCount: count(),
+      })
+      .from(flightCrew)
+      .where(eq(flightCrew.flightId, flightId))
+      .groupBy(flightCrew.designationId)
+      .all();
+
+    const effective = new Map(
+      defaults.map((item) => [
+        item.designationId,
+        {
+          designationId: item.designationId,
+          designationName: item.designationName,
+          requiredCount: item.requiredCount,
+        },
+      ]),
+    );
+    for (const item of overrides) {
+      effective.set(item.designationId, {
+        designationId: item.designationId,
+        designationName: item.designationName,
+        requiredCount: item.requiredCount,
+      });
+    }
+
+    const assignedByDesignation = new Map(
+      assigned.map((item) => [item.designationId, item.assignedCount]),
+    );
+    for (const item of assigned) {
+      if (!effective.has(item.designationId)) {
+        const designation = db
+          .select({ name: crewDesignations.name })
+          .from(crewDesignations)
+          .where(eq(crewDesignations.id, item.designationId))
+          .get();
+        effective.set(item.designationId, {
+          designationId: item.designationId,
+          designationName: designation?.name ?? "Unknown designation",
+          requiredCount: 0,
+        });
+      }
+    }
+
+    const rows = Array.from(effective.values())
+      .map((item) => {
+        const assignedCount = assignedByDesignation.get(item.designationId) ?? 0;
+        return {
+          ...item,
+          assignedCount,
+          shortage: Math.max(0, item.requiredCount - assignedCount),
+          surplus: Math.max(0, assignedCount - item.requiredCount),
+          isComplete: assignedCount >= item.requiredCount,
+        };
+      })
+      .sort((a, b) => a.designationName.localeCompare(b.designationName));
+
+    return {
+      configured: defaults.length > 0 || overrides.length > 0,
+      complete: rows.every((row) => row.isComplete),
+      rows,
+    };
+  },
+
 
   manifest(flightId: string) {
     return db
@@ -300,6 +398,8 @@ export const flightCrewRepository = {
           id: flights.id,
           flightNumber: flights.flightNumber,
           scheduledDeparture: flights.scheduledDeparture,
+          scheduledArrival: flights.scheduledArrival,
+          actualArrival: flights.actualArrival,
         })
         .from(flights)
         .where(and(eq(flights.id, input.flightId), eq(flights.isActive, true)))
@@ -322,6 +422,78 @@ export const flightCrewRepository = {
         )
         .get();
       if (!crew) throw new Error("CREW_NOT_AVAILABLE");
+
+      // Enforce the configured rest/turnaround interval against the crew member's
+      // immediately adjacent assigned flights. Actual arrival is preferred; when
+      // it is not available, scheduled arrival is used as the fallback.
+      const settingRows = tx
+        .select({ key: flightOperationsSettings.settingKey, value: flightOperationsSettings.valueJson })
+        .from(flightOperationsSettings)
+        .where(inArray(flightOperationsSettings.settingKey, [
+          "minimum_rest_minutes",
+          "minimum_turnaround_minutes",
+        ]))
+        .all();
+      const settings = new Map(settingRows.map((row) => [row.key, row.value]));
+      const readMinutes = (key: string) => {
+        const raw = settings.get(key);
+        if (raw === undefined) return 0;
+        try {
+          const value: unknown = JSON.parse(raw);
+          const minutes = typeof value === "number" ? value : Number(value);
+          return Number.isFinite(minutes) && minutes >= 0 ? minutes : 0;
+        } catch {
+          return 0;
+        }
+      };
+      const requiredGapMinutes = Math.max(
+        readMinutes("minimum_rest_minutes"),
+        readMinutes("minimum_turnaround_minutes"),
+      );
+      if (requiredGapMinutes > 0) {
+        const candidateDeparture = Date.parse(flight.scheduledDeparture);
+        const candidateArrival = Date.parse(flight.actualArrival ?? flight.scheduledArrival);
+        const otherAssignments = tx
+          .select({
+            flightId: flights.id,
+            flightNumber: flights.flightNumber,
+            scheduledDeparture: flights.scheduledDeparture,
+            scheduledArrival: flights.scheduledArrival,
+            actualArrival: flights.actualArrival,
+            status: flights.status,
+          })
+          .from(flightCrew)
+          .innerJoin(flights, eq(flightCrew.flightId, flights.id))
+          .where(eq(flightCrew.crewMemberId, input.crewMemberId))
+          .all()
+          .filter((item) => item.flightId !== input.flightId && item.status !== "CANCELLED")
+          .map((item) => ({
+            ...item,
+            departureMs: Date.parse(item.scheduledDeparture),
+            arrivalMs: Date.parse(item.actualArrival ?? item.scheduledArrival),
+          }))
+          .filter((item) => Number.isFinite(item.departureMs) && Number.isFinite(item.arrivalMs));
+
+        if (!Number.isFinite(candidateDeparture) || !Number.isFinite(candidateArrival)) {
+          throw new Error("FLIGHT_TIMES_INVALID");
+        }
+        const previous = otherAssignments
+          .filter((item) => item.departureMs < candidateDeparture)
+          .sort((a, b) => b.departureMs - a.departureMs)[0];
+        const next = otherAssignments
+          .filter((item) => item.departureMs > candidateDeparture)
+          .sort((a, b) => a.departureMs - b.departureMs)[0];
+        const requiredGapMs = requiredGapMinutes * 60_000;
+        if (previous && candidateDeparture - previous.arrivalMs < requiredGapMs) {
+          const availableMinutes = Math.floor((candidateDeparture - previous.arrivalMs) / 60_000);
+          throw new Error(`CREW_REST_REQUIREMENT_NOT_MET:${previous.flightNumber}:${requiredGapMinutes}:${availableMinutes}`);
+        }
+        if (next && next.departureMs - candidateArrival < requiredGapMs) {
+          const availableMinutes = Math.floor((next.departureMs - candidateArrival) / 60_000);
+          throw new Error(`CREW_REST_REQUIREMENT_NOT_MET:${next.flightNumber}:${requiredGapMinutes}:${availableMinutes}`);
+        }
+      }
+
       const designation = tx
         .select({ id: crewDesignations.id, name: crewDesignations.name })
         .from(crewDesignations)

@@ -57,6 +57,20 @@ export const POST = withRouteGuard(
         return NextResponse.json({ error: "Select an active crew member." }, { status: 400 });
       if (error instanceof Error && error.message === "DESIGNATION_NOT_AVAILABLE")
         return NextResponse.json({ error: "Select an active crew designation." }, { status: 400 });
+      if (error instanceof Error && error.message.startsWith("CREW_REST_REQUIREMENT_NOT_MET:")) {
+        const [, conflictingFlight, requiredMinutes, availableMinutes] = error.message.split(":");
+        return NextResponse.json(
+          {
+            error: `Assignment blocked: the crew member needs at least ${requiredMinutes} minutes between flights. Only ${availableMinutes} minutes are available around flight ${conflictingFlight}.`,
+          },
+          { status: 422 },
+        );
+      }
+      if (error instanceof Error && error.message === "FLIGHT_TIMES_INVALID")
+        return NextResponse.json(
+          { error: "Flight departure or arrival time is invalid; crew rest could not be validated." },
+          { status: 422 },
+        );
       if (error instanceof Error && error.message === "CREW_NOT_QUALIFIED_FOR_DESIGNATION")
         return NextResponse.json(
           {

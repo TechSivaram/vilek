@@ -62,7 +62,24 @@ const listResponseSchema = z.object({
     totalPages: z.number(),
   }),
 });
-const manifestResponseSchema = z.object({ rows: z.array(rowSchema) });
+const complementRowSchema = z.object({
+  designationId: z.number(),
+  designationName: z.string(),
+  requiredCount: z.number(),
+  assignedCount: z.number(),
+  shortage: z.number(),
+  surplus: z.number(),
+  isComplete: z.boolean(),
+});
+const complementSchema = z.object({
+  configured: z.boolean(),
+  complete: z.boolean(),
+  rows: z.array(complementRowSchema),
+});
+const manifestResponseSchema = z.object({
+  rows: z.array(rowSchema),
+  complement: complementSchema,
+});
 const mutationResponseSchema = z.object({ ok: z.boolean() });
 type AssignmentRow = z.infer<typeof rowSchema>;
 type FlightSummary = z.infer<typeof flightSchema>;
@@ -128,6 +145,9 @@ export function OperationsFlightCrewPage() {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => new Set());
   const [expandedFlights, setExpandedFlights] = useState<Set<string>>(() => new Set());
   const [manifests, setManifests] = useState<Record<string, AssignmentRow[]>>({});
+  const [complementSummaries, setComplementSummaries] = useState<
+    Record<string, z.infer<typeof complementSchema>>
+  >({});
   const [manifestErrors, setManifestErrors] = useState<Record<string, string>>({});
   const [loadingManifests, setLoadingManifests] = useState<Set<string>>(() => new Set());
   const toggleGroup = (key: string) =>
@@ -180,6 +200,10 @@ export function OperationsFlightCrewPage() {
       setFlightId("");
       setCrewMemberId("");
       setDesignationId("");
+      setManifests({});
+      setComplementSummaries({});
+      setManifestErrors({});
+      setExpandedFlights(new Set());
       await queryClient.invalidateQueries({
         queryKey: ["operations-flight-crew"],
       });
@@ -199,6 +223,10 @@ export function OperationsFlightCrewPage() {
     onSuccess: async () => {
       setNotice("Crew assignment removed and recorded in audit history.");
       setError("");
+      setManifests({});
+      setComplementSummaries({});
+      setManifestErrors({});
+      setExpandedFlights(new Set());
       await queryClient.invalidateQueries({
         queryKey: ["operations-flight-crew"],
       });
@@ -287,6 +315,10 @@ export function OperationsFlightCrewPage() {
         manifestResponseSchema,
       );
       setManifests((current) => ({ ...current, [flightId]: result.rows }));
+      setComplementSummaries((current) => ({
+        ...current,
+        [flightId]: result.complement,
+      }));
     } catch (e) {
       setManifestErrors((current) => ({
         ...current,
@@ -593,6 +625,67 @@ export function OperationsFlightCrewPage() {
                               </td>
                             </tr>
                             {expandedFlights.has(flight.id) &&
+                              complementSummaries[flight.id] && (
+                                <tr>
+                                  <td
+                                    colSpan={3}
+                                    style={{
+                                      padding: "12px 48px",
+                                      background: "#fbfcfe",
+                                      borderTop: "1px solid #e7edf2",
+                                    }}
+                                  >
+                                    <div style={{ fontWeight: 600, marginBottom: 8 }}>
+                                      Crew complement
+                                      <span
+                                        style={{
+                                          marginLeft: 8,
+                                          fontWeight: 500,
+                                          color: complementSummaries[flight.id].configured
+                                            ? complementSummaries[flight.id].complete
+                                              ? "#067647"
+                                              : "#b54708"
+                                            : "#607487",
+                                        }}
+                                      >
+                                        {!complementSummaries[flight.id].configured
+                                          ? "Not configured"
+                                          : complementSummaries[flight.id].complete
+                                            ? "Complete"
+                                            : "Incomplete — warning"}
+                                      </span>
+                                    </div>
+                                    {!complementSummaries[flight.id].configured ? (
+                                      <div style={{ color: "#607487" }}>
+                                        No default or flight-specific crew requirements are configured.
+                                      </div>
+                                    ) : (
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          flexWrap: "wrap",
+                                          gap: "8px 18px",
+                                        }}
+                                      >
+                                        {complementSummaries[flight.id].rows.map((item) => (
+                                          <div key={item.designationId} style={{ minWidth: 150 }}>
+                                            <strong>{item.designationName}</strong>
+                                            <div style={{ color: "#607487", fontSize: 13 }}>
+                                              {item.assignedCount} assigned / {item.requiredCount} required
+                                              {item.shortage > 0
+                                                ? ` · ${item.shortage} still needed`
+                                                : item.surplus > 0
+                                                  ? ` · ${item.surplus} above requirement`
+                                                  : " · satisfied"}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              )}
+                            {expandedFlights.has(flight.id) &&
                               (loadingManifests.has(flight.id) ? (
                                 <tr>
                                   <td
@@ -620,6 +713,11 @@ export function OperationsFlightCrewPage() {
                                       className="admin-secondary-button"
                                       onClick={() => {
                                         setManifests((current) => {
+                                          const next = { ...current };
+                                          delete next[flight.id];
+                                          return next;
+                                        });
+                                        setComplementSummaries((current) => {
                                           const next = { ...current };
                                           delete next[flight.id];
                                           return next;
