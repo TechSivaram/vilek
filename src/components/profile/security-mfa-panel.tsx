@@ -123,31 +123,52 @@ export function SecurityMfaPanel() {
         throw new Error(errorMessage(body, "The authenticator code could not be verified."));
       setEnrollment(null);
       setCode("");
-      let newCodes = Array.isArray(body.recoveryCodes)
-        ? body.recoveryCodes.filter((item): item is string => typeof item === "string")
-        : [];
-      // Some identity providers return recovery codes from the enrollment verification
-      // response; others return them from the immediate post-enrollment status response.
-      if (newCodes.length === 0) {
-        const statusResponse = await fetch("/api/profile/mfa/status", {
-          cache: "no-store",
+
+      // TSCloak does not expose recovery codes from /status. Generate them
+      // immediately after enrollment verification, using the same TOTP code.
+      let recoveryCodeError = "";
+      try {
+        const recoveryResponse = await fetch("/api/profile/mfa/recovery-codes/regenerate", {
+          method: "POST",
           credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ code }),
         });
-        if (statusResponse.ok) {
-          const statusBody = (await statusResponse.json()) as MfaStatus & { recoveryCodes?: string[] };
-          if (Array.isArray(statusBody.recoveryCodes)) {
-            newCodes = statusBody.recoveryCodes.filter((item): item is string => typeof item === "string");
-          }
-          setStatus(statusBody);
+        const recoveryBody = (await recoveryResponse.json()) as {
+          error?: string;
+          message?: string;
+          recoveryCodes?: string[];
+        };
+
+        if (!recoveryResponse.ok) {
+          throw new Error(errorMessage(recoveryBody, "Unable to generate recovery codes."));
         }
+
+        const newCodes = Array.isArray(recoveryBody.recoveryCodes)
+          ? recoveryBody.recoveryCodes.filter((item): item is string => typeof item === "string")
+          : [];
+
+        if (newCodes.length === 0) {
+          throw new Error("The identity provider did not return recovery codes.");
+        }
+
+        setRecoveryCodes(newCodes);
+        setCodesSaved(false);
+      } catch (cause) {
+        recoveryCodeError =
+          cause instanceof Error ? cause.message : "Unable to generate recovery codes.";
+        setRecoveryCodes([]);
       }
-      setRecoveryCodes(newCodes);
-      setCodesSaved(false);
-      setNotice(body.message || "Multi-factor authentication has been enabled successfully.");
-      if (newCodes.length === 0) {
-        setError("MFA is enabled, but the identity provider did not return recovery codes. Check its MFA enrollment response configuration.");
-      }
+
+      // Refresh the enabled state independently. A recovery-code failure must
+      // not make a successfully enabled MFA enrollment look unsuccessful.
       await loadStatus();
+      setNotice(body.message || "Multi-factor authentication has been enabled successfully.");
+      if (recoveryCodeError) {
+        setError(
+          `MFA is enabled, but recovery codes could not be generated: ${recoveryCodeError} You can try regenerating them below.`,
+        );
+      }
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "The authenticator code could not be verified.",
@@ -160,8 +181,8 @@ export function SecurityMfaPanel() {
   async function regenerateRecoveryCodes(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const normalizedCode = regenerateCode.trim();
-    if (!/^\d{6}$/.test(normalizedCode)) {
-      setError("Enter the current six-digit code from your authenticator app.");
+    if (!/^(?:\d{6}|[A-Za-z0-9-]{8,128})$/.test(normalizedCode)) {
+      setError("Enter a valid six-digit authenticator code or recovery code.");
       return;
     }
     setRegenerating(true);
@@ -174,19 +195,28 @@ export function SecurityMfaPanel() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ code: normalizedCode }),
       });
-      const body = (await response.json()) as { error?: string; message?: string; recoveryCodes?: string[] };
+      const body = (await response.json()) as {
+        error?: string;
+        message?: string;
+        recoveryCodes?: string[];
+      };
       if (!response.ok) throw new Error(errorMessage(body, "Unable to regenerate recovery codes."));
       const newCodes = Array.isArray(body.recoveryCodes)
         ? body.recoveryCodes.filter((item): item is string => typeof item === "string")
         : [];
       if (newCodes.length === 0) {
-        throw new Error("The identity provider did not return recovery codes. No codes are displayed.");
+        throw new Error(
+          "The identity provider did not return recovery codes. No codes are displayed.",
+        );
       }
       setRecoveryCodes(newCodes);
       setCodesSaved(false);
       setRegenerateCode("");
       setShowRegenerateForm(false);
-      setNotice(body.message || "Recovery codes regenerated. Your previous recovery codes are no longer valid.");
+      setNotice(
+        body.message ||
+          "Recovery codes regenerated. Your previous recovery codes are no longer valid.",
+      );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Unable to regenerate recovery codes.");
     } finally {
@@ -204,7 +234,12 @@ export function SecurityMfaPanel() {
   }
 
   function downloadRecoveryCodes() {
-    const blob = new Blob([`ViLek MFA recovery codes\nEach code can be used once. Keep these codes private.\n\n${recoveryCodes.join("\n")}\n`], { type: "text/plain;charset=utf-8" });
+    const blob = new Blob(
+      [
+        `ViLek MFA recovery codes\nEach code can be used once. Keep these codes private.\n\n${recoveryCodes.join("\n")}\n`,
+      ],
+      { type: "text/plain;charset=utf-8" },
+    );
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -218,8 +253,8 @@ export function SecurityMfaPanel() {
   async function disableMfa(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const normalizedCode = disableCode.trim();
-    if (!/^\d{6}$/.test(normalizedCode)) {
-      setError("Enter the current six-digit code from your authenticator app.");
+    if (!/^(?:\d{6}|[A-Za-z0-9-]{8,128})$/.test(normalizedCode)) {
+      setError("Enter a valid six-digit authenticator code or recovery code.");
       setNotice("");
       return;
     }
@@ -299,28 +334,84 @@ export function SecurityMfaPanel() {
                 <>
                   <button
                     type="button"
-                    onClick={() => { setShowRegenerateForm(true); setRegenerateCode(""); setError(""); setNotice(""); }}
+                    onClick={() => {
+                      setShowRegenerateForm(true);
+                      setRegenerateCode("");
+                      setError("");
+                      setNotice("");
+                    }}
                     disabled={loading || disabling || starting || verifying || regenerating}
                     className="inline-flex items-center justify-center rounded-lg border border-[#e7d3a9] bg-white px-5 py-3 text-sm font-bold text-[#8c5a13] transition hover:bg-[#fffaf0] disabled:cursor-not-allowed disabled:opacity-60"
-                  >Regenerate recovery codes</button>
+                  >
+                    Regenerate recovery codes
+                  </button>
                   <button
                     type="button"
-                    onClick={() => { setShowDisableForm(true); setDisableCode(""); setError(""); setNotice(""); }}
+                    onClick={() => {
+                      setShowDisableForm(true);
+                      setDisableCode("");
+                      setError("");
+                      setNotice("");
+                    }}
                     disabled={loading || disabling || starting || verifying || regenerating}
                     className="inline-flex items-center justify-center rounded-lg border border-[#e7b8b4] bg-white px-5 py-3 text-sm font-bold text-[#a42e25] transition hover:bg-[#fff4f2] disabled:cursor-not-allowed disabled:opacity-60"
-                  >Disable MFA</button>
+                  >
+                    Disable MFA
+                  </button>
                 </>
               )}
               {showRegenerateForm && (
-                <form onSubmit={regenerateRecoveryCodes} className="w-full rounded-lg border border-[#ead8b4] bg-[#fffdf7] p-4">
+                <form
+                  onSubmit={regenerateRecoveryCodes}
+                  className="w-full rounded-lg border border-[#ead8b4] bg-[#fffdf7] p-4"
+                >
                   <h3 className="text-sm font-bold text-[#20384b]">Regenerate recovery codes</h3>
-                  <p className="mt-1 text-sm leading-5 text-[#5d7181]">Enter your current six-digit authenticator code. Regenerating codes invalidates all existing recovery codes.</p>
+                  <p className="mt-1 text-sm leading-5 text-[#5d7181]">
+                    Enter your current six-digit authenticator code. Regenerating codes invalidates
+                    all existing recovery codes.
+                  </p>
                   <div className="mt-3 flex flex-wrap items-end gap-3">
-                    <div><label htmlFor="mfa-regenerate-code" className="mb-2 block text-sm font-semibold text-[#425a68]">Authenticator code</label>
-                      <input id="mfa-regenerate-code" autoComplete="one-time-code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={regenerateCode} onChange={(event) => setRegenerateCode(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="123456" required className="w-56 rounded-lg border border-[#e3d6ba] bg-white px-4 py-3 text-center font-mono tracking-[0.25em] text-[#20384b] outline-none focus:border-[#b98225]" />
+                    <div>
+                      <label
+                        htmlFor="mfa-regenerate-code"
+                        className="mb-2 block text-sm font-semibold text-[#425a68]"
+                      >
+                        Authenticator code
+                      </label>
+                      <input
+                        id="mfa-regenerate-code"
+                        autoComplete="one-time-code"
+                        inputMode="numeric"
+                        pattern="[0-9]{6}"
+                        maxLength={6}
+                        value={regenerateCode}
+                        onChange={(event) =>
+                          setRegenerateCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+                        }
+                        placeholder="123456"
+                        required
+                        className="w-56 rounded-lg border border-[#e3d6ba] bg-white px-4 py-3 text-center font-mono tracking-[0.25em] text-[#20384b] outline-none focus:border-[#b98225]"
+                      />
                     </div>
-                    <button type="submit" disabled={regenerating || regenerateCode.length !== 6} className="rounded-lg bg-[#087f80] px-5 py-3 text-sm font-bold text-white disabled:opacity-60">{regenerating ? "Regenerating…" : "Confirm regeneration"}</button>
-                    <button type="button" onClick={() => { setShowRegenerateForm(false); setRegenerateCode(""); setError(""); }} disabled={regenerating} className="rounded-lg border border-[#d5e2df] px-4 py-3 text-sm font-semibold text-[#526976]">Cancel</button>
+                    <button
+                      type="submit"
+                      disabled={regenerating || regenerateCode.length !== 6}
+                      className="rounded-lg bg-[#087f80] px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                    >
+                      {regenerating ? "Regenerating…" : "Confirm regeneration"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowRegenerateForm(false);
+                        setRegenerateCode("");
+                        setError("");
+                      }}
+                      disabled={regenerating}
+                      className="rounded-lg border border-[#d5e2df] px-4 py-3 text-sm font-semibold text-[#526976]"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </form>
               )}
@@ -331,8 +422,8 @@ export function SecurityMfaPanel() {
                 >
                   <h3 className="text-sm font-bold text-[#20384b]">Confirm disabling MFA</h3>
                   <p className="mt-1 text-sm leading-5 text-[#5d7181]">
-                    Enter the current six-digit code from your authenticator app to disable
-                    multi-factor authentication.
+                    Enter a six-digit authenticator code or one unused recovery code to disable
+                    multi-factor authentication. A recovery code can only be used once.
                   </p>
                   <div className="mt-3 flex flex-wrap items-end gap-3">
                     <div>
@@ -340,26 +431,27 @@ export function SecurityMfaPanel() {
                         htmlFor="mfa-disable-code"
                         className="mb-2 block text-sm font-semibold text-[#425a68]"
                       >
-                        Authenticator code
+                        Authenticator or recovery code
                       </label>
                       <input
                         id="mfa-disable-code"
                         autoComplete="one-time-code"
-                        inputMode="numeric"
-                        pattern="[0-9]{6}"
-                        maxLength={6}
+                        autoCapitalize="characters"
+                        maxLength={128}
                         value={disableCode}
                         onChange={(event) =>
-                          setDisableCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+                          setDisableCode(event.target.value.replace(/\s/g, "").slice(0, 128))
                         }
-                        placeholder="123456"
+                        placeholder="Authenticator or recovery code"
                         required
                         className="w-56 rounded-lg border border-[#e3c7c4] bg-white px-4 py-3 text-center font-mono tracking-[0.25em] text-[#20384b] outline-none focus:border-[#c15b51] focus:ring-2 focus:ring-[#c15b51]/15"
                       />
                     </div>
                     <button
                       type="submit"
-                      disabled={disabling || disableCode.length !== 6}
+                      disabled={
+                        disabling || !/^(?:\d{6}|[A-Za-z0-9-]{8,128})$/.test(disableCode.trim())
+                      }
                       className="rounded-lg bg-[#b9382d] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#982c24] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {disabling ? "Disabling MFA…" : "Confirm & disable"}
@@ -381,7 +473,8 @@ export function SecurityMfaPanel() {
               ) : null}
               {!showDisableForm && !showRegenerateForm && (
                 <p className="w-full mt-2 text-xs leading-5 text-[#7a8d94]">
-                  Disabling MFA removes the second-factor requirement from your identity provider account.
+                  Disabling MFA removes the second-factor requirement from your identity provider
+                  account.
                 </p>
               )}
             </div>
@@ -524,17 +617,55 @@ export function SecurityMfaPanel() {
       )}
 
       {recoveryCodes.length > 0 && !codesSaved && (
-        <section className="rounded-xl border border-[#e7d3a9] bg-[#fffdf7] p-5 sm:p-6" aria-labelledby="recovery-codes-heading">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8c5a13]">Save these now</p>
-          <h2 id="recovery-codes-heading" className="mt-2 text-lg font-bold text-[#20384b]">Your MFA recovery codes</h2>
-          <p className="mt-2 text-sm leading-6 text-[#5d7181]">Each code can be used only once to access your account if you cannot use your authenticator. These codes are shown only in this session; store them securely.</p>
+        <section
+          className="rounded-xl border border-[#e7d3a9] bg-[#fffdf7] p-5 sm:p-6"
+          aria-labelledby="recovery-codes-heading"
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8c5a13]">
+            Save these now
+          </p>
+          <h2 id="recovery-codes-heading" className="mt-2 text-lg font-bold text-[#20384b]">
+            Your MFA recovery codes
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[#5d7181]">
+            Each code can be used only once to access your account if you cannot use your
+            authenticator. These codes are shown only in this session; store them securely.
+          </p>
           <div className="mt-4 grid grid-cols-1 gap-2 rounded-lg border border-[#eadfca] bg-white p-4 sm:grid-cols-2">
-            {recoveryCodes.map((recoveryCode, index) => <code key={`${index}-${recoveryCode}`} className="rounded bg-[#f8f7f2] px-3 py-2 font-mono text-sm text-[#20384b]">{recoveryCode}</code>)}
+            {recoveryCodes.map((recoveryCode, index) => (
+              <code
+                key={`${index}-${recoveryCode}`}
+                className="rounded bg-[#f8f7f2] px-3 py-2 font-mono text-sm text-[#20384b]"
+              >
+                {recoveryCode}
+              </code>
+            ))}
           </div>
           <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" onClick={() => void copyRecoveryCodes()} className="rounded-lg border border-[#d5e2df] bg-white px-4 py-3 text-sm font-semibold text-[#087f80]">Copy codes</button>
-            <button type="button" onClick={downloadRecoveryCodes} className="rounded-lg border border-[#d5e2df] bg-white px-4 py-3 text-sm font-semibold text-[#087f80]">Download codes</button>
-            <button type="button" onClick={() => { setRecoveryCodes([]); setCodesSaved(true); }} className="rounded-lg bg-[#087f80] px-4 py-3 text-sm font-bold text-white">I have saved my codes</button>
+            <button
+              type="button"
+              onClick={() => void copyRecoveryCodes()}
+              className="rounded-lg border border-[#d5e2df] bg-white px-4 py-3 text-sm font-semibold text-[#087f80]"
+            >
+              Copy codes
+            </button>
+            <button
+              type="button"
+              onClick={downloadRecoveryCodes}
+              className="rounded-lg border border-[#d5e2df] bg-white px-4 py-3 text-sm font-semibold text-[#087f80]"
+            >
+              Download codes
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setRecoveryCodes([]);
+                setCodesSaved(true);
+              }}
+              className="rounded-lg bg-[#087f80] px-4 py-3 text-sm font-bold text-white"
+            >
+              I have saved my codes
+            </button>
           </div>
         </section>
       )}
