@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { unlink } from "node:fs/promises";
+import path from "node:path";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import { crewExpensesService } from "@/lib/crew/expenses/service";
 
@@ -49,6 +51,27 @@ export const DELETE = withRouteGuard<Context>(
   async (_request, context, auth) => {
     const { expenseId } = await context.params;
     try {
+      const documents = crewExpensesService.getExpenseDocuments(auth.user.id, expenseId);
+      const root = path.resolve(
+        process.env.VILEK_DOCUMENT_STORAGE_PATH ||
+          path.join(process.cwd(), "data", "expense-documents"),
+      );
+      // Remove files before deleting the expense/metadata. ENOENT is safe to ignore,
+      // making a partially completed cleanup safely retryable.
+      for (const document of documents) {
+        if (path.basename(document.storageKey) !== document.storageKey)
+          throw new Error("INVALID_DOCUMENT_STORAGE_KEY");
+        try {
+          await unlink(path.join(root, document.storageKey));
+        } catch (fileError) {
+          if ((fileError as NodeJS.ErrnoException).code !== "ENOENT") {
+            return NextResponse.json(
+              { error: "An expense receipt could not be removed. Please retry." },
+              { status: 500 },
+            );
+          }
+        }
+      }
       crewExpensesService.delete(auth.user.id, expenseId);
       return NextResponse.json({ success: true });
     } catch (error) {

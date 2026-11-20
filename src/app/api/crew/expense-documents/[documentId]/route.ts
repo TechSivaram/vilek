@@ -51,8 +51,27 @@ export const DELETE = withRouteGuard<Context>(
     );
     if (path.basename(document.storageKey) !== document.storageKey)
       return NextResponse.json({ error: "Receipt not found." }, { status: 404 });
-    crewExpensesService.deleteDocument(documentId);
-    await unlink(path.join(root, document.storageKey)).catch(() => undefined);
+    // Delete the physical file first. If storage is temporarily unavailable, retain
+    // the DB row so the user can retry. A missing file is already effectively deleted.
+    try {
+      await unlink(path.join(root, document.storageKey));
+    } catch (fileError) {
+      if ((fileError as NodeJS.ErrnoException).code !== "ENOENT") {
+        return NextResponse.json(
+          { error: "The receipt file could not be removed. Please retry." },
+          { status: 500 },
+        );
+      }
+    }
+    try {
+      crewExpensesService.deleteDocument(documentId);
+    } catch {
+      // The next retry treats the now-missing file as success and removes its metadata.
+      return NextResponse.json(
+        { error: "The receipt metadata could not be removed. Please retry." },
+        { status: 500 },
+      );
+    }
     return NextResponse.json({ success: true });
   },
 );

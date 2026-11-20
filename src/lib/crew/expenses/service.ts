@@ -323,11 +323,23 @@ export const crewExpensesService = {
       .where(eq(expenses.id, expenseId))
       .run();
   },
+  getExpenseDocuments(userId: string, expenseId: string) {
+    const owned = expenseOwner(expenseId, userId);
+    if (!owned) throw new Error("EXPENSE_NOT_FOUND");
+    if (owned.claimId && owned.claimStatus !== "REVISION_REQUIRED")
+      throw new Error("EXPENSE_CLAIMED");
+    return db
+      .select({ id: expenseDocuments.id, storageKey: expenseDocuments.storageKey })
+      .from(expenseDocuments)
+      .where(eq(expenseDocuments.expenseId, expenseId))
+      .all();
+  },
   delete(userId: string, expenseId: string) {
     const owned = expenseOwner(expenseId, userId);
     if (!owned) throw new Error("EXPENSE_NOT_FOUND");
     if (owned.claimId && owned.claimStatus !== "REVISION_REQUIRED")
       throw new Error("EXPENSE_CLAIMED");
+    // The API removes receipt files first. This DB delete then cascades their metadata.
     db.delete(expenses).where(eq(expenses.id, expenseId)).run();
   },
   getOwnedExpense(userId: string, expenseId: string) {
