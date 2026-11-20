@@ -308,7 +308,7 @@ export const crewExpensesService = {
   ) {
     const owned = expenseOwner(expenseId, userId);
     if (!owned) throw new Error("EXPENSE_NOT_FOUND");
-    if (owned.claimId && owned.claimStatus !== "REVISION_REQUIRED")
+    if (owned.claimId && !["DRAFT", "REVISION_REQUIRED"].includes(owned.claimStatus ?? ""))
       throw new Error("EXPENSE_CLAIMED");
     db.update(expenses)
       .set({

@@ -121,6 +121,7 @@ export const crewClaimsService = {
               .select({
                 id: claimComments.id,
                 comment: claimComments.comment,
+                parentCommentId: claimComments.parentCommentId,
                 createdAt: claimComments.createdAt,
                 authorFirstName: users.firstName,
                 authorLastName: users.lastName,
@@ -223,6 +224,56 @@ export const crewClaimsService = {
       return;
     }
     throw new Error("INVALID_ACTION");
+  },
+
+  postComment(userId: string, claimId: string, comment: string, parentCommentId?: string) {
+    const claim = ownedClaim(claimId, userId);
+    if (!claim) throw new Error("CLAIM_NOT_FOUND");
+    if (!comment.trim()) throw new Error("COMMENT_REQUIRED");
+    if (parentCommentId) {
+      const parent = db
+        .select({ id: claimComments.id })
+        .from(claimComments)
+        .where(and(eq(claimComments.id, parentCommentId), eq(claimComments.claimId, claimId)))
+        .get();
+      if (!parent) throw new Error("COMMENT_NOT_FOUND");
+    }
+    const id = crypto.randomUUID();
+    db.insert(claimComments)
+      .values({
+        id,
+        claimId,
+        userId,
+        comment: comment.trim(),
+        parentCommentId: parentCommentId ?? null,
+      })
+      .run();
+    return { id };
+  },
+
+  postReviewerComment(userId: string, claimId: string, comment: string, parentCommentId?: string) {
+    const claim = db.select({ id: claims.id }).from(claims).where(eq(claims.id, claimId)).get();
+    if (!claim) throw new Error("CLAIM_NOT_FOUND");
+    if (!comment.trim()) throw new Error("COMMENT_REQUIRED");
+    if (parentCommentId) {
+      const parent = db
+        .select({ id: claimComments.id })
+        .from(claimComments)
+        .where(and(eq(claimComments.id, parentCommentId), eq(claimComments.claimId, claimId)))
+        .get();
+      if (!parent) throw new Error("COMMENT_NOT_FOUND");
+    }
+    const id = crypto.randomUUID();
+    db.insert(claimComments)
+      .values({
+        id,
+        claimId,
+        userId,
+        comment: comment.trim(),
+        parentCommentId: parentCommentId ?? null,
+      })
+      .run();
+    return { id };
   },
 
   review(userId: string, claimId: string, action: string, comment: string) {

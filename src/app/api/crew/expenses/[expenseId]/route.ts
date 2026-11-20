@@ -34,7 +34,10 @@ export const PATCH = withRouteGuard<Context>(
         return NextResponse.json({ error: "Expense not found." }, { status: 404 });
       if (code === "EXPENSE_CLAIMED")
         return NextResponse.json(
-          { error: "This expense is linked to a claim and can no longer be edited." },
+          {
+            error:
+              "This expense can only be edited while its claim is in draft or reopened for correction.",
+          },
           { status: 409 },
         );
       return NextResponse.json({ error: "The expense could not be updated." }, { status: 500 });

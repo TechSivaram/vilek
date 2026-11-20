@@ -13,9 +13,12 @@ export const POST = withRouteGuard<Context>({ roles: ["CREW"] }, async (request,
   const { expenseId } = await context.params;
   const owned = crewExpensesService.getOwnedExpense(auth.user.id, expenseId);
   if (!owned) return NextResponse.json({ error: "Expense not found." }, { status: 404 });
-  if (owned.claimId && owned.claimStatus !== "REVISION_REQUIRED")
+  if (owned.claimId && !["DRAFT", "REVISION_REQUIRED"].includes(owned.claimStatus ?? ""))
     return NextResponse.json(
-      { error: "Receipts can only be changed while a rejected claim is reopened for correction." },
+      {
+        error:
+          "Receipts can only be uploaded while a claim is in draft or reopened for correction.",
+      },
       { status: 409 },
     );
   let form: FormData;

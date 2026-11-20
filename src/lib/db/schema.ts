@@ -599,9 +599,13 @@ export const claimComments = sqliteTable(
       .notNull()
       .references(() => users.id, { onDelete: "restrict" }),
     comment: text("comment").notNull(),
+    parentCommentId: text("parent_comment_id"),
     createdAt: createdAt(),
   },
-  (t) => [index("claim_comment_claim_idx").on(t.claimId)],
+  (t) => [
+    index("claim_comment_claim_idx").on(t.claimId),
+    index("claim_comment_parent_idx").on(t.parentCommentId),
+  ],
 );
 
 export const deploymentSetup = sqliteTable(

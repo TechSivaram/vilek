@@ -567,3 +567,226 @@
     width: 100%;
   }
 }
+
+/* Claim discussion: additive threaded comments and replies */
+.crew-claims-comment-composer {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e5ebf0;
+}
+.crew-claims-comment-composer textarea {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid #cbd8e2;
+  border-radius: 9px;
+  color: #263f53;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.crew-claims-comment-composer textarea::placeholder {
+  color: #687d8f;
+  opacity: 1;
+}
+.crew-claims-comment-composer textarea:focus {
+  outline: none;
+  border-color: #3987d5;
+  box-shadow: 0 0 0 3px rgba(39, 126, 194, 0.12);
+}
+.crew-claims-comment-composer > button {
+  justify-self: end;
+  cursor: pointer;
+}
+.crew-claims-reply-link {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  color: #1268c4;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.crew-claims-comment--reply {
+  margin: 12px 0 0 20px;
+  padding-left: 13px;
+  border-left: 3px solid #d7e6f3;
+}
+.crew-claims-replying {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #40586a;
+  font-size: 13px;
+  font-weight: 650;
+}
+.crew-claims-replying button {
+  border: 0;
+  color: #1268c4;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Refined claim discussion typography and surfaces */
+.crew-claims-comments {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #e8edf2;
+}
+
+.crew-claims-comments > h3 {
+  margin: 0 0 14px;
+  color: #29445a;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.crew-claims-comment {
+  margin-top: 10px;
+  padding: 13px 15px;
+  border: 1px solid #e7edf2;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.crew-claims-comment p {
+  margin: 0 0 9px;
+  color: #40586a;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.crew-claims-comment-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  min-height: 18px;
+}
+
+.crew-claims-comment-meta small {
+  color: #82909d;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.crew-claims-comment .crew-claims-reply-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #1268c4;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.crew-claims-comment .crew-claims-reply-link:hover {
+  color: #0b4f99;
+  text-decoration: underline;
+}
+
+.crew-claims-comment--reply {
+  margin: 11px 0 0 18px;
+  padding: 11px 13px;
+  border: 0;
+  border-left: 2px solid #dce8f2;
+  border-radius: 0 8px 8px 0;
+  background: #f8fafc;
+}
+
+.crew-claims-comment--reply p {
+  font-size: 12.5px;
+}
+
+.crew-claims-comment-composer {
+  gap: 11px;
+  margin-top: 16px;
+  padding-top: 15px;
+  border-top: 1px solid #e8edf2;
+}
+
+.crew-claims-comment-composer textarea {
+  min-height: 82px;
+  padding: 11px 13px;
+  border: 1px solid #d8e1e9;
+  border-radius: 9px;
+  color: #344e63;
+  background: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.55;
+  box-shadow: none;
+}
+
+.crew-claims-comment-composer textarea::placeholder {
+  color: #8493a1;
+  opacity: 1;
+}
+
+.crew-claims-comment-composer textarea:focus {
+  border-color: #8bb8e2;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(18, 104, 196, 0.08);
+}
+
+.crew-claims-comment-composer > .crew-claims-primary {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #176bc1;
+  border-radius: 8px;
+  background: #176bc1;
+  font-size: 12px;
+  font-weight: 650;
+  box-shadow: none;
+}
+
+.crew-claims-comment-composer > .crew-claims-primary:hover:not(:disabled) {
+  border-color: #105aa6;
+  background: #105aa6;
+}
+
+.crew-claims-replying {
+  padding: 8px 10px;
+  border: 1px solid #e4edf5;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #52697c;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.crew-claims-replying button {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+@media (max-width: 640px) {
+  .crew-claims-comment {
+    padding: 12px;
+  }
+
+  .crew-claims-comment--reply {
+    margin-left: 10px;
+  }
+
+  .crew-claims-comment-composer > .crew-claims-primary {
+    width: 100%;
+  }
+}

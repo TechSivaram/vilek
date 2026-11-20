@@ -5,8 +5,9 @@ import { crewClaimsService } from "@/lib/crew/claims/service";
 
 type Context = { params: Promise<{ claimId: string }> };
 const schema = z.object({
-  action: z.enum(["reject", "approve"]),
+  action: z.enum(["reject", "approve", "comment"]),
   comment: z.string().trim().min(1).max(2000),
+  parentCommentId: z.string().optional(),
 });
 
 export const PATCH = withRouteGuard<Context>(
@@ -26,7 +27,25 @@ export const PATCH = withRouteGuard<Context>(
         { status: 400 },
       );
     try {
-      crewClaimsService.review(auth.user.id, claimId, parsed.data.action, parsed.data.comment);
+      if (parsed.data.action === "comment") {
+        crewClaimsService.postReviewerComment(
+          auth.user.id,
+          claimId,
+          parsed.data.comment,
+          parsed.data.parentCommentId,
+        );
+      } else {
+        if (parsed.data.action === "comment") {
+          crewClaimsService.postReviewerComment(
+            auth.user.id,
+            claimId,
+            parsed.data.comment,
+            parsed.data.parentCommentId,
+          );
+        } else {
+          crewClaimsService.review(auth.user.id, claimId, parsed.data.action, parsed.data.comment);
+        }
+      }
       return NextResponse.json({ success: true });
     } catch (error) {
       const code = error instanceof Error ? error.message : "";

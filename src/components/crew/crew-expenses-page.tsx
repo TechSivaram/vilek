@@ -91,6 +91,10 @@ function flightLabel(item: { airlineIata: string; flightNumber: string }) {
     : `${item.airlineIata} ${n}`;
 }
 
+function canUploadReceipt(item: Expense) {
+  return !item.claimId || item.claimStatus === "DRAFT" || item.claimStatus === "REVISION_REQUIRED";
+}
+
 export function CrewExpensesPage({
   roleCodes,
   firstName,
@@ -527,7 +531,9 @@ export function CrewExpensesPage({
                           </td>
                           <td>
                             <div className="crew-expenses-row-actions">
-                              {(!item.claimId || item.claimStatus === "REVISION_REQUIRED") && (
+                              {(!item.claimId ||
+                                item.claimStatus === "DRAFT" ||
+                                item.claimStatus === "REVISION_REQUIRED") && (
                                 <>
                                   <button
                                     type="button"
@@ -547,22 +553,20 @@ export function CrewExpensesPage({
                                   )}
                                 </>
                               )}
-                              <label className="receipt-upload">
-                                Upload
-                                <input
-                                  type="file"
-                                  accept="application/pdf,image/jpeg,image/png"
-                                  disabled={
-                                    busy ||
-                                    (Boolean(item.claimId) &&
-                                      item.claimStatus !== "REVISION_REQUIRED")
-                                  }
-                                  onChange={(e) => {
-                                    void upload(item, e.target.files?.[0]);
-                                    e.currentTarget.value = "";
-                                  }}
-                                />
-                              </label>
+                              {canUploadReceipt(item) && (
+                                <label className="receipt-upload">
+                                  Upload
+                                  <input
+                                    type="file"
+                                    accept="application/pdf,image/jpeg,image/png"
+                                    disabled={busy}
+                                    onChange={(e) => {
+                                      void upload(item, e.target.files?.[0]);
+                                      e.currentTarget.value = "";
+                                    }}
+                                  />
+                                </label>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -600,7 +604,9 @@ export function CrewExpensesPage({
                         </a>
                       ))}
                       <div className="crew-expenses-row-actions">
-                        {(!item.claimId || item.claimStatus === "REVISION_REQUIRED") && (
+                        {(!item.claimId ||
+                          item.claimStatus === "DRAFT" ||
+                          item.claimStatus === "REVISION_REQUIRED") && (
                           <>
                             <button type="button" onClick={() => openEdit(item)} disabled={busy}>
                               Edit
@@ -616,21 +622,20 @@ export function CrewExpensesPage({
                             )}
                           </>
                         )}
-                        <label className="receipt-upload">
-                          Upload receipt
-                          <input
-                            type="file"
-                            accept="application/pdf,image/jpeg,image/png"
-                            disabled={
-                              busy ||
-                              (Boolean(item.claimId) && item.claimStatus !== "REVISION_REQUIRED")
-                            }
-                            onChange={(e) => {
-                              void upload(item, e.target.files?.[0]);
-                              e.currentTarget.value = "";
-                            }}
-                          />
-                        </label>
+                        {canUploadReceipt(item) && (
+                          <label className="receipt-upload">
+                            Upload receipt
+                            <input
+                              type="file"
+                              accept="application/pdf,image/jpeg,image/png"
+                              disabled={busy}
+                              onChange={(e) => {
+                                void upload(item, e.target.files?.[0]);
+                                e.currentTarget.value = "";
+                              }}
+                            />
+                          </label>
+                        )}
                       </div>
                     </article>
                   ))}

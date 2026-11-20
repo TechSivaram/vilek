@@ -6,9 +6,18 @@ import { crewClaimsService } from "@/lib/crew/claims/service";
 
 type Context = { params: Promise<{ claimId: string }> };
 const schema = z.object({
-  action: z.enum(["submit", "reopen", "add-expense", "remove-expense", "reject", "approve"]),
+  action: z.enum([
+    "submit",
+    "reopen",
+    "add-expense",
+    "remove-expense",
+    "reject",
+    "approve",
+    "comment",
+  ]),
   expenseId: z.string().optional(),
   comment: z.string().trim().max(2000).optional(),
+  parentCommentId: z.string().optional(),
 });
 
 export const PATCH = withRouteGuard<Context>({}, async (request, context, auth) => {
@@ -23,7 +32,16 @@ export const PATCH = withRouteGuard<Context>({}, async (request, context, auth) 
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid claim action." }, { status: 400 });
   try {
-    if (["reject", "approve"].includes(parsed.data.action)) {
+    if (parsed.data.action === "comment") {
+      if (!hasVilekPermission(auth.roleCodes, "CLAIM_CREATE"))
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      crewClaimsService.postComment(
+        auth.user.id,
+        claimId,
+        parsed.data.comment ?? "",
+        parsed.data.parentCommentId,
+      );
+    } else if (["reject", "approve"].includes(parsed.data.action)) {
       if (!hasVilekPermission(auth.roleCodes, "CLAIM_REVIEW"))
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       crewClaimsService.review(
@@ -53,11 +71,12 @@ export const PATCH = withRouteGuard<Context>({}, async (request, context, auth) 
       EMPTY_CLAIM: "Add at least one expense before submitting the claim.",
       INVALID_STATUS: "This action is not available for the claim's current status.",
       CLAIM_LOCKED: "This claim is read-only.",
-      COMMENT_REQUIRED: "Enter a reason for this review decision.",
+      COMMENT_REQUIRED: "Enter a comment before posting.",
+      COMMENT_NOT_FOUND: "The comment you are replying to was not found.",
       INVALID_ACTION: "This claim action is not supported.",
     };
     const status =
-      code === "CLAIM_NOT_FOUND" || code === "EXPENSE_NOT_FOUND"
+      code === "CLAIM_NOT_FOUND" || code === "EXPENSE_NOT_FOUND" || code === "COMMENT_NOT_FOUND"
         ? 404
         : code === "INVALID_STATUS" ||
             code === "CLAIM_LOCKED" ||

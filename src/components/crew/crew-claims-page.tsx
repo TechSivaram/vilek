@@ -85,6 +85,8 @@ export function CrewClaimsPage({
   const [flightSearch, setFlightSearch] = useState("");
   const [claimFilter, setClaimFilter] = useState("ALL");
   const [assignmentPage, setAssignmentPage] = useState(1);
+  const [newComment, setNewComment] = useState("");
+  const [replyToCommentId, setReplyToCommentId] = useState<string | null>(null);
   const assignmentPageSize = 8;
 
   const refresh = useCallback(async (keepSelection = true) => {
@@ -540,15 +542,87 @@ export function CrewClaimsPage({
                       {selected.comments.length > 0 && (
                         <section className="crew-claims-comments" aria-label="Claim history">
                           <h3>Claim history &amp; comments</h3>
-                          {selected.comments.map((comment) => (
-                            <article key={comment.id} className="crew-claims-comment">
-                              <p>{comment.comment}</p>
-                              <small>
-                                {comment.authorFirstName} {comment.authorLastName} ·{" "}
-                                {dateLabel(comment.createdAt)}
-                              </small>
-                            </article>
-                          ))}
+                          {selected.comments.length === 0 && (
+                            <p className="crew-claims-muted">
+                              No comments yet. Start the discussion below.
+                            </p>
+                          )}
+                          {selected.comments
+                            .filter((comment) => !comment.parentCommentId)
+                            .map((comment) => (
+                              <article key={comment.id} className="crew-claims-comment">
+                                <p>{comment.comment}</p>
+                                <div className="crew-claims-comment-meta">
+                                  <small>
+                                    {comment.authorFirstName} {comment.authorLastName} ·{" "}
+                                    {dateLabel(comment.createdAt)}
+                                  </small>
+                                  <button
+                                    type="button"
+                                    className="crew-claims-reply-link"
+                                    onClick={() => setReplyToCommentId(comment.id)}
+                                  >
+                                    Reply
+                                  </button>
+                                </div>
+                                {selected.comments
+                                  .filter((reply) => reply.parentCommentId === comment.id)
+                                  .map((reply) => (
+                                    <article
+                                      key={reply.id}
+                                      className="crew-claims-comment crew-claims-comment--reply"
+                                    >
+                                      <p>{reply.comment}</p>
+                                      <div className="crew-claims-comment-meta">
+                                        <small>
+                                          {reply.authorFirstName} {reply.authorLastName} ·{" "}
+                                          {dateLabel(reply.createdAt)}
+                                        </small>
+                                      </div>
+                                    </article>
+                                  ))}
+                              </article>
+                            ))}
+                          <div className="crew-claims-comment-composer">
+                            {replyToCommentId && (
+                              <div className="crew-claims-replying">
+                                Replying to a comment
+                                <button type="button" onClick={() => setReplyToCommentId(null)}>
+                                  Cancel
+                                </button>
+                              </div>
+                            )}
+                            <textarea
+                              value={newComment}
+                              maxLength={2000}
+                              onChange={(event) => setNewComment(event.target.value)}
+                              placeholder="Write a comment…"
+                              rows={3}
+                            />
+                            <button
+                              type="button"
+                              className="crew-claims-primary"
+                              disabled={busy || !newComment.trim()}
+                              onClick={async () => {
+                                await mutate(
+                                  `/api/crew/claims/${selected.claimId}`,
+                                  "PATCH",
+                                  {
+                                    action: "comment",
+                                    comment: newComment.trim(),
+                                    ...(replyToCommentId
+                                      ? { parentCommentId: replyToCommentId }
+                                      : {}),
+                                  },
+                                  "Comment posted.",
+                                );
+                                setNewComment("");
+                                setReplyToCommentId(null);
+                              }}
+                            >
+                              Post comment
+                            </button>
+                          </div>
                         </section>
                       )}
                     </>
