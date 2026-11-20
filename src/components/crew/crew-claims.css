@@ -1,0 +1,48 @@
+/* Claims page layout */
+.crew-claims-shell { min-height: 100vh; }
+.crew-claims-content { max-width: 1550px; }
+.crew-claims-layout { display:grid; grid-template-columns:minmax(270px, .85fr) minmax(0, 1.7fr); gap:18px; align-items:start; }
+.crew-claims-panel { min-width:0; overflow:hidden; border:1px solid #e3ebef; border-radius:14px; background:#fff; box-shadow:0 5px 18px rgba(28,54,72,.035); }
+.crew-claims-panel-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:17px 19px; border-bottom:1px solid #edf1f3; }
+.crew-claims-panel-heading h2 { margin:0; color:#20384b; font-size:15px; font-weight:780; }
+.crew-claims-panel-heading p { margin:5px 0 0; color:#7b8996; font-size:12px; }
+.crew-claims-assignment-list { display:flex; flex-direction:column; }
+.crew-claims-assignment { display:flex; flex-direction:column; gap:7px; width:100%; padding:15px 18px; border:0; border-bottom:1px solid #edf1f3; background:#fff; color:#40586a; text-align:left; cursor:pointer; }
+.crew-claims-assignment:last-child { border-bottom:0; }
+.crew-claims-assignment:hover,.crew-claims-assignment.is-selected { background:#f2f7fc; }
+.crew-claims-assignment.is-selected { box-shadow:inset 3px 0 #1671d9; }
+.crew-claims-flight { color:#263f53; font-size:13px; font-weight:750; }
+.crew-claims-route { color:#52697c; font-size:12px; }
+.crew-claims-date,.crew-claims-muted { color:#82909d; font-size:11px; }
+.crew-claims-status { display:inline-flex; align-items:center; width:max-content; padding:4px 8px; border-radius:20px; color:#687887; background:#f0f3f5; font-size:10px; font-weight:750; }
+.crew-claims-status.is-submitted { color:#155ca8; background:#e9f3ff; }
+.crew-claims-status.is-draft { color:#8a5a0a; background:#fff5df; }
+.crew-claims-status.is-rejected { color:#9b2c2c; background:#fff0f0; }
+.crew-claims-detail { padding:19px; }
+.crew-claims-detail-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; margin-bottom:18px; }
+.crew-claims-detail-heading h2 { margin:0 0 6px; color:#20384b; font-size:17px; }
+.crew-claims-detail-heading p { margin:0; color:#7b8996; font-size:12px; }
+.crew-claims-expense-list { display:flex; flex-direction:column; gap:9px; margin:14px 0; }
+.crew-claims-expense { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 14px; border:1px solid #e8edf1; border-radius:10px; }
+.crew-claims-expense-heading { display:flex; flex-direction:column; gap:5px; min-width:0; }
+.crew-claims-expense-heading strong { color:#30495d; font-size:12px; }
+.crew-claims-expense-heading span { color:#82909d; font-size:11px; }
+.crew-claims-eligible { margin-top:18px; padding-top:16px; border-top:1px solid #edf1f3; }
+.crew-claims-eligible h3 { margin:0 0 10px; color:#30495d; font-size:13px; }
+.crew-claims-primary,.crew-claims-submit,.crew-claims-start { min-height:36px; padding:0 13px; border:1px solid #1268c4; border-radius:8px; color:#fff; background:#1268c4; font-size:11px; font-weight:750; cursor:pointer; }
+.crew-claims-primary:disabled,.crew-claims-submit:disabled,.crew-claims-start:disabled { opacity:.55; cursor:not-allowed; }
+.crew-claims-start { color:#1268c4; background:#fff; }
+.crew-claims-empty { padding:24px 18px; color:#82909d; text-align:center; font-size:12px; }
+.crew-claims-empty--compact { padding:13px; }
+.crew-claims-alert { margin:0 0 15px; padding:12px 14px; border-radius:9px; font-size:12px; }
+.crew-claims-alert--error { color:#9b2c2c; background:#fff0f0; border:1px solid #f4cccc; }
+.crew-claims-alert--success { color:#176b49; background:#edfaf3; border:1px solid #ccebd9; }
+.crew-claims-submitted-note { margin:13px 0; padding:12px 14px; border-radius:9px; color:#53697b; background:#f4f7fa; font-size:12px; }
+.crew-claims-comments { margin-top:24px; padding-top:18px; border-top:1px solid #e5e7eb; }
+.crew-claims-comments h3 { margin:0 0 12px; color:#30495d; font-size:13px; }
+.crew-claims-comment { padding:12px 14px; margin-top:8px; border:1px solid #e5e7eb; border-radius:10px; }
+.crew-claims-comment p { margin:0 0 7px; white-space:pre-wrap; color:#40586a; font-size:12px; }
+.crew-claims-comment small { color:#64748b; font-size:10px; }
+.crew-claims-shell button { font-family:inherit; }
+@media(max-width:950px) { .crew-claims-layout { grid-template-columns:1fr; } }
+@media(max-width:640px) { .crew-claims-detail { padding:14px; } .crew-claims-expense { align-items:flex-start; flex-direction:column; } }

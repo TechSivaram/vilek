@@ -1195,12 +1195,16 @@
 }
 .crew-flight-overview-refresh button:disabled {
   cursor: wait;
-  opacity: .65;
+  opacity: 0.65;
 }
 .crew-flight-overview-refresh button.is-refreshing span {
-  animation: crew-flight-spin .8s linear infinite;
+  animation: crew-flight-spin 0.8s linear infinite;
 }
-@keyframes crew-flight-spin { to { transform: rotate(360deg); } }
+@keyframes crew-flight-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .crew-flight-overview-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1236,7 +1240,7 @@
 }
 .crew-flight-overview-section-label {
   font-weight: 750;
-  letter-spacing: .2px;
+  letter-spacing: 0.2px;
 }
 .crew-flight-overview-flight-heading > div,
 .crew-flight-overview-route div {
@@ -1259,7 +1263,9 @@
   align-items: center;
   gap: 12px;
 }
-.crew-flight-overview-route div:last-child { text-align: right; }
+.crew-flight-overview-route div:last-child {
+  text-align: right;
+}
 .crew-flight-overview-route div strong {
   color: #20394e;
   font-size: 22px;
@@ -1295,9 +1301,242 @@
   font-size: 11px;
   font-weight: 750;
 }
-.crew-flight-overview-stale { color: #a66a19; }
+.crew-flight-overview-stale {
+  color: #a66a19;
+}
 @media (max-width: 767px) {
-  .crew-flight-overview-card { gap: 13px; }
-  .crew-flight-overview-stats strong { font-size: 22px; }
-  .crew-flight-overview-refresh { font-size: 9px; }
+  .crew-flight-overview-card {
+    gap: 13px;
+  }
+  .crew-flight-overview-stats strong {
+    font-size: 22px;
+  }
+  .crew-flight-overview-refresh {
+    font-size: 9px;
+  }
+}
+
+
+/* Crew dashboard: keep Expenses and Claims aligned with the Flights card. */
+.role-dashboard { --rd-muted: #53677a; }
+.role-dashboard-sidebar-label,
+.role-dashboard-footer { color: #64778a; }
+.role-dashboard-nav a { color: #40566b; }
+.role-dashboard-capability p { color: #40566b; }
+
+.crew-expense-overview-card,
+.crew-claims-overview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 0;
+  height: 100%;
+}
+
+.crew-expense-overview-header,
+.crew-expense-overview-title,
+.crew-expense-overview-refresh,
+.crew-claims-overview-header,
+.crew-claims-overview-title,
+.crew-claims-overview-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.crew-expense-overview-title,
+.crew-claims-overview-title { justify-content: flex-start; }
+.crew-expense-overview-title h2,
+.crew-claims-overview-title h2 { margin: 0; }
+.crew-expense-overview-refresh,
+.crew-claims-overview-refresh {
+  color: #64778a;
+  font-size: 10px;
+  font-weight: 550;
+  white-space: nowrap;
+}
+.crew-expense-overview-refresh button,
+.crew-claims-overview-refresh button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dce5ed;
+  border-radius: 8px;
+  color: #1767c2;
+  background: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+.crew-expense-overview-refresh button:hover:not(:disabled),
+.crew-claims-overview-refresh button:hover:not(:disabled) {
+  border-color: #b8d3f2;
+  background: #f3f8ff;
+}
+.crew-expense-overview-refresh button:disabled,
+.crew-claims-overview-refresh button:disabled { cursor: wait; opacity: .65; }
+.crew-expense-overview-refresh button.is-refreshing span { animation: crew-flight-spin .8s linear infinite; }
+
+/* Same three-column metric treatment as My Flights. */
+.crew-expense-overview-stats,
+.crew-claims-overview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid #edf1f4;
+  border-bottom: 1px solid #edf1f4;
+}
+.crew-expense-overview-stats > div,
+.crew-claims-overview-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.crew-expense-overview-stats strong,
+.crew-claims-overview-stats strong {
+  color: #20394e;
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.35px;
+}
+.crew-expense-overview-stats span,
+.crew-claims-overview-stats span,
+.crew-expense-overview-section-label,
+.crew-expense-overview-totals > span {
+  color: #64778a;
+  font-size: 10px;
+  font-weight: 550;
+  line-height: 1.35;
+}
+
+.crew-expense-overview-recent {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+.crew-expense-overview-section-label { font-weight: 750; }
+.crew-expense-overview-recent-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.crew-expense-overview-recent-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.crew-expense-overview-recent-row > div strong {
+  overflow: hidden;
+  color: #20394e;
+  font-size: 11px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.crew-expense-overview-recent-row > div span {
+  color: #64778a;
+  font-size: 10px;
+}
+.crew-expense-overview-recent-row > strong {
+  flex: 0 0 auto;
+  color: #20394e;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.crew-expense-overview-totals {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #edf1f4;
+}
+.crew-expense-overview-totals > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.crew-expense-overview-totals strong {
+  color: #20394e;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.crew-expense-overview-message,
+.crew-expense-overview-error p,
+.crew-expense-overview-stale,
+.crew-claims-overview-message,
+.crew-claims-overview-error p {
+  margin: 0;
+  color: #53697e;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.crew-expense-overview-error button,
+.crew-claims-overview-error button {
+  padding: 0;
+  border: 0;
+  color: #125fc7;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 750;
+}
+.crew-expense-overview-stale { color: #98651c; }
+.crew-claims-overview-statuses {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.crew-claims-overview-statuses > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #40566b;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.crew-claims-overview-statuses > div strong {
+  margin-left: auto;
+  color: #20394e;
+  font-size: 12px;
+  font-weight: 800;
+}
+.crew-claims-overview-statuses > div span {
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9aa8b5;
+}
+.crew-claims-overview-statuses .is-approved { background: #16a36a; }
+.crew-claims-overview-statuses .is-paid { background: #2475d5; }
+.crew-claims-overview-statuses .is-draft { background: #d69a28; }
+.crew-expense-overview-card > .role-dashboard-capability-link,
+.crew-claims-overview-card > .role-dashboard-capability-link { margin-top: auto; }
+
+@media (max-width: 767px) {
+  .crew-expense-overview-card,
+  .crew-claims-overview-card { gap: 13px; }
+  .crew-expense-overview-stats strong,
+  .crew-claims-overview-stats strong { font-size: 22px; }
+  .crew-expense-overview-refresh,
+  .crew-claims-overview-refresh { font-size: 9px; }
+  .crew-claims-overview-statuses { gap: 6px; }
+  .crew-claims-overview-statuses > div { font-size: 9px; }
 }

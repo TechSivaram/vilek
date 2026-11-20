@@ -61,19 +61,27 @@ export function CrewFlightsOverviewCard() {
   const data = query.data;
   const nextFlight = data?.nextFlight;
   const updatedAt = query.dataUpdatedAt
-    ? new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(query.dataUpdatedAt)
+    ? new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(
+        query.dataUpdatedAt,
+      )
     : null;
 
   return (
     <article className="role-dashboard-capability crew-flight-overview-card">
       <div className="crew-flight-overview-header">
         <div className="crew-flight-overview-title">
-          <span className="role-dashboard-capability-icon" aria-hidden="true">✈</span>
+          <span className="role-dashboard-capability-icon" aria-hidden="true">
+            ✈
+          </span>
           <h2>My flights</h2>
         </div>
         <div className="crew-flight-overview-refresh">
           <span aria-live="polite">
-            {query.isFetching ? "Refreshing…" : updatedAt ? `Updated ${updatedAt}` : "Flight summary"}
+            {query.isFetching
+              ? "Refreshing…"
+              : updatedAt
+                ? `Updated ${updatedAt}`
+                : "Flight summary"}
           </span>
           <button
             type="button"
@@ -92,40 +100,69 @@ export function CrewFlightsOverviewCard() {
         <p className="crew-flight-overview-message">Loading your flight summary…</p>
       ) : query.isError && !data ? (
         <div className="crew-flight-overview-error" role="alert">
-          <p>{query.error instanceof Error ? query.error.message : "Unable to load flight summary."}</p>
-          <button type="button" onClick={() => void query.refetch()}>Try again</button>
+          <p>
+            {query.error instanceof Error ? query.error.message : "Unable to load flight summary."}
+          </p>
+          <button type="button" onClick={() => void query.refetch()}>
+            Try again
+          </button>
         </div>
       ) : (
         <>
           <div className="crew-flight-overview-stats">
-            <div><strong>{data?.summary.upcoming ?? 0}</strong><span>Upcoming</span></div>
-            <div><strong>{data?.summary.thisMonth ?? 0}</strong><span>This month</span></div>
-            <div><strong>{data?.summary.total ?? 0}</strong><span>Total flights</span></div>
+            <div>
+              <strong>{data?.summary.upcoming ?? 0}</strong>
+              <span>Upcoming</span>
+            </div>
+            <div>
+              <strong>{data?.summary.thisMonth ?? 0}</strong>
+              <span>This month</span>
+            </div>
+            <div>
+              <strong>{data?.summary.total ?? 0}</strong>
+              <span>Total flights</span>
+            </div>
           </div>
           <div className="crew-flight-overview-next">
             <span className="crew-flight-overview-section-label">Next assigned flight</span>
             {nextFlight ? (
               <>
                 <div className="crew-flight-overview-flight-heading">
-                  <div><strong>{flightNumberLabel(nextFlight)}</strong><span>{nextFlight.airlineName} · {nextFlight.designation}</span></div>
+                  <div>
+                    <strong>{flightNumberLabel(nextFlight)}</strong>
+                    <span>
+                      {nextFlight.airlineName} · {nextFlight.designation}
+                    </span>
+                  </div>
                   <span className={`crew-flight-status is-${statusClass(nextFlight.flightStatus)}`}>
                     {nextFlight.flightStatus.replaceAll("_", " ")}
                   </span>
                 </div>
                 <div className="crew-flight-overview-route">
-                  <div><strong>{nextFlight.originCode}</strong><span>{nextFlight.originCity}</span></div>
+                  <div>
+                    <strong>{nextFlight.originCode}</strong>
+                    <span>{nextFlight.originCity}</span>
+                  </div>
                   <span aria-hidden="true">→</span>
-                  <div><strong>{nextFlight.destinationCode}</strong><span>{nextFlight.destinationCity}</span></div>
+                  <div>
+                    <strong>{nextFlight.destinationCode}</strong>
+                    <span>{nextFlight.destinationCity}</span>
+                  </div>
                 </div>
                 <div className="crew-flight-overview-times">
-                  <span>Departure</span><strong>{dateTimeLabel(nextFlight.scheduledDeparture)}</strong>
+                  <span>Departure</span>
+                  <strong>{dateTimeLabel(nextFlight.scheduledDeparture)}</strong>
                 </div>
               </>
             ) : (
               <p className="crew-flight-overview-message">You have no upcoming assigned flights.</p>
             )}
           </div>
-          {query.isError && <p className="crew-flight-overview-stale" role="status">Refresh failed. Showing the last successfully loaded information.</p>}
+          {query.isError && (
+            <p className="crew-flight-overview-stale" role="status">
+              Refresh failed. Showing the last successfully loaded information.
+            </p>
+          )}
         </>
       )}
 

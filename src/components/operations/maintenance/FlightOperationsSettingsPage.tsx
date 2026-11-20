@@ -66,7 +66,8 @@ const operationalSettingLabels: Record<string, string> = {
 const operationalSettingDescriptions: Record<string, string> = {
   minimum_rest_minutes: "Minimum rest period required between crew duties.",
   minimum_turnaround_minutes: "Minimum connection turnaround time between flight duties.",
-  qualification_alert_intervals_days: "Days before qualification expiry when alerts should be raised.",
+  qualification_alert_intervals_days:
+    "Days before qualification expiry when alerts should be raised.",
   release_buffer_minutes: "Additional time after scheduled arrival before crew release.",
   reporting_buffer_minutes: "Time before scheduled departure when crew must report.",
 };
@@ -89,13 +90,20 @@ function getOperationalSettingValueLabel(settingKey: string, rawValue: unknown):
   }
 
   if (
-    ["minimum_rest_minutes", "minimum_turnaround_minutes", "release_buffer_minutes", "reporting_buffer_minutes"].includes(settingKey) &&
-    (typeof parsed === "number" || (typeof parsed === "string" && /^\\d+(?:\\.\\d+)?$/.test(parsed)))
+    [
+      "minimum_rest_minutes",
+      "minimum_turnaround_minutes",
+      "release_buffer_minutes",
+      "reporting_buffer_minutes",
+    ].includes(settingKey) &&
+    (typeof parsed === "number" ||
+      (typeof parsed === "string" && /^\\d+(?:\\.\\d+)?$/.test(parsed)))
   ) {
     const minutes = Number(parsed);
     const hours = minutes / 60;
-    const hoursLabel =
-      Number.isInteger(hours) ? `${hours} ${hours === 1 ? "hour" : "hours"}` : `${hours.toFixed(1)} hours`;
+    const hoursLabel = Number.isInteger(hours)
+      ? `${hours} ${hours === 1 ? "hour" : "hours"}`
+      : `${hours.toFixed(1)} hours`;
     return `${minutes} minutes (${hoursLabel})`;
   }
 
@@ -381,8 +389,8 @@ export function FlightOperationsSettingsPage() {
                       <input
                         value={
                           editingId !== null && c === "setting_key"
-                            ? operationalSettingLabels[form[c] ?? ""] ?? form[c] ?? ""
-                            : form[c] ?? ""
+                            ? (operationalSettingLabels[form[c] ?? ""] ?? form[c] ?? "")
+                            : (form[c] ?? "")
                         }
                         readOnly={editingId !== null && c === "setting_key"}
                         aria-readonly={editingId !== null && c === "setting_key"}
@@ -503,11 +511,18 @@ export function FlightOperationsSettingsPage() {
                       {displayColumns.map((k) => (
                         <td key={k}>
                           {selected === "flight-operations-settings" && k === "setting"
-                            ? operationalSettingLabels[String(row.setting_key ?? row.setting ?? "")] ?? String(row.setting ?? row.setting_key ?? "—")
+                            ? (operationalSettingLabels[
+                                String(row.setting_key ?? row.setting ?? "")
+                              ] ?? String(row.setting ?? row.setting_key ?? "—"))
                             : selected === "flight-operations-settings" && k === "value_json"
-                              ? getOperationalSettingValueLabel(String(row.setting_key ?? ""), row[k])
-                              : selected === "flight-operations-settings" && (k === "setting_description" || k === "description")
-                                ? operationalSettingDescriptions[String(row.setting_key ?? "")] ?? String(row[k] ?? "—")
+                              ? getOperationalSettingValueLabel(
+                                  String(row.setting_key ?? ""),
+                                  row[k],
+                                )
+                              : selected === "flight-operations-settings" &&
+                                  (k === "setting_description" || k === "description")
+                                ? (operationalSettingDescriptions[String(row.setting_key ?? "")] ??
+                                  String(row[k] ?? "—"))
                                 : row[k] === null || row[k] === undefined || row[k] === ""
                                   ? "—"
                                   : typeof row[k] === "number" &&

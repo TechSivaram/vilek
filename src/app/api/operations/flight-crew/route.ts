@@ -68,7 +68,9 @@ export const POST = withRouteGuard(
       }
       if (error instanceof Error && error.message === "FLIGHT_TIMES_INVALID")
         return NextResponse.json(
-          { error: "Flight departure or arrival time is invalid; crew rest could not be validated." },
+          {
+            error: "Flight departure or arrival time is invalid; crew rest could not be validated.",
+          },
           { status: 422 },
         );
       if (error instanceof Error && error.message === "CREW_NOT_QUALIFIED_FOR_DESIGNATION")

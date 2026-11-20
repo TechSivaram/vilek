@@ -1,5 +1,17 @@
 import "server-only";
-import { and, asc, count, countDistinct, desc, eq, inArray, like, or, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  countDistinct,
+  desc,
+  eq,
+  inArray,
+  like,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { db } from "@/lib/db";
 import {
@@ -138,10 +150,7 @@ export const flightCrewRepository = {
         requiredCount: flightCrewRequirements.requiredCount,
       })
       .from(flightCrewRequirements)
-      .innerJoin(
-        crewDesignations,
-        eq(flightCrewRequirements.designationId, crewDesignations.id),
-      )
+      .innerJoin(crewDesignations, eq(flightCrewRequirements.designationId, crewDesignations.id))
       .where(eq(flightCrewRequirements.flightId, flightId))
       .all();
 
@@ -210,7 +219,6 @@ export const flightCrewRepository = {
       rows,
     };
   },
-
 
   manifest(flightId: string) {
     return db
@@ -427,12 +435,17 @@ export const flightCrewRepository = {
       // immediately adjacent assigned flights. Actual arrival is preferred; when
       // it is not available, scheduled arrival is used as the fallback.
       const settingRows = tx
-        .select({ key: flightOperationsSettings.settingKey, value: flightOperationsSettings.valueJson })
+        .select({
+          key: flightOperationsSettings.settingKey,
+          value: flightOperationsSettings.valueJson,
+        })
         .from(flightOperationsSettings)
-        .where(inArray(flightOperationsSettings.settingKey, [
-          "minimum_rest_minutes",
-          "minimum_turnaround_minutes",
-        ]))
+        .where(
+          inArray(flightOperationsSettings.settingKey, [
+            "minimum_rest_minutes",
+            "minimum_turnaround_minutes",
+          ]),
+        )
         .all();
       const settings = new Map(settingRows.map((row) => [row.key, row.value]));
       const readMinutes = (key: string) => {
@@ -486,11 +499,15 @@ export const flightCrewRepository = {
         const requiredGapMs = requiredGapMinutes * 60_000;
         if (previous && candidateDeparture - previous.arrivalMs < requiredGapMs) {
           const availableMinutes = Math.floor((candidateDeparture - previous.arrivalMs) / 60_000);
-          throw new Error(`CREW_REST_REQUIREMENT_NOT_MET:${previous.flightNumber}:${requiredGapMinutes}:${availableMinutes}`);
+          throw new Error(
+            `CREW_REST_REQUIREMENT_NOT_MET:${previous.flightNumber}:${requiredGapMinutes}:${availableMinutes}`,
+          );
         }
         if (next && next.departureMs - candidateArrival < requiredGapMs) {
           const availableMinutes = Math.floor((next.departureMs - candidateArrival) / 60_000);
-          throw new Error(`CREW_REST_REQUIREMENT_NOT_MET:${next.flightNumber}:${requiredGapMinutes}:${availableMinutes}`);
+          throw new Error(
+            `CREW_REST_REQUIREMENT_NOT_MET:${next.flightNumber}:${requiredGapMinutes}:${availableMinutes}`,
+          );
         }
       }
 

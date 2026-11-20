@@ -4,6 +4,8 @@ import { WorkspaceSwitcher } from "@/components/workspaces/workspace-switcher";
 import { ProfileMenu } from "@/components/workspaces/profile-menu";
 import { getWorkspace } from "@/lib/workspaces";
 import { CrewFlightsOverviewCard } from "@/components/workspaces/crew-flights-overview-card";
+import { CrewExpensesOverviewCard } from "@/components/workspaces/crew-expenses-overview-card";
+import { CrewClaimsOverviewCard } from "@/components/workspaces/crew-claims-overview-card";
 
 export function WorkspaceDashboard({
   roleCode,
@@ -94,6 +96,10 @@ export function WorkspaceDashboard({
             {workspace.capabilities.map((capability) =>
               workspace.code === "CREW" && capability.title === "My flights" ? (
                 <CrewFlightsOverviewCard key={capability.title} />
+              ) : workspace.code === "CREW" && capability.title === "My expenses" ? (
+                <CrewExpensesOverviewCard key={capability.title} />
+              ) : workspace.code === "CREW" && capability.title === "My claims" ? (
+                <CrewClaimsOverviewCard key={capability.title} />
               ) : (
                 <Link
                   className="role-dashboard-capability"

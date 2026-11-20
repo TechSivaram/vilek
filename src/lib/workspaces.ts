@@ -41,7 +41,7 @@ export const WORKSPACES: WorkspaceDefinition[] = [
         icon: "↗",
         title: "My expenses",
         description: "Review and organize flight-related expenses.",
-        href: "/crew#expenses",
+        href: "/crew/expenses",
       },
       {
         icon: "▤",

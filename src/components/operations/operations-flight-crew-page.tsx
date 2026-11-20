@@ -624,67 +624,68 @@ export function OperationsFlightCrewPage() {
                                 </button>
                               </td>
                             </tr>
-                            {expandedFlights.has(flight.id) &&
-                              complementSummaries[flight.id] && (
-                                <tr>
-                                  <td
-                                    colSpan={3}
-                                    style={{
-                                      padding: "12px 48px",
-                                      background: "#fbfcfe",
-                                      borderTop: "1px solid #e7edf2",
-                                    }}
-                                  >
-                                    <div style={{ fontWeight: 600, marginBottom: 8 }}>
-                                      Crew complement
-                                      <span
-                                        style={{
-                                          marginLeft: 8,
-                                          fontWeight: 500,
-                                          color: complementSummaries[flight.id].configured
-                                            ? complementSummaries[flight.id].complete
-                                              ? "#067647"
-                                              : "#b54708"
-                                            : "#607487",
-                                        }}
-                                      >
-                                        {!complementSummaries[flight.id].configured
-                                          ? "Not configured"
-                                          : complementSummaries[flight.id].complete
-                                            ? "Complete"
-                                            : "Incomplete — warning"}
-                                      </span>
+                            {expandedFlights.has(flight.id) && complementSummaries[flight.id] && (
+                              <tr>
+                                <td
+                                  colSpan={3}
+                                  style={{
+                                    padding: "12px 48px",
+                                    background: "#fbfcfe",
+                                    borderTop: "1px solid #e7edf2",
+                                  }}
+                                >
+                                  <div style={{ fontWeight: 600, marginBottom: 8 }}>
+                                    Crew complement
+                                    <span
+                                      style={{
+                                        marginLeft: 8,
+                                        fontWeight: 500,
+                                        color: complementSummaries[flight.id].configured
+                                          ? complementSummaries[flight.id].complete
+                                            ? "#067647"
+                                            : "#b54708"
+                                          : "#607487",
+                                      }}
+                                    >
+                                      {!complementSummaries[flight.id].configured
+                                        ? "Not configured"
+                                        : complementSummaries[flight.id].complete
+                                          ? "Complete"
+                                          : "Incomplete — warning"}
+                                    </span>
+                                  </div>
+                                  {!complementSummaries[flight.id].configured ? (
+                                    <div style={{ color: "#607487" }}>
+                                      No default or flight-specific crew requirements are
+                                      configured.
                                     </div>
-                                    {!complementSummaries[flight.id].configured ? (
-                                      <div style={{ color: "#607487" }}>
-                                        No default or flight-specific crew requirements are configured.
-                                      </div>
-                                    ) : (
-                                      <div
-                                        style={{
-                                          display: "flex",
-                                          flexWrap: "wrap",
-                                          gap: "8px 18px",
-                                        }}
-                                      >
-                                        {complementSummaries[flight.id].rows.map((item) => (
-                                          <div key={item.designationId} style={{ minWidth: 150 }}>
-                                            <strong>{item.designationName}</strong>
-                                            <div style={{ color: "#607487", fontSize: 13 }}>
-                                              {item.assignedCount} assigned / {item.requiredCount} required
-                                              {item.shortage > 0
-                                                ? ` · ${item.shortage} still needed`
-                                                : item.surplus > 0
-                                                  ? ` · ${item.surplus} above requirement`
-                                                  : " · satisfied"}
-                                            </div>
+                                  ) : (
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: "8px 18px",
+                                      }}
+                                    >
+                                      {complementSummaries[flight.id].rows.map((item) => (
+                                        <div key={item.designationId} style={{ minWidth: 150 }}>
+                                          <strong>{item.designationName}</strong>
+                                          <div style={{ color: "#607487", fontSize: 13 }}>
+                                            {item.assignedCount} assigned / {item.requiredCount}{" "}
+                                            required
+                                            {item.shortage > 0
+                                              ? ` · ${item.shortage} still needed`
+                                              : item.surplus > 0
+                                                ? ` · ${item.surplus} above requirement`
+                                                : " · satisfied"}
                                           </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </td>
-                                </tr>
-                              )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            )}
                             {expandedFlights.has(flight.id) &&
                               (loadingManifests.has(flight.id) ? (
                                 <tr>
