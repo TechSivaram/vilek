@@ -43,6 +43,7 @@ type Assignment = {
     createdAt: string;
     authorFirstName: string;
     authorLastName: string;
+    parentCommentId: string | null;
   }[];
 };
 

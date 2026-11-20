@@ -10,13 +10,14 @@ export const GET = withRouteGuard<Context>({ roles: ["CREW"] }, async (_request,
   const document = crewExpensesService.getDocument(auth.user.id, documentId);
   if (!document) return NextResponse.json({ error: "Receipt not found." }, { status: 404 });
   const root = path.resolve(
+    /*turbopackIgnore: true*/
     process.env.VILEK_DOCUMENT_STORAGE_PATH ||
-      path.join(process.cwd(), "data", "expense-documents"),
+      path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "expense-documents"),
   );
   if (path.basename(document.storageKey) !== document.storageKey)
     return NextResponse.json({ error: "Receipt not found." }, { status: 404 });
   try {
-    const bytes = await readFile(path.join(root, document.storageKey));
+    const bytes = await readFile(path.join(/*turbopackIgnore: true*/ root, document.storageKey));
     return new NextResponse(bytes, {
       headers: {
         "Content-Type": document.contentType,
@@ -46,15 +47,16 @@ export const DELETE = withRouteGuard<Context>(
       );
     }
     const root = path.resolve(
+      /*turbopackIgnore: true*/
       process.env.VILEK_DOCUMENT_STORAGE_PATH ||
-        path.join(process.cwd(), "data", "expense-documents"),
+        path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "expense-documents"),
     );
     if (path.basename(document.storageKey) !== document.storageKey)
       return NextResponse.json({ error: "Receipt not found." }, { status: 404 });
     // Delete the physical file first. If storage is temporarily unavailable, retain
     // the DB row so the user can retry. A missing file is already effectively deleted.
     try {
-      await unlink(path.join(root, document.storageKey));
+      await unlink(path.join(/*turbopackIgnore: true*/ root, document.storageKey));
     } catch (fileError) {
       if ((fileError as NodeJS.ErrnoException).code !== "ENOENT") {
         return NextResponse.json(

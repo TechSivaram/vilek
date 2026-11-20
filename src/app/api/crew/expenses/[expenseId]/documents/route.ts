@@ -53,12 +53,13 @@ export const POST = withRouteGuard<Context>({ roles: ["CREW"] }, async (request,
     file.type === "application/pdf" ? ".pdf" : file.type === "image/jpeg" ? ".jpg" : ".png";
   const id = randomUUID();
   const root = path.resolve(
+    /*turbopackIgnore: true*/
     process.env.VILEK_DOCUMENT_STORAGE_PATH ||
-      path.join(process.cwd(), "data", "expense-documents"),
+      path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "expense-documents"),
   );
   const storageKey = `${id}${extension}`;
   await mkdir(root, { recursive: true });
-  const fullPath = path.join(root, storageKey);
+  const fullPath = path.join(/*turbopackIgnore: true*/ root, storageKey);
   await writeFile(fullPath, bytes, { flag: "wx" });
   try {
     crewExpensesService.addDocument(expenseId, {

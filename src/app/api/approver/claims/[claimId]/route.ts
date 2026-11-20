@@ -35,16 +35,7 @@ export const PATCH = withRouteGuard<Context>(
           parsed.data.parentCommentId,
         );
       } else {
-        if (parsed.data.action === "comment") {
-          crewClaimsService.postReviewerComment(
-            auth.user.id,
-            claimId,
-            parsed.data.comment,
-            parsed.data.parentCommentId,
-          );
-        } else {
-          crewClaimsService.review(auth.user.id, claimId, parsed.data.action, parsed.data.comment);
-        }
+        crewClaimsService.review(auth.user.id, claimId, parsed.data.action, parsed.data.comment);
       }
       return NextResponse.json({ success: true });
     } catch (error) {

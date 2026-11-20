@@ -10,7 +10,7 @@ function resolveDatabasePath() {
     const filePath = configured.slice("file:".length);
     const absolutePath = path.isAbsolute(filePath)
       ? filePath
-      : path.resolve(process.cwd(), filePath);
+      : path.resolve(/*turbopackIgnore: true*/ process.cwd(), filePath);
     fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
     return absolutePath;
   }

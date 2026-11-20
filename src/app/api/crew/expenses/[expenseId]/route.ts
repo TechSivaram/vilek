@@ -53,8 +53,9 @@ export const DELETE = withRouteGuard<Context>(
     try {
       const documents = crewExpensesService.getExpenseDocuments(auth.user.id, expenseId);
       const root = path.resolve(
+        /*turbopackIgnore: true*/
         process.env.VILEK_DOCUMENT_STORAGE_PATH ||
-          path.join(process.cwd(), "data", "expense-documents"),
+          path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "expense-documents"),
       );
       // Remove files before deleting the expense/metadata. ENOENT is safe to ignore,
       // making a partially completed cleanup safely retryable.
@@ -62,7 +63,7 @@ export const DELETE = withRouteGuard<Context>(
         if (path.basename(document.storageKey) !== document.storageKey)
           throw new Error("INVALID_DOCUMENT_STORAGE_KEY");
         try {
-          await unlink(path.join(root, document.storageKey));
+          await unlink(path.join(/*turbopackIgnore: true*/ root, document.storageKey));
         } catch (fileError) {
           if ((fileError as NodeJS.ErrnoException).code !== "ENOENT") {
             return NextResponse.json(
