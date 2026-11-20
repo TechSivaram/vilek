@@ -48,6 +48,8 @@ export async function proxyMfaRequest(
   }
 
   let upstream: Response;
+  const startedAt = Date.now();
+  const requestId = crypto.randomUUID();
   try {
     upstream = await fetch(
       `${(process.env.IDP_MFA_BASE_URL?.trim() || "").replace(/\/$/, "")}${upstreamPath}`,
@@ -57,19 +59,40 @@ export async function proxyMfaRequest(
           authorization: `Bearer ${validated.token}`,
           accept: "application/json",
           ...(method === "POST" ? { "content-type": "application/json" } : {}),
+          "x-correlation-id": requestId,
         },
         ...(body !== undefined ? { body } : {}),
         cache: "no-store",
         signal: AbortSignal.timeout(15_000),
       },
     );
-  } catch {
+  } catch (cause) {
+    const durationMs = Date.now() - startedAt;
+    const timedOut =
+      cause instanceof Error && (cause.name === "TimeoutError" || cause.name === "AbortError");
+
+    // Never log request bodies, TOTP values, recovery codes, or bearer tokens.
+    console.error("[MFA proxy] Upstream request failed", {
+      requestId,
+      upstreamPath,
+      method,
+      durationMs,
+      failure: timedOut ? "timeout" : "connection",
+    });
+
     return NextResponse.json(
-      { error: "Unable to reach the configured identity provider MFA service. Please try again." },
-      { status: 502 },
+      {
+        error: timedOut
+          ? "The identity provider MFA request timed out. Please try again."
+          : "Unable to connect to the identity provider MFA service. Please try again.",
+        requestId,
+      },
+      {
+        status: timedOut ? 504 : 502,
+        headers: { "Cache-Control": "no-store" },
+      },
     );
   }
-
   const responseText = await upstream.text();
   let responseBody: unknown = null;
   if (responseText) {

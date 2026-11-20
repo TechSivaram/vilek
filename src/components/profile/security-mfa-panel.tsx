@@ -124,50 +124,39 @@ export function SecurityMfaPanel() {
       setEnrollment(null);
       setCode("");
 
-      // TSCloak does not expose recovery codes from /status. Generate them
-      // immediately after enrollment verification, using the same TOTP code.
-      let recoveryCodeError = "";
-      try {
-        const recoveryResponse = await fetch("/api/profile/mfa/recovery-codes/regenerate", {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ code }),
-        });
-        const recoveryBody = (await recoveryResponse.json()) as {
-          error?: string;
-          message?: string;
-          recoveryCodes?: string[];
-        };
+      // Prefer recovery codes returned by the enrollment-verification operation.
+      // Do not submit the same TOTP value to a second endpoint: providers may
+      // reject reuse of a TOTP value within the same time step.
+      const newCodes = Array.isArray(body.recoveryCodes)
+        ? body.recoveryCodes.filter(
+            (item): item is string => typeof item === "string" && item.length > 0,
+          )
+        : [];
 
-        if (!recoveryResponse.ok) {
-          throw new Error(errorMessage(recoveryBody, "Unable to generate recovery codes."));
-        }
-
-        const newCodes = Array.isArray(recoveryBody.recoveryCodes)
-          ? recoveryBody.recoveryCodes.filter((item): item is string => typeof item === "string")
-          : [];
-
-        if (newCodes.length === 0) {
-          throw new Error("The identity provider did not return recovery codes.");
-        }
-
+      if (newCodes.length > 0) {
         setRecoveryCodes(newCodes);
         setCodesSaved(false);
-      } catch (cause) {
-        recoveryCodeError =
-          cause instanceof Error ? cause.message : "Unable to generate recovery codes.";
+        setShowRegenerateForm(false);
+        setNotice(
+          body.message ||
+            "Multi-factor authentication has been enabled. Save your recovery codes now.",
+        );
+      } else {
         setRecoveryCodes([]);
+        setShowRegenerateForm(true);
+        setRegenerateCode("");
+        setNotice(
+          body.message ||
+            "Multi-factor authentication has been enabled. To generate recovery codes, enter a fresh authenticator code below.",
+        );
       }
 
-      // Refresh the enabled state independently. A recovery-code failure must
-      // not make a successfully enabled MFA enrollment look unsuccessful.
-      await loadStatus();
-      setNotice(body.message || "Multi-factor authentication has been enabled successfully.");
-      if (recoveryCodeError) {
-        setError(
-          `MFA is enabled, but recovery codes could not be generated: ${recoveryCodeError} You can try regenerating them below.`,
-        );
+      // Refresh the enabled state independently. A status-refresh failure must
+      // not undo a successful enrollment or hide recovery codes already returned.
+      try {
+        await loadStatus();
+      } catch {
+        // loadStatus reports its own error; enrollment has already succeeded.
       }
     } catch (cause) {
       setError(
