@@ -3,6 +3,7 @@ import Link from "next/link";
 import { WorkspaceSwitcher } from "@/components/workspaces/workspace-switcher";
 import { ProfileMenu } from "@/components/workspaces/profile-menu";
 import { getWorkspace } from "@/lib/workspaces";
+import { CrewFlightsOverviewCard } from "@/components/workspaces/crew-flights-overview-card";
 
 export function WorkspaceDashboard({
   roleCode,
@@ -40,10 +41,10 @@ export function WorkspaceDashboard({
             <span>◫</span> Overview
           </a>
           {workspace.capabilities.map((capability) => (
-            <a href={capability.href} key={capability.title}>
+            <Link href={capability.href} key={capability.title}>
               <span>{capability.icon}</span>
               {capability.title}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="role-dashboard-sidebar-bottom">
@@ -77,31 +78,38 @@ export function WorkspaceDashboard({
               {workspace.icon}
             </span>
           </div>
-          <div className="role-dashboard-note">
-            <span aria-hidden="true">ⓘ</span>
-            <p>
-              This workspace layout is ready. Live operational metrics and workflows will be
-              connected in the next implementation step.
-            </p>
-          </div>
+          {workspace.code !== "CREW" && (
+            <div className="role-dashboard-note">
+              <span aria-hidden="true">ⓘ</span>
+              <p>
+                This workspace layout is ready. Live operational metrics and workflows will be
+                connected in the next implementation step.
+              </p>
+            </div>
+          )}
           <section
             className="role-dashboard-capabilities"
             aria-label={`${workspace.name} quick links`}
           >
-            {workspace.capabilities.map((capability) => (
-              <article
-                className="role-dashboard-capability"
-                key={capability.title}
-                id={capability.href.split("#")[1]}
-              >
-                <span className="role-dashboard-capability-icon">{capability.icon}</span>
-                <h2>{capability.title}</h2>
-                <p>{capability.description}</p>
-                <span className="role-dashboard-capability-link">
-                  Open section <span aria-hidden="true">→</span>
-                </span>
-              </article>
-            ))}
+            {workspace.capabilities.map((capability) =>
+              workspace.code === "CREW" && capability.title === "My flights" ? (
+                <CrewFlightsOverviewCard key={capability.title} />
+              ) : (
+                <Link
+                  className="role-dashboard-capability"
+                  key={capability.title}
+                  href={capability.href}
+                  id={capability.href.split("#")[1]}
+                >
+                  <span className="role-dashboard-capability-icon">{capability.icon}</span>
+                  <h2>{capability.title}</h2>
+                  <p>{capability.description}</p>
+                  <span className="role-dashboard-capability-link">
+                    Open section <span aria-hidden="true">→</span>
+                  </span>
+                </Link>
+              ),
+            )}
           </section>
         </main>
         <footer className="role-dashboard-footer">

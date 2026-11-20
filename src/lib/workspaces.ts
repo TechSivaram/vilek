@@ -32,6 +32,12 @@ export const WORKSPACES: WorkspaceDefinition[] = [
     summary: "Keep your flight-related expenses and reimbursement claims organized.",
     capabilities: [
       {
+        icon: "✈",
+        title: "My flights",
+        description: "View your flight assignments and related details.",
+        href: "/crew/flights",
+      },
+      {
         icon: "↗",
         title: "My expenses",
         description: "Review and organize flight-related expenses.",
@@ -41,13 +47,7 @@ export const WORKSPACES: WorkspaceDefinition[] = [
         icon: "▤",
         title: "My claims",
         description: "Prepare claims and follow their progress.",
-        href: "/crew#claims",
-      },
-      {
-        icon: "✈",
-        title: "My flights",
-        description: "View your flight assignments and related details.",
-        href: "/crew#flights",
+        href: "/crew/claims",
       },
     ],
   },
