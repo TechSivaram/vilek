@@ -260,3 +260,310 @@
     flex-direction: column;
   }
 }
+
+/* Assignment search and pagination */
+.crew-claims-assignment-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(130px, 0.75fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #e8edf1;
+  background: #fbfcfd;
+}
+.crew-claims-assignment-tools input,
+.crew-claims-assignment-tools select {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid #d6e0e7;
+  border-radius: 8px;
+  outline: none;
+  color: #263f53;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+.crew-claims-assignment-tools input::placeholder {
+  color: #687d8f;
+  opacity: 1;
+}
+.crew-claims-assignment-tools input:focus,
+.crew-claims-assignment-tools select:focus {
+  border-color: #3987d5;
+  box-shadow: 0 0 0 3px rgba(39, 126, 194, 0.12);
+}
+.crew-claims-result-count {
+  color: #52697c;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.crew-claims-assignment-list {
+  max-height: min(620px, calc(100vh - 390px));
+  overflow-y: auto;
+}
+.crew-claims-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 13px;
+  border-top: 1px solid #e8edf1;
+  color: #52697c;
+  font-size: 13px;
+}
+.crew-claims-pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.crew-claims-pagination button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d6e0e7;
+  border-radius: 7px;
+  color: #24445d;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.crew-claims-pagination button:hover:not(:disabled) {
+  border-color: #3987d5;
+  background: #f2f7fc;
+}
+.crew-claims-pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Shared readable typography scale for the crew expense and claims modules */
+.crew-claims-shell,
+.crew-expenses-shell {
+  color: #263f53;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+.crew-claims-flight,
+.crew-expenses-table td strong,
+.crew-expense-card-top > div strong {
+  font-size: 15px;
+  font-weight: 750;
+}
+.crew-claims-route {
+  font-size: 14px;
+  color: #40586a;
+}
+.crew-claims-date,
+.crew-claims-muted,
+.crew-expenses-table td span,
+.crew-expense-card-meta {
+  font-size: 13px;
+  color: #52697c;
+}
+.crew-claims-detail-heading h2 {
+  font-size: 19px;
+  font-weight: 750;
+}
+.crew-claims-panel-heading h2,
+.crew-claims-eligible h3,
+.crew-claims-comments h3,
+.crew-claims-expense-heading h3,
+.crew-expenses-panel-heading h2 {
+  font-size: 16px;
+  font-weight: 750;
+}
+.crew-claims-expense > div > strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+.crew-claims-expense > div > span {
+  font-size: 13px;
+  color: #52697c;
+}
+.crew-claims-empty,
+.crew-claims-empty--compact {
+  font-size: 14px;
+  color: #40586a;
+}
+.crew-claims-submit span,
+.crew-claims-submitted-note,
+.crew-claims-alert,
+.crew-claims-comment p {
+  font-size: 14px;
+}
+.crew-claims-shell button,
+.crew-expenses-shell button,
+.crew-expenses-shell .receipt-upload {
+  font-size: 13px;
+}
+.crew-expenses-summary article span,
+.crew-expenses-toolbar label,
+.crew-expenses-modal label,
+.crew-expenses-pagination {
+  font-size: 13px;
+  color: #52697c;
+}
+.crew-expenses-summary article strong {
+  font-weight: 800;
+}
+.crew-expenses-table th {
+  font-size: 13px;
+  color: #40586a;
+}
+.crew-expenses-table td {
+  font-size: 13px;
+  color: #40586a;
+}
+.crew-expenses-table td strong {
+  font-size: 15px;
+}
+.crew-expenses-table td span {
+  font-size: 13px;
+}
+.crew-expenses-toolbar input,
+.crew-expenses-toolbar select,
+.crew-expenses-pagination select,
+.crew-expenses-modal input,
+.crew-expenses-modal select {
+  font-size: 13px;
+}
+.crew-expenses-actions button,
+.crew-expenses-row-actions button,
+.crew-expenses-modal-actions button,
+.crew-expenses-pagination button {
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .crew-claims-assignment-tools {
+    grid-template-columns: 1fr 1fr;
+  }
+  .crew-claims-search {
+    grid-column: 1 / -1;
+  }
+  .crew-claims-result-count {
+    justify-self: end;
+  }
+  .crew-claims-assignment-list {
+    max-height: 440px;
+  }
+  .crew-claims-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .crew-claims-pagination > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Final alignment and interaction fixes */
+.crew-claims-shell button,
+.crew-claims-shell input,
+.crew-claims-shell select {
+  font-family: inherit;
+}
+.crew-claims-shell button:not(:disabled),
+.crew-claims-shell select {
+  cursor: pointer;
+}
+.crew-claims-shell button:disabled {
+  cursor: not-allowed;
+}
+.crew-claims-assignment-tools {
+  grid-template-columns: minmax(0, 1fr) minmax(132px, 0.72fr) auto;
+}
+.crew-claims-assignment-tools input,
+.crew-claims-assignment-tools select {
+  font-size: 13px;
+  font-weight: 500;
+  color: #263f53;
+}
+.crew-claims-assignment-tools input::placeholder {
+  color: #52697c;
+  opacity: 1;
+}
+.crew-claims-expense > div:first-child {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+.crew-claims-expense > div:first-child strong {
+  display: block;
+  color: #263f53;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.crew-claims-expense > div:first-child span {
+  display: block;
+  color: #40586a;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.crew-claims-expense > button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #cbdceb;
+  border-radius: 8px;
+  color: #1268c4;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.crew-claims-expense > button:hover:not(:disabled) {
+  border-color: #1268c4;
+  background: #f2f7fc;
+}
+/* The submit wrapper is a neutral information panel, not a blue button. */
+.crew-claims-submit {
+  display: flex;
+  min-height: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #dce7f0;
+  border-radius: 10px;
+  color: #40586a;
+  background: #f7fafd;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.crew-claims-submit span {
+  min-width: 0;
+  color: #40586a;
+  font-size: 14px;
+  font-weight: 500;
+}
+.crew-claims-submit .crew-claims-primary {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 15px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.crew-claims-primary:disabled {
+  cursor: not-allowed;
+}
+@media (max-width: 640px) {
+  .crew-claims-submit {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .crew-claims-submit .crew-claims-primary {
+    width: 100%;
+  }
+}

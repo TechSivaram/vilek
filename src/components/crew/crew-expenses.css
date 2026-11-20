@@ -488,3 +488,69 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Consistent readable typography across the crew expense register */
+.crew-expenses-shell {
+  color: #263f53;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+.crew-expenses-panel-heading h2 {
+  font-size: 16px;
+  font-weight: 750;
+}
+.crew-expenses-summary article span,
+.crew-expenses-toolbar label,
+.crew-expenses-modal label {
+  color: #52697c;
+  font-size: 13px;
+}
+.crew-expenses-table th {
+  color: #40586a;
+  font-size: 13px;
+}
+.crew-expenses-table td {
+  color: #40586a;
+  font-size: 13px;
+}
+.crew-expenses-table td strong {
+  color: #20384b;
+  font-size: 15px;
+  font-weight: 750;
+}
+.crew-expenses-table td span {
+  color: #52697c;
+  font-size: 13px;
+}
+.crew-expenses-toolbar input,
+.crew-expenses-toolbar select,
+.crew-expenses-pagination select,
+.crew-expenses-modal input,
+.crew-expenses-modal select {
+  font-size: 13px;
+}
+.crew-expenses-actions button,
+.crew-expenses-row-actions button,
+.receipt-upload,
+.crew-expenses-pagination button,
+.crew-expenses-modal-actions button {
+  font-size: 13px;
+}
+.crew-expenses-pagination {
+  color: #52697c;
+  font-size: 13px;
+}
+.crew-expenses-empty {
+  color: #40586a;
+  font-size: 14px;
+}
+.crew-expenses-modal-heading h2 {
+  font-size: 19px;
+}
+.crew-expenses-summary article strong {
+  font-weight: 800;
+}
+.crew-expenses-summary article small {
+  color: #52697c;
+  font-size: 13px;
+}

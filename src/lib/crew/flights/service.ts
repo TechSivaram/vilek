@@ -106,16 +106,8 @@ export const crewFlightsService = {
     const aggregate = db
       .select({
         total: count(),
-        upcoming: sql<number>`coalesce(sum(case
-          when ${flights.status} in ('BOARDING', 'DEPARTED') then 1
-          when ${flights.status} = 'SCHEDULED'
-            and datetime(${flights.scheduledDeparture}) >= datetime('now', 'localtime') then 1
-          else 0
-        end), 0)`,
-        completed: sql<number>`coalesce(sum(case
-          when ${flights.status} in ('COMPLETED', 'CANCELLED') then 1
-          else 0
-        end), 0)`,
+        upcoming: sql<number>`coalesce(sum(case when ${flights.status} not in ('COMPLETED', 'CANCELLED') then 1 else 0 end), 0)`,
+        completed: sql<number>`coalesce(sum(case when ${flights.status} in ('COMPLETED', 'CANCELLED') then 1 else 0 end), 0)`,
       })
       .from(flightCrew)
       .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))

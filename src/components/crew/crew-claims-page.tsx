@@ -52,6 +52,14 @@ function dateLabel(value: string) {
     ? value
     : date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
+function flightLabel(airlineIata: string, flightNumber: string) {
+  const airline = airlineIata.trim();
+  const number = flightNumber.trim();
+  if (!airline) return number;
+  // Some API responses already include the airline prefix (for example "AI 701").
+  // Avoid rendering it twice in the assignment list and claim heading.
+  return number.toUpperCase().startsWith(airline.toUpperCase()) ? number : `${airline} ${number}`;
+}
 function money(value: string, currency: string) {
   const amount = Number(value);
   return `${currency} ${Number.isFinite(amount) ? amount.toFixed(2) : value}`;
@@ -74,6 +82,10 @@ export function CrewClaimsPage({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [flightSearch, setFlightSearch] = useState("");
+  const [claimFilter, setClaimFilter] = useState("ALL");
+  const [assignmentPage, setAssignmentPage] = useState(1);
+  const assignmentPageSize = 8;
 
   const refresh = useCallback(async (keepSelection = true) => {
     setLoading(true);
@@ -104,6 +116,45 @@ export function CrewClaimsPage({
     () => assignments.find((item) => item.assignmentId === selectedId) ?? null,
     [assignments, selectedId],
   );
+  const filteredAssignments = useMemo(() => {
+    const term = flightSearch.trim().toLowerCase();
+    return assignments.filter((item) => {
+      const matchesSearch =
+        !term ||
+        [
+          item.airlineIata,
+          item.flightNumber,
+          item.airlineName,
+          item.originCode,
+          item.originCity,
+          item.destinationCode,
+          item.destinationCity,
+          item.designation,
+        ].some((value) => value.toLowerCase().includes(term));
+      const status = item.claimStatus ?? "NO_CLAIM";
+      const matchesStatus = claimFilter === "ALL" || status === claimFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [assignments, flightSearch, claimFilter]);
+  const assignmentPageCount = Math.max(
+    1,
+    Math.ceil(filteredAssignments.length / assignmentPageSize),
+  );
+  const pagedAssignments = filteredAssignments.slice(
+    (assignmentPage - 1) * assignmentPageSize,
+    assignmentPage * assignmentPageSize,
+  );
+  useEffect(() => {
+    setAssignmentPage(1);
+  }, [flightSearch, claimFilter]);
+  useEffect(() => {
+    if (
+      filteredAssignments.length > 0 &&
+      !filteredAssignments.some((item) => item.assignmentId === selectedId)
+    ) {
+      setSelectedId(filteredAssignments[0].assignmentId);
+    }
+  }, [filteredAssignments, selectedId]);
   const attachedExpenses =
     selected?.expenses.filter((expense) => expense.isAttachedToThisClaim) ?? [];
   const eligibleExpenses = selected?.expenses.filter((expense) => !expense.isClaimed) ?? [];
@@ -238,40 +289,108 @@ export function CrewClaimsPage({
                 </div>
                 <span>{assignments.length}</span>
               </div>
+              {!loading && assignments.length > 0 && (
+                <div className="crew-claims-assignment-tools">
+                  <label className="crew-claims-search">
+                    <span className="sr-only">Search flight assignments</span>
+                    <input
+                      type="search"
+                      value={flightSearch}
+                      onChange={(event) => setFlightSearch(event.target.value)}
+                      placeholder="Search flight, route or city"
+                    />
+                  </label>
+                  <label className="crew-claims-filter">
+                    <span className="sr-only">Filter claims by status</span>
+                    <select
+                      value={claimFilter}
+                      onChange={(event) => setClaimFilter(event.target.value)}
+                    >
+                      <option value="ALL">All claims</option>
+                      <option value="NO_CLAIM">No claim</option>
+                      <option value="DRAFT">Draft</option>
+                      <option value="SUBMITTED">Submitted</option>
+                      <option value="REVISION_REQUIRED">Needs correction</option>
+                      <option value="REJECTED">Rejected</option>
+                      <option value="APPROVED">Approved</option>
+                      <option value="PAID">Paid</option>
+                    </select>
+                  </label>
+                  <span className="crew-claims-result-count">
+                    {filteredAssignments.length} of {assignments.length}
+                  </span>
+                </div>
+              )}
               {loading ? (
                 <div className="crew-claims-empty">Loading your assignments…</div>
               ) : assignments.length === 0 ? (
                 <div className="crew-claims-empty">
                   No flight assignments are linked to your crew profile yet.
                 </div>
-              ) : (
-                <div className="crew-claims-assignment-list">
-                  {assignments.map((item) => (
-                    <button
-                      type="button"
-                      key={item.assignmentId}
-                      className={`crew-claims-assignment ${selectedId === item.assignmentId ? "is-selected" : ""}`}
-                      onClick={() => {
-                        setSelectedId(item.assignmentId);
-                        setError("");
-                        setNotice("");
-                      }}
-                    >
-                      <span className="crew-claims-flight">
-                        {item.airlineIata} {item.flightNumber}
-                      </span>
-                      <span className="crew-claims-route">
-                        {item.originCode} <span>→</span> {item.destinationCode}
-                      </span>
-                      <span className="crew-claims-date">{dateLabel(item.scheduledDeparture)}</span>
-                      <span
-                        className={`crew-claims-status ${item.claimStatus === "SUBMITTED" ? "is-submitted" : item.claimStatus === "DRAFT" ? "is-draft" : "is-none"}`}
-                      >
-                        {item.claimStatus ?? "No claim"}
-                      </span>
-                    </button>
-                  ))}
+              ) : filteredAssignments.length === 0 ? (
+                <div className="crew-claims-empty">
+                  No flights match your search or status filter.
                 </div>
+              ) : (
+                <>
+                  <div className="crew-claims-assignment-list">
+                    {pagedAssignments.map((item) => (
+                      <button
+                        type="button"
+                        key={item.assignmentId}
+                        className={`crew-claims-assignment ${selectedId === item.assignmentId ? "is-selected" : ""}`}
+                        onClick={() => {
+                          setSelectedId(item.assignmentId);
+                          setError("");
+                          setNotice("");
+                        }}
+                      >
+                        <span className="crew-claims-flight">
+                          {flightLabel(item.airlineIata, item.flightNumber)}
+                        </span>
+                        <span className="crew-claims-route">
+                          {item.originCode} <span>→</span> {item.destinationCode}
+                        </span>
+                        <span className="crew-claims-date">
+                          {dateLabel(item.scheduledDeparture)}
+                        </span>
+                        <span
+                          className={`crew-claims-status ${item.claimStatus === "SUBMITTED" ? "is-submitted" : item.claimStatus === "DRAFT" || item.claimStatus === "REVISION_REQUIRED" ? "is-draft" : item.claimStatus === "REJECTED" ? "is-rejected" : "is-none"}`}
+                        >
+                          {item.claimStatus ?? "No claim"}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="crew-claims-pagination">
+                    <span>
+                      Showing {(assignmentPage - 1) * assignmentPageSize + 1}–
+                      {Math.min(assignmentPage * assignmentPageSize, filteredAssignments.length)} of{" "}
+                      {filteredAssignments.length}
+                    </span>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setAssignmentPage((page) => Math.max(1, page - 1))}
+                        disabled={assignmentPage <= 1}
+                      >
+                        Previous
+                      </button>
+                      <span>
+                        Page {assignmentPage} of {assignmentPageCount}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setAssignmentPage((page) => Math.min(assignmentPageCount, page + 1))
+                        }
+                        disabled={assignmentPage >= assignmentPageCount}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </>
               )}
             </section>
             <section className="crew-claims-panel crew-claims-detail">
@@ -284,9 +403,7 @@ export function CrewClaimsPage({
                       <span className="role-dashboard-eyebrow">
                         {selected.airlineName} · {selected.designation}
                       </span>
-                      <h2>
-                        {selected.airlineIata} {selected.flightNumber}
-                      </h2>
+                      <h2>{flightLabel(selected.airlineIata, selected.flightNumber)}</h2>
                       <p>
                         {selected.originCity} ({selected.originCode}) → {selected.destinationCity} (
                         {selected.destinationCode})
