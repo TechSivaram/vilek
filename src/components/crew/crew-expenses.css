@@ -554,3 +554,29 @@
   color: #52697c;
   font-size: 13px;
 }
+
+.crew-expense-document-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 3px 0;
+}
+.crew-expense-document-row .crew-expenses-doc-link {
+  margin: 0;
+}
+.crew-expense-document-row button {
+  min-height: 24px;
+  padding: 0 7px;
+  border: 1px solid #dfe7eb;
+  border-radius: 6px;
+  color: #a33b3b;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.crew-expense-document-row button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

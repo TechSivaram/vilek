@@ -45,4 +45,4 @@ next-env.d.ts
 #/data/*.db
 #/data/*.db-*
 src.zip
-data/expense-documents
+data/expense-documents/*

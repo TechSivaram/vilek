@@ -355,12 +355,19 @@ export const crewExpensesService = {
         fileName: expenseDocuments.fileName,
         contentType: expenseDocuments.contentType,
         expenseId: expenseDocuments.expenseId,
+        claimId: claimExpenses.claimId,
+        claimStatus: claims.status,
       })
       .from(expenseDocuments)
       .innerJoin(expenses, eq(expenseDocuments.expenseId, expenses.id))
       .innerJoin(flightCrew, eq(expenses.flightCrewId, flightCrew.id))
       .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
+      .leftJoin(claimExpenses, eq(claimExpenses.expenseId, expenses.id))
+      .leftJoin(claims, eq(claimExpenses.claimId, claims.id))
       .where(and(eq(expenseDocuments.id, documentId), eq(crewMembers.userId, userId)))
       .get();
+  },
+  deleteDocument(documentId: string) {
+    db.delete(expenseDocuments).where(eq(expenseDocuments.id, documentId)).run();
   },
 };

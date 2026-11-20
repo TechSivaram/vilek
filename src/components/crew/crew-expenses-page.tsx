@@ -236,6 +236,24 @@ export function CrewExpensesPage({
       setBusy(false);
     }
   }
+  async function removeDocument(doc: Expense["documents"][number]) {
+    if (!window.confirm(`Remove receipt “${doc.fileName}”?`)) return;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const r = await fetch(`/api/crew/expense-documents/${doc.id}`, { method: "DELETE" });
+      const p = await r.json();
+      if (!r.ok) throw new Error(p.error ?? "Unable to remove receipt.");
+      setNotice("Receipt removed.");
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unable to remove receipt.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function upload(item: Expense, file?: File) {
     if (!file) return;
     const body = new FormData();
@@ -515,15 +533,25 @@ export function CrewExpensesPage({
                           <td>
                             {item.documents.length ? (
                               item.documents.map((doc) => (
-                                <a
-                                  className="crew-expenses-doc-link"
-                                  key={doc.id}
-                                  href={`/api/crew/expense-documents/${doc.id}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  {doc.fileName}
-                                </a>
+                                <div className="crew-expense-document-row" key={doc.id}>
+                                  <a
+                                    className="crew-expenses-doc-link"
+                                    href={`/api/crew/expense-documents/${doc.id}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {doc.fileName}
+                                  </a>
+                                  {canUploadReceipt(item) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => void removeDocument(doc)}
+                                      disabled={busy}
+                                    >
+                                      Remove
+                                    </button>
+                                  )}
+                                </div>
                               ))
                             ) : (
                               <span>No receipt</span>
@@ -593,15 +621,25 @@ export function CrewExpensesPage({
                       </div>
                       {item.location && <p>{item.location}</p>}
                       {item.documents.map((doc) => (
-                        <a
-                          className="crew-expenses-doc-link"
-                          key={doc.id}
-                          href={`/api/crew/expense-documents/${doc.id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          View {doc.fileName}
-                        </a>
+                        <div className="crew-expense-document-row" key={doc.id}>
+                          <a
+                            className="crew-expenses-doc-link"
+                            href={`/api/crew/expense-documents/${doc.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            View {doc.fileName}
+                          </a>
+                          {canUploadReceipt(item) && (
+                            <button
+                              type="button"
+                              onClick={() => void removeDocument(doc)}
+                              disabled={busy}
+                            >
+                              Remove receipt
+                            </button>
+                          )}
+                        </div>
                       ))}
                       <div className="crew-expenses-row-actions">
                         {(!item.claimId ||
