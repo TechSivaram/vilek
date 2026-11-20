@@ -63,7 +63,10 @@ export const POST = withRouteGuard({ roles: ["CREW"] }, async (request, _context
     );
   } catch (error) {
     if (error instanceof Error && error.message === "EXPENSE_CLAIM_LOCKED")
-      return NextResponse.json({ error: "This flight claim is locked. Reopen a rejected claim before adding expenses." }, { status: 409 });
+      return NextResponse.json(
+        { error: "This flight claim is locked. Reopen a rejected claim before adding expenses." },
+        { status: 409 },
+      );
     if (error instanceof Error && error.message === "ASSIGNMENT_NOT_FOUND")
       return NextResponse.json(
         { error: "The selected flight assignment is not available to your account." },

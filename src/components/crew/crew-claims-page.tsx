@@ -37,7 +37,13 @@ type Assignment = {
   claimStatus: string | null;
   claimCreatedAt: string | null;
   expenses: Expense[];
-  comments: { id: string; comment: string; createdAt: string; authorFirstName: string; authorLastName: string }[];
+  comments: {
+    id: string;
+    comment: string;
+    createdAt: string;
+    authorFirstName: string;
+    authorLastName: string;
+  }[];
 };
 
 function dateLabel(value: string) {
@@ -101,7 +107,8 @@ export function CrewClaimsPage({
   const attachedExpenses =
     selected?.expenses.filter((expense) => expense.isAttachedToThisClaim) ?? [];
   const eligibleExpenses = selected?.expenses.filter((expense) => !expense.isClaimed) ?? [];
-  const canEditClaim = selected?.claimStatus === "DRAFT" || selected?.claimStatus === "REVISION_REQUIRED";
+  const canEditClaim =
+    selected?.claimStatus === "DRAFT" || selected?.claimStatus === "REVISION_REQUIRED";
   const totalsByCurrency = attachedExpenses.reduce<Record<string, number>>((totals, expense) => {
     totals[expense.currencyCode] =
       (totals[expense.currencyCode] ?? 0) + (Number(expense.amount) || 0);
@@ -379,7 +386,9 @@ export function CrewClaimsPage({
                       {canEditClaim ? (
                         <div className="crew-claims-submit">
                           <span>
-                            {selected.claimStatus === "REVISION_REQUIRED" ? "Correct the rejected claim and resubmit it for review." : "Review the expenses before submitting. A submitted claim can no longer be edited."}
+                            {selected.claimStatus === "REVISION_REQUIRED"
+                              ? "Correct the rejected claim and resubmit it for review."
+                              : "Review the expenses before submitting. A submitted claim can no longer be edited."}
                           </span>
                           <button
                             type="button"
@@ -392,14 +401,23 @@ export function CrewClaimsPage({
                         </div>
                       ) : selected.claimStatus === "REJECTED" ? (
                         <div className="crew-claims-submit">
-                          <span>This claim was rejected. Review the comments below, then reopen it to make corrections.</span>
-                          <button type="button" className="crew-claims-primary" disabled={busy} onClick={() => claimAction("reopen")}>
+                          <span>
+                            This claim was rejected. Review the comments below, then reopen it to
+                            make corrections.
+                          </span>
+                          <button
+                            type="button"
+                            className="crew-claims-primary"
+                            disabled={busy}
+                            onClick={() => claimAction("reopen")}
+                          >
                             Reopen for correction
                           </button>
                         </div>
                       ) : (
                         <p className="crew-claims-submitted-note">
-                          This claim is {selected.claimStatus?.toLowerCase().replaceAll("_", " ")} and is read-only.
+                          This claim is {selected.claimStatus?.toLowerCase().replaceAll("_", " ")}{" "}
+                          and is read-only.
                         </p>
                       )}
                       {selected.comments.length > 0 && (
@@ -408,7 +426,10 @@ export function CrewClaimsPage({
                           {selected.comments.map((comment) => (
                             <article key={comment.id} className="crew-claims-comment">
                               <p>{comment.comment}</p>
-                              <small>{comment.authorFirstName} {comment.authorLastName} · {dateLabel(comment.createdAt)}</small>
+                              <small>
+                                {comment.authorFirstName} {comment.authorLastName} ·{" "}
+                                {dateLabel(comment.createdAt)}
+                              </small>
                             </article>
                           ))}
                         </section>

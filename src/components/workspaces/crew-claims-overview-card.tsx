@@ -18,46 +18,89 @@ export function CrewClaimsOverviewCard() {
   });
   const assignments = query.data?.assignments ?? [];
   const claims = assignments.filter((item) => item.claimId);
-  const count = (statuses: string[]) => claims.filter((item) => statuses.includes(item.claimStatus ?? "")).length;
+  const count = (statuses: string[]) =>
+    claims.filter((item) => statuses.includes(item.claimStatus ?? "")).length;
   const updated = query.dataUpdatedAt
-    ? new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(query.dataUpdatedAt)
+    ? new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(
+        query.dataUpdatedAt,
+      )
     : null;
 
   return (
     <article className="role-dashboard-capability crew-claims-overview-card">
       <div className="crew-claims-overview-header">
         <div className="crew-claims-overview-title">
-          <span className="role-dashboard-capability-icon" aria-hidden="true">▤</span>
+          <span className="role-dashboard-capability-icon" aria-hidden="true">
+            ▤
+          </span>
           <h2>My claims</h2>
         </div>
         <div className="crew-claims-overview-refresh">
-          <span aria-live="polite">{query.isFetching ? "Refreshing…" : updated ? `Updated ${updated}` : "Claims summary"}</span>
-          <button type="button" onClick={() => void query.refetch()} disabled={query.isFetching} aria-label="Refresh claims summary" title="Refresh claims summary">↻</button>
+          <span aria-live="polite">
+            {query.isFetching ? "Refreshing…" : updated ? `Updated ${updated}` : "Claims summary"}
+          </span>
+          <button
+            type="button"
+            onClick={() => void query.refetch()}
+            disabled={query.isFetching}
+            aria-label="Refresh claims summary"
+            title="Refresh claims summary"
+          >
+            ↻
+          </button>
         </div>
       </div>
       {query.isPending ? (
         <p className="crew-claims-overview-message">Loading your claims summary…</p>
       ) : query.isError && !query.data ? (
         <div className="crew-claims-overview-error" role="alert">
-          <p>{query.error instanceof Error ? query.error.message : "Unable to load claims summary."}</p>
-          <button type="button" onClick={() => void query.refetch()}>Try again</button>
+          <p>
+            {query.error instanceof Error ? query.error.message : "Unable to load claims summary."}
+          </p>
+          <button type="button" onClick={() => void query.refetch()}>
+            Try again
+          </button>
         </div>
       ) : (
         <>
           <div className="crew-claims-overview-stats">
-            <div><strong>{claims.length}</strong><span>Total claims</span></div>
-            <div><strong>{count(["SUBMITTED"])}</strong><span>Submitted</span></div>
-            <div><strong>{count(["REVISION_REQUIRED", "REJECTED"])}</strong><span>Needs attention</span></div>
+            <div>
+              <strong>{claims.length}</strong>
+              <span>Total claims</span>
+            </div>
+            <div>
+              <strong>{count(["SUBMITTED"])}</strong>
+              <span>Submitted</span>
+            </div>
+            <div>
+              <strong>{count(["REVISION_REQUIRED", "REJECTED"])}</strong>
+              <span>Needs attention</span>
+            </div>
           </div>
           <div className="crew-claims-overview-statuses">
-            <div><span className="is-approved" />Approved <strong>{count(["APPROVED"])}</strong></div>
-            <div><span className="is-paid" />Paid <strong>{count(["PAID"])}</strong></div>
-            <div><span className="is-draft" />Draft <strong>{count(["DRAFT"])}</strong></div>
+            <div>
+              <span className="is-approved" />
+              Approved <strong>{count(["APPROVED"])}</strong>
+            </div>
+            <div>
+              <span className="is-paid" />
+              Paid <strong>{count(["PAID"])}</strong>
+            </div>
+            <div>
+              <span className="is-draft" />
+              Draft <strong>{count(["DRAFT"])}</strong>
+            </div>
           </div>
-          {query.isError ? <p className="crew-claims-overview-message">Refresh failed. Showing the last loaded information.</p> : null}
+          {query.isError ? (
+            <p className="crew-claims-overview-message">
+              Refresh failed. Showing the last loaded information.
+            </p>
+          ) : null}
         </>
       )}
-      <Link href="/crew/claims" className="role-dashboard-capability-link">View all claims <span aria-hidden="true">→</span></Link>
+      <Link href="/crew/claims" className="role-dashboard-capability-link">
+        View all claims <span aria-hidden="true">→</span>
+      </Link>
     </article>
   );
 }

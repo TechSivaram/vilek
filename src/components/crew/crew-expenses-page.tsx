@@ -552,7 +552,11 @@ export function CrewExpensesPage({
                                 <input
                                   type="file"
                                   accept="application/pdf,image/jpeg,image/png"
-                                  disabled={busy || (Boolean(item.claimId) && item.claimStatus !== "REVISION_REQUIRED")}
+                                  disabled={
+                                    busy ||
+                                    (Boolean(item.claimId) &&
+                                      item.claimStatus !== "REVISION_REQUIRED")
+                                  }
                                   onChange={(e) => {
                                     void upload(item, e.target.files?.[0]);
                                     e.currentTarget.value = "";
@@ -602,7 +606,11 @@ export function CrewExpensesPage({
                               Edit
                             </button>
                             {!item.claimId && (
-                              <button type="button" onClick={() => void remove(item)} disabled={busy}>
+                              <button
+                                type="button"
+                                onClick={() => void remove(item)}
+                                disabled={busy}
+                              >
                                 Delete
                               </button>
                             )}
@@ -613,7 +621,10 @@ export function CrewExpensesPage({
                           <input
                             type="file"
                             accept="application/pdf,image/jpeg,image/png"
-                            disabled={busy || (Boolean(item.claimId) && item.claimStatus !== "REVISION_REQUIRED")}
+                            disabled={
+                              busy ||
+                              (Boolean(item.claimId) && item.claimStatus !== "REVISION_REQUIRED")
+                            }
                             onChange={(e) => {
                               void upload(item, e.target.files?.[0]);
                               e.currentTarget.value = "";
