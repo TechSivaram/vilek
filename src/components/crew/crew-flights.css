@@ -397,3 +397,236 @@
     flex-direction: column;
   }
 }
+
+/* Shared ViLek Crew workspace visual language */
+.crew-flights-shell .role-dashboard-nav a,
+.crew-claims-shell .role-dashboard-nav a {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #40566b;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.crew-flights-shell .role-dashboard-nav a:hover,
+.crew-claims-shell .role-dashboard-nav a:hover {
+  color: #145db5;
+  background: #f3f7fc;
+  border-color: #e5edf7;
+}
+.crew-flights-shell .role-dashboard-nav a.is-active,
+.crew-claims-shell .role-dashboard-nav a.is-active {
+  color: #075fc5;
+  background: #eaf2ff;
+  border-color: #d7e6ff;
+  font-weight: 750;
+}
+.crew-flights-shell .role-dashboard-nav a > span:first-child,
+.crew-claims-shell .role-dashboard-nav a > span:first-child {
+  display: inline-flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  color: inherit;
+  background: #f0f4f8;
+  font-size: 15px;
+  line-height: 1;
+}
+.crew-flights-shell .role-dashboard-nav a.is-active > span:first-child,
+.crew-claims-shell .role-dashboard-nav a.is-active > span:first-child {
+  background: #dceaff;
+}
+.crew-flights-shell .role-dashboard-heading,
+.crew-claims-shell .role-dashboard-heading {
+  margin-bottom: 22px;
+}
+.crew-flights-shell .role-dashboard-heading h1,
+.crew-claims-shell .role-dashboard-heading h1 {
+  color: #1d3448;
+  font-size: clamp(25px, 2.2vw, 32px);
+  font-weight: 780;
+  letter-spacing: -0.8px;
+}
+.crew-flights-shell .role-dashboard-heading p,
+.crew-claims-shell .role-dashboard-heading p {
+  color: #637b91;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.crew-flights-shell .role-dashboard-heading-icon,
+.crew-claims-shell .role-dashboard-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid #d7e6ff;
+  border-radius: 15px;
+  color: #075fc5;
+  background: #eaf2ff;
+}
+@media (max-width: 760px) {
+  .crew-flights-shell .role-dashboard-sidebar,
+  .crew-claims-shell .role-dashboard-sidebar {
+    width: min(290px, 86vw);
+    box-shadow: 12px 0 32px rgb(20 43 60 / 12%);
+  }
+  .crew-flights-shell .role-dashboard-content,
+  .crew-claims-shell .role-dashboard-content {
+    padding: 22px 16px 28px;
+  }
+}
+
+/* ViLek Enterprise UI refresh — flight assignments */
+.crew-flights-summary {
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.crew-flights-summary article {
+  gap: 10px;
+  padding: 21px 22px;
+  border-color: #dfe7ef;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(20, 43, 67, 0.025);
+}
+.crew-flights-summary article span {
+  color: #657a90;
+  font-size: 12px;
+  font-weight: 650;
+}
+.crew-flights-summary article strong {
+  color: #18334f;
+  font-size: 29px;
+  font-weight: 760;
+}
+.crew-flights-panel {
+  border-color: #dfe7ef;
+  border-radius: 15px;
+  box-shadow: 0 4px 16px rgba(20, 43, 67, 0.035);
+}
+.crew-flights-panel-heading {
+  padding: 22px 24px;
+  border-bottom-color: #e7edf4;
+}
+.crew-flights-panel-heading h2 {
+  color: #18334f;
+  font-size: 19px;
+}
+.crew-flights-panel-heading p {
+  color: #718399;
+  font-size: 13px;
+}
+.crew-flights-toolbar {
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom-color: #e7edf4;
+  background: #fbfcfe;
+}
+.crew-flights-toolbar label {
+  color: #526981;
+  font-size: 11px;
+  font-weight: 700;
+}
+.crew-flights-toolbar input,
+.crew-flights-toolbar select,
+.crew-flights-pagination select {
+  height: 42px;
+  padding: 0 12px;
+  border-color: #d7e1ec;
+  border-radius: 9px;
+  color: #29435c;
+  font-size: 12px;
+}
+.crew-flights-toolbar input:focus,
+.crew-flights-toolbar select:focus {
+  border-color: #78a9dc;
+  box-shadow: 0 0 0 3px rgba(23, 105, 194, 0.11);
+}
+.crew-flights-reset,
+.crew-flights-pagination button {
+  min-height: 40px;
+  border-color: #d7e1ec;
+  border-radius: 9px;
+  color: #38536d;
+  background: #fff;
+  font-size: 12px;
+}
+.crew-flights-table th {
+  padding: 14px 16px;
+  color: #526981;
+  background: #f5f8fc;
+  font-size: 11px;
+  letter-spacing: 0.25px;
+}
+.crew-flights-table td {
+  padding: 16px;
+  border-top-color: #e9eef4;
+  color: #405a73;
+  font-size: 12px;
+}
+.crew-flights-table td strong {
+  color: #1d3854;
+  font-size: 12px;
+}
+.crew-flights-table td span:not(.crew-flight-status) {
+  color: #75889b;
+  font-size: 11px;
+}
+.crew-flight-status {
+  padding: 6px 10px;
+  font-size: 10px;
+  letter-spacing: 0.15px;
+}
+.crew-flights-pagination {
+  padding: 16px 20px;
+  color: #718399;
+  font-size: 11px;
+}
+@media (max-width: 760px) {
+  .crew-flights-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .crew-flights-panel-heading {
+    padding: 18px;
+  }
+  .crew-flights-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px;
+  }
+  .crew-flights-toolbar label:first-child {
+    grid-column: 1 / -1;
+  }
+  .crew-flights-table th,
+  .crew-flights-table td {
+    padding: 13px 12px;
+  }
+}
+@media (max-width: 480px) {
+  .crew-flights-summary {
+    gap: 10px;
+  }
+  .crew-flights-summary article {
+    padding: 16px;
+  }
+  .crew-flights-summary article strong {
+    font-size: 25px;
+  }
+  .crew-flights-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .crew-flights-toolbar label:first-child {
+    grid-column: auto;
+  }
+  .crew-flights-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

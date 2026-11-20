@@ -217,29 +217,53 @@ export function CrewClaimsPage({
     );
   }
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   return (
-    <div className="role-dashboard role-dashboard--crew crew-claims-shell">
+    <div
+      className={`role-dashboard role-dashboard--crew crew-claims-shell${sidebarCollapsed ? " crew-sidebar-collapsed" : ""}${mobileNavOpen ? " crew-mobile-nav-open" : ""}`}
+    >
       <aside className="role-dashboard-sidebar">
+        <button
+          type="button"
+          className="crew-sidebar-toggle"
+          onClick={() => setSidebarCollapsed((value) => !value)}
+          aria-label={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
+          aria-expanded={!sidebarCollapsed}
+          title={sidebarCollapsed ? "Expand navigation" : "Collapse navigation"}
+        >
+          <span aria-hidden="true">{sidebarCollapsed ? "›" : "‹"}</span>
+        </button>
         <Link href="/crew" className="role-dashboard-brand" aria-label="ViLek dashboard">
           <Image src="/Branding/logo.png" alt="ViLek" width={118} height={48} priority />
         </Link>
         <div className="role-dashboard-sidebar-label">WORKSPACE</div>
-        <div className="role-dashboard-current">
+        <div className="role-dashboard-current" title="Crew workspace">
           <span>♙</span>
           <strong>Crew workspace</strong>
         </div>
         <nav className="role-dashboard-nav" aria-label="Crew navigation">
-          <Link href="/crew">
-            <span>◫</span> Overview
+          <Link href="/crew" onClick={() => setMobileNavOpen(false)}>
+            <span className="crew-nav-icon">◫</span>
+            <span className="crew-nav-label">Overview</span>
           </Link>
-          <Link href="/crew/flights">
-            <span>✈</span> My flights
+          <Link href="/crew/flights" onClick={() => setMobileNavOpen(false)}>
+            <span className="crew-nav-icon">✈</span>
+            <span className="crew-nav-label">My flights</span>
           </Link>
-          <Link href="/crew/expenses">
-            <span>₹</span> My expenses
+          <Link href="/crew/expenses" onClick={() => setMobileNavOpen(false)}>
+            <span className="crew-nav-icon">₹</span>
+            <span className="crew-nav-label">My expenses</span>
           </Link>
-          <Link href="/crew/claims" className="is-active">
-            <span>▤</span> My claims
+          <Link
+            href="/crew/claims"
+            className={"is-active"}
+            aria-current={"page"}
+            onClick={() => setMobileNavOpen(false)}
+          >
+            <span className="crew-nav-icon">▤</span>
+            <span className="crew-nav-label">My claims</span>
           </Link>
         </nav>
         <div className="role-dashboard-sidebar-bottom">
@@ -251,6 +275,18 @@ export function CrewClaimsPage({
       </aside>
       <div className="role-dashboard-main">
         <header className="role-dashboard-topbar">
+          <Link href="/crew" className="crew-topbar-brand" aria-label="ViLek home">
+            <Image src="/Branding/logo.png" alt="ViLek" width={42} height={42} priority />
+          </Link>
+          <button
+            type="button"
+            className="crew-mobile-nav-toggle"
+            onClick={() => setMobileNavOpen((value) => !value)}
+            aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileNavOpen}
+          >
+            <span aria-hidden="true">{mobileNavOpen ? "×" : "☰"}</span>
+          </button>
           <div className="role-dashboard-breadcrumb">
             <Link href="/crew">Crew workspace</Link>
             <span>/</span>

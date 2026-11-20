@@ -14,7 +14,10 @@ export function ProfileMenu({
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const initials = `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`.toUpperCase();
+  const initials =
+    `${firstName.slice(0, 1)}${lastName.slice(0, 1)}`.toUpperCase() ||
+    email.slice(0, 1).toUpperCase() ||
+    "U";
 
   useEffect(() => {
     if (!open) return;
@@ -36,6 +39,7 @@ export function ProfileMenu({
     <div className="profile-menu" ref={rootRef}>
       <button
         className="profile-menu__trigger"
+        data-profile-trigger="true"
         type="button"
         aria-label="Open profile menu"
         aria-haspopup="menu"

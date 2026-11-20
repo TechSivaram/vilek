@@ -580,3 +580,642 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+/* ViLek Expenses — cohesive enterprise visual pass */
+.crew-expenses-shell {
+  --expense-ink: #183247;
+  --expense-muted: #64798b;
+  --expense-line: #e4ebf1;
+  --expense-blue: #176bc1;
+  --expense-teal: #087f79;
+  background: #f4f7fb;
+}
+.crew-expenses-content {
+  width: 100%;
+  max-width: 1600px;
+  padding-top: 30px;
+}
+.crew-expenses-shell .role-dashboard-heading {
+  margin-bottom: 25px;
+  align-items: center;
+}
+.crew-expenses-shell .role-dashboard-heading h1 {
+  color: var(--expense-ink);
+  font-size: clamp(27px, 2.4vw, 34px);
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+.crew-expenses-shell .role-dashboard-heading p {
+  margin-top: 8px;
+  color: var(--expense-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.crew-expenses-shell .role-dashboard-eyebrow {
+  color: var(--expense-blue);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.crew-expenses-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.crew-expenses-summary article {
+  position: relative;
+  min-height: 112px;
+  justify-content: center;
+  gap: 10px;
+  padding: 19px 20px;
+  border: 1px solid var(--expense-line);
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(25, 52, 73, 0.025);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+.crew-expenses-summary article:hover {
+  border-color: #cbdceb;
+  box-shadow: 0 7px 20px rgba(25, 52, 73, 0.06);
+  transform: translateY(-1px);
+}
+.crew-expenses-summary article span {
+  color: #687e90;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.005em;
+}
+.crew-expenses-summary article strong {
+  color: var(--expense-ink);
+  font-size: 27px;
+  font-weight: 780;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+.crew-expenses-summary article .crew-expenses-total {
+  font-size: clamp(17px, 1.4vw, 21px);
+  letter-spacing: -0.02em;
+}
+.crew-expenses-summary article small {
+  color: #8393a1;
+  font-size: 11px;
+}
+.crew-expenses-panel {
+  border: 1px solid var(--expense-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(25, 52, 73, 0.035);
+}
+.crew-expenses-panel-heading {
+  min-height: 76px;
+  padding: 18px 21px;
+  border-bottom: 1px solid #eaf0f4;
+}
+.crew-expenses-panel-heading h2 {
+  color: var(--expense-ink);
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+}
+.crew-expenses-panel-heading p {
+  margin-top: 5px;
+  color: #7b8d9c;
+  font-size: 12px;
+}
+.crew-expenses-actions {
+  gap: 8px;
+}
+.crew-expenses-actions button,
+.crew-expenses-row-actions button,
+.crew-expenses-pagination button,
+.receipt-upload {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #d8e2ea;
+  border-radius: 8px;
+  color: #405a6f;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 650;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.crew-expenses-actions button:hover,
+.crew-expenses-row-actions button:hover,
+.crew-expenses-pagination button:hover:not(:disabled),
+.receipt-upload:hover {
+  border-color: #a9c6df;
+  color: #155d9f;
+  background: #f5f9fd;
+}
+.crew-expenses-actions button.primary,
+.crew-expenses-modal-actions button.primary {
+  border-color: #087f79;
+  color: #fff;
+  background: #087f79;
+  box-shadow: 0 2px 5px rgba(8, 127, 121, 0.14);
+}
+.crew-expenses-actions button.primary:hover,
+.crew-expenses-modal-actions button.primary:hover {
+  border-color: #066b66;
+  background: #066b66;
+}
+.crew-expenses-toolbar {
+  grid-template-columns: minmax(190px, 1.7fr) repeat(7, minmax(110px, 1fr));
+  gap: 11px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaf0f4;
+  background: #fbfcfe;
+}
+.crew-expenses-toolbar label,
+.crew-expenses-modal label {
+  gap: 7px;
+  color: #536b7e;
+  font-size: 11px;
+  font-weight: 700;
+}
+.crew-expenses-toolbar input,
+.crew-expenses-toolbar select,
+.crew-expenses-pagination select,
+.crew-expenses-modal input,
+.crew-expenses-modal select {
+  height: 38px;
+  padding: 0 11px;
+  border: 1px solid #dbe4eb;
+  border-radius: 8px;
+  color: #2f4a60;
+  background-color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(25, 52, 73, 0.025);
+}
+.crew-expenses-toolbar input::placeholder {
+  color: #98a6b2;
+}
+.crew-expenses-toolbar input:focus,
+.crew-expenses-toolbar select:focus,
+.crew-expenses-modal input:focus,
+.crew-expenses-modal select:focus {
+  border-color: #83b3dc;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(23, 107, 193, 0.09);
+}
+.crew-expenses-table-wrap {
+  overflow-x: auto;
+}
+.crew-expenses-table {
+  min-width: 1050px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.crew-expenses-table th {
+  padding: 13px 14px;
+  border-bottom: 1px solid #e8eef3;
+  color: #718597;
+  background: #f7f9fc;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.crew-expenses-table td {
+  padding: 15px 14px;
+  border-top: 0;
+  border-bottom: 1px solid #edf1f5;
+  color: #536b7e;
+  font-size: 12px;
+  line-height: 1.45;
+  vertical-align: middle;
+}
+.crew-expenses-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.crew-expenses-table tbody tr {
+  transition: background 0.15s ease;
+}
+.crew-expenses-table tbody tr:hover {
+  background: #f8fbfe;
+}
+.crew-expenses-table td strong {
+  color: #243f54;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.crew-expenses-table td span {
+  margin-top: 4px;
+  color: #7a8d9d;
+  font-size: 11px;
+}
+.crew-expenses-table td:nth-child(5) strong {
+  color: #203c52;
+  font-size: 13px;
+  font-weight: 760;
+  white-space: nowrap;
+}
+.crew-expenses-status {
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 10px !important;
+  font-weight: 750;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+.crew-expenses-status.unclaimed {
+  color: #08766f !important;
+  background: #e8f6f3;
+}
+.crew-expenses-status.claimed {
+  color: #21649b !important;
+  background: #eaf3fb;
+}
+.crew-expenses-row-actions {
+  gap: 6px;
+}
+.crew-expenses-row-actions button,
+.receipt-upload {
+  min-height: 29px;
+  padding: 0 9px;
+  font-size: 11px;
+  font-weight: 650;
+}
+.crew-expenses-row-actions button:nth-child(2) {
+  color: #a34b4b;
+}
+.crew-expenses-doc-link {
+  max-width: 170px;
+  color: #087f79;
+  font-size: 11px;
+  font-weight: 600;
+}
+.crew-expense-document-row {
+  gap: 7px;
+}
+.crew-expense-document-row button {
+  min-height: 25px;
+  border-radius: 6px;
+  font-size: 10px;
+}
+.crew-expenses-pagination {
+  padding: 13px 18px;
+  color: #718597;
+  font-size: 12px;
+  background: #fcfdff;
+}
+.crew-expenses-pagination select {
+  width: 70px;
+  height: 32px;
+}
+.crew-expenses-pagination button {
+  min-height: 32px;
+}
+.crew-expenses-empty {
+  padding: 42px 20px;
+  color: #718597;
+  font-size: 13px;
+}
+.crew-expenses-alert,
+.crew-expenses-notice {
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.crew-expenses-modal {
+  gap: 17px;
+  padding: 25px;
+  border-color: #e1e9ef;
+  border-radius: 16px;
+}
+.crew-expenses-modal-heading h2 {
+  margin-top: 5px;
+  color: var(--expense-ink);
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+}
+.crew-expenses-modal-heading > button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e1e8ee;
+  border-radius: 8px;
+  color: #607789;
+  background: #fff;
+  font-size: 20px;
+}
+.crew-expenses-form-grid {
+  gap: 13px;
+}
+.crew-expenses-modal input,
+.crew-expenses-modal select {
+  height: 41px;
+}
+.crew-expenses-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 7px;
+}
+.crew-expenses-modal-actions button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid #d8e2ea;
+  border-radius: 8px;
+  color: #405a6f;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 650;
+}
+.crew-expenses-mobile-list {
+  display: none;
+}
+
+@media (max-width: 1250px) {
+  .crew-expenses-toolbar {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .crew-expenses-toolbar label.wide {
+    grid-column: span 2;
+  }
+  .crew-expenses-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 850px) {
+  .crew-expenses-content {
+    padding-top: 22px;
+  }
+  .crew-expenses-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .crew-expenses-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .crew-expenses-toolbar label.wide {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 640px) {
+  .crew-expenses-shell .role-dashboard-heading {
+    align-items: flex-start;
+  }
+  .crew-expenses-shell .role-dashboard-heading-icon {
+    display: none;
+  }
+  .crew-expenses-summary {
+    gap: 9px;
+  }
+  .crew-expenses-summary article {
+    min-height: 96px;
+    padding: 14px;
+  }
+  .crew-expenses-summary article strong {
+    font-size: 23px;
+  }
+  .crew-expenses-summary article .crew-expenses-total {
+    font-size: 16px;
+  }
+  .crew-expenses-panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+  }
+  .crew-expenses-actions {
+    width: 100%;
+  }
+  .crew-expenses-actions button {
+    flex: 1;
+  }
+  .crew-expenses-toolbar {
+    padding: 14px;
+    gap: 10px;
+  }
+  .crew-expenses-table-wrap {
+    display: none;
+  }
+  .crew-expenses-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+  .crew-expense-card {
+    padding: 15px;
+    border: 1px solid #e5ecf2;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 2px 7px rgba(25, 52, 73, 0.025);
+  }
+  .crew-expense-card-top > div strong {
+    font-size: 13px;
+  }
+  .crew-expense-card-top > div span,
+  .crew-expense-card-meta {
+    font-size: 11px;
+  }
+  .crew-expense-card-top > b {
+    color: #203c52;
+    font-size: 13px;
+  }
+  .crew-expense-card-meta {
+    padding-top: 10px;
+    border-top: 1px solid #edf1f5;
+    color: #718597;
+  }
+  .crew-expense-card p {
+    color: #718597;
+    font-size: 11px;
+  }
+  .crew-expenses-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .crew-expenses-pagination > div {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .crew-expenses-modal {
+    padding: 18px;
+  }
+  .crew-expenses-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 380px) {
+  .crew-expenses-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .crew-expenses-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .crew-expenses-toolbar label.wide {
+    grid-column: auto;
+  }
+}
+
+/* ViLek Enterprise UI refresh — expense register */
+.crew-expenses-summary {
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.crew-expenses-summary article {
+  gap: 10px;
+  padding: 20px 21px;
+  border-color: #dfe7ef;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px rgba(20, 43, 67, 0.025);
+}
+.crew-expenses-summary article span {
+  color: #657a90;
+  font-size: 12px;
+}
+.crew-expenses-summary article strong {
+  color: #18334f;
+  font-size: 28px;
+  font-weight: 760;
+}
+.crew-expenses-summary article .crew-expenses-total {
+  font-size: 19px;
+}
+.crew-expenses-panel {
+  border-color: #dfe7ef;
+  border-radius: 15px;
+  box-shadow: 0 4px 16px rgba(20, 43, 67, 0.035);
+}
+.crew-expenses-panel-heading {
+  padding: 21px 23px;
+  border-bottom-color: #e7edf4;
+}
+.crew-expenses-panel-heading h2 {
+  color: #18334f;
+  font-size: 19px;
+}
+.crew-expenses-panel-heading p {
+  color: #718399;
+  font-size: 13px;
+}
+.crew-expenses-actions button,
+.crew-expenses-row-actions button,
+.receipt-upload,
+.crew-expenses-pagination button {
+  min-height: 36px;
+  padding: 0 12px;
+  border-color: #d7e1ec;
+  border-radius: 8px;
+  color: #38536d;
+  font-size: 11px;
+}
+.crew-expenses-actions button.primary,
+.crew-expenses-modal-actions button.primary {
+  border-color: #145eae;
+  background: #1769c2;
+}
+.crew-expenses-toolbar {
+  gap: 11px;
+  padding: 18px 20px;
+  border-bottom-color: #e7edf4;
+  background: #fbfcfe;
+}
+.crew-expenses-toolbar label,
+.crew-expenses-modal label {
+  color: #526981;
+  font-size: 11px;
+}
+.crew-expenses-toolbar input,
+.crew-expenses-toolbar select,
+.crew-expenses-pagination select,
+.crew-expenses-modal input,
+.crew-expenses-modal select {
+  height: 41px;
+  padding: 0 11px;
+  border-color: #d7e1ec;
+  border-radius: 9px;
+  color: #29435c;
+  font-size: 12px;
+}
+.crew-expenses-toolbar input:focus,
+.crew-expenses-toolbar select:focus,
+.crew-expenses-modal input:focus,
+.crew-expenses-modal select:focus {
+  border-color: #78a9dc;
+  box-shadow: 0 0 0 3px rgba(23, 105, 194, 0.11);
+}
+.crew-expenses-table th {
+  padding: 14px;
+  color: #526981;
+  background: #f5f8fc;
+  font-size: 11px;
+  letter-spacing: 0.2px;
+}
+.crew-expenses-table td {
+  padding: 15px 14px;
+  border-top-color: #e9eef4;
+  color: #405a73;
+  font-size: 11px;
+}
+.crew-expenses-table td strong {
+  color: #1d3854;
+  font-size: 12px;
+}
+.crew-expenses-table td span {
+  color: #75889b;
+  font-size: 10px;
+}
+.crew-expenses-status {
+  padding: 6px 9px;
+  font-size: 10px !important;
+}
+.crew-expenses-pagination {
+  padding: 15px 18px;
+  color: #718399;
+  font-size: 11px;
+}
+@media (max-width: 900px) {
+  .crew-expenses-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .crew-expenses-toolbar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .crew-expenses-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .crew-expenses-summary article {
+    padding: 15px;
+  }
+  .crew-expenses-summary article strong {
+    font-size: 24px;
+  }
+  .crew-expenses-panel-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+  }
+  .crew-expenses-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 15px;
+  }
+  .crew-expenses-toolbar label:first-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 420px) {
+  .crew-expenses-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .crew-expenses-toolbar label:first-child {
+    grid-column: auto;
+  }
+}

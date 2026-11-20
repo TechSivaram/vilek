@@ -1578,3 +1578,1026 @@
     font-size: 9px;
   }
 }
+
+/* Crew workspace collapsible navigation */
+.crew-expenses-shell .role-dashboard-sidebar {
+  transition:
+    width 180ms ease,
+    padding 180ms ease;
+}
+.crew-expenses-shell .crew-sidebar-toggle {
+  position: absolute;
+  top: 28px;
+  right: -13px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid #dce5eb;
+  border-radius: 50%;
+  color: #526779;
+  background: #fff;
+  box-shadow: 0 2px 7px rgb(20 43 60 / 10%);
+  cursor: pointer;
+  font-size: 21px;
+  line-height: 1;
+}
+.crew-expenses-shell .crew-sidebar-toggle:hover {
+  color: #087f78;
+  border-color: #a9d9d2;
+  background: #f0faf8;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-sidebar {
+  width: 84px;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-brand {
+  justify-content: center;
+  margin-right: 0;
+  margin-left: 0;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-brand img {
+  width: 48px;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-sidebar-label,
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-current strong,
+.crew-expenses-shell.crew-sidebar-collapsed .crew-nav-label,
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-help {
+  display: none;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-current {
+  justify-content: center;
+  padding: 8px 4px;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-nav a {
+  justify-content: center;
+  padding-right: 8px;
+  padding-left: 8px;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-nav a span:first-child {
+  width: auto;
+  font-size: 18px;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-main {
+  width: calc(100% - 84px);
+  margin-left: 84px;
+}
+@media (max-width: 760px) {
+  .crew-expenses-shell .crew-sidebar-toggle {
+    display: none;
+  }
+  .crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-sidebar {
+    width: 252px;
+  }
+  .crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-main {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Keep navigation icons and labels in separate, predictable columns.
+   The base selector assigns a fixed width to every span; override it for
+   the text label added by the collapsible sidebar. */
+.crew-expenses-shell .role-dashboard-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.crew-expenses-shell .role-dashboard-nav a > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  flex: 0 0 20px;
+}
+.crew-expenses-shell .role-dashboard-nav a > .crew-nav-label {
+  display: block;
+  width: auto;
+  min-width: 0;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-nav a > .crew-nav-label {
+  display: none;
+}
+.crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-nav a > span:first-child {
+  width: 20px;
+  min-width: 20px;
+  flex: 0 0 20px;
+}
+
+/* Crew navigation: consistent links and an accessible mobile drawer. */
+.crew-expenses-shell .role-dashboard-nav a {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #40566b;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.crew-expenses-shell .role-dashboard-nav a:hover {
+  color: #145db5;
+  background: #f3f7fc;
+  border-color: #e5edf7;
+}
+.crew-expenses-shell .role-dashboard-nav a.is-active {
+  color: #075fc5;
+  background: #eaf2ff;
+  border-color: #d7e6ff;
+  font-weight: 750;
+}
+.crew-expenses-shell .role-dashboard-nav a > .crew-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  color: inherit;
+  background: #f0f4f8;
+  font-size: 15px;
+  line-height: 1;
+}
+.crew-expenses-shell .role-dashboard-nav a.is-active > .crew-nav-icon {
+  background: #dceaff;
+}
+.crew-expenses-shell .role-dashboard-nav a > .crew-nav-label {
+  white-space: nowrap;
+}
+.crew-mobile-nav-toggle {
+  display: none;
+}
+@media (max-width: 760px) {
+  .crew-expenses-shell .role-dashboard-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 100;
+    display: flex;
+    width: min(290px, 84vw);
+    padding: 20px 15px 14px;
+    box-shadow: 12px 0 32px rgb(20 43 60 / 16%);
+    transform: translateX(-110%);
+    transition: transform 180ms ease;
+  }
+  .crew-expenses-shell.crew-mobile-nav-open .role-dashboard-sidebar {
+    transform: translateX(0);
+  }
+  .crew-expenses-shell .crew-sidebar-toggle {
+    display: none;
+  }
+  .crew-expenses-shell .role-dashboard-main,
+  .crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-main {
+    width: 100%;
+    margin-left: 0;
+  }
+  .crew-expenses-shell.crew-sidebar-collapsed .role-dashboard-sidebar {
+    width: min(290px, 84vw);
+    padding: 20px 15px 14px;
+  }
+  .crew-expenses-shell.crew-mobile-nav-open .role-dashboard-sidebar-label,
+  .crew-expenses-shell.crew-mobile-nav-open .role-dashboard-current strong,
+  .crew-expenses-shell.crew-mobile-nav-open .crew-nav-label,
+  .crew-expenses-shell.crew-mobile-nav-open .role-dashboard-help {
+    display: block;
+  }
+  .crew-expenses-shell.crew-mobile-nav-open .role-dashboard-current {
+    justify-content: flex-start;
+  }
+  .crew-expenses-shell.crew-mobile-nav-open .role-dashboard-nav a {
+    justify-content: flex-start;
+  }
+  .crew-mobile-nav-toggle {
+    display: grid;
+    flex: 0 0 38px;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid #dce5eb;
+    border-radius: 9px;
+    color: #24445e;
+    background: #fff;
+    cursor: pointer;
+    font-size: 19px;
+  }
+  .crew-expenses-shell .role-dashboard-topbar {
+    flex-direction: row;
+    align-items: center;
+  }
+  .crew-expenses-shell .role-dashboard-breadcrumb {
+    min-width: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crew-expenses-shell .role-dashboard-sidebar {
+    transition: none;
+  }
+}
+
+/* Crew overview: match the polished expenses workspace styling. */
+.role-dashboard--crew .role-dashboard-nav a {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #40566b;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.role-dashboard--crew .role-dashboard-nav a:hover {
+  color: #145db5;
+  background: #f3f7fc;
+  border-color: #e5edf7;
+}
+.role-dashboard--crew .role-dashboard-nav a.is-active {
+  color: #075fc5;
+  background: #eaf2ff;
+  border-color: #d7e6ff;
+  font-weight: 750;
+}
+.role-dashboard--crew .role-dashboard-nav a > span:first-child {
+  display: inline-flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  color: inherit;
+  background: #f0f4f8;
+  font-size: 15px;
+  line-height: 1;
+}
+.role-dashboard--crew .role-dashboard-nav a.is-active > span:first-child {
+  background: #dceaff;
+}
+.role-dashboard--crew .role-dashboard-heading h1 {
+  color: #1d3448;
+  font-size: clamp(25px, 2.2vw, 32px);
+  font-weight: 780;
+  letter-spacing: -0.8px;
+}
+.role-dashboard--crew .role-dashboard-heading p {
+  color: #637b91;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.role-dashboard--crew .role-dashboard-heading-icon {
+  border: 1px solid #d7e6ff;
+  border-radius: 15px;
+  color: #075fc5;
+  background: #eaf2ff;
+}
+.role-dashboard--crew .role-dashboard-capability,
+.role-dashboard--crew .crew-flights-overview-card,
+.role-dashboard--crew .crew-expense-overview-card,
+.role-dashboard--crew .crew-claims-overview-card {
+  border-color: #e3ebf2;
+  border-radius: 14px;
+  box-shadow: 0 5px 18px rgb(28 54 72 / 4%);
+}
+@media (max-width: 760px) {
+  .role-dashboard--crew .role-dashboard-content {
+    padding: 22px 16px 28px;
+  }
+  .role-dashboard--crew .role-dashboard-capabilities {
+    gap: 12px;
+  }
+}
+
+/* Shared Crew sidebar behaviour for Overview, Flights, Claims and Expenses. */
+/* Crew workspace collapsible navigation */
+.role-dashboard--crew .role-dashboard-sidebar {
+  transition:
+    width 180ms ease,
+    padding 180ms ease;
+}
+.role-dashboard--crew .crew-sidebar-toggle {
+  position: absolute;
+  top: 28px;
+  right: -13px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid #dce5eb;
+  border-radius: 50%;
+  color: #526779;
+  background: #fff;
+  box-shadow: 0 2px 7px rgb(20 43 60 / 10%);
+  cursor: pointer;
+  font-size: 21px;
+  line-height: 1;
+}
+.role-dashboard--crew .crew-sidebar-toggle:hover {
+  color: #087f78;
+  border-color: #a9d9d2;
+  background: #f0faf8;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-sidebar {
+  width: 84px;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-brand {
+  justify-content: center;
+  margin-right: 0;
+  margin-left: 0;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-brand img {
+  width: 48px;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-sidebar-label,
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-current strong,
+.role-dashboard--crew.crew-sidebar-collapsed .crew-nav-label,
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-help {
+  display: none;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-current {
+  justify-content: center;
+  padding: 8px 4px;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-nav a {
+  justify-content: center;
+  padding-right: 8px;
+  padding-left: 8px;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-nav a span:first-child {
+  width: auto;
+  font-size: 18px;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-main {
+  width: calc(100% - 84px);
+  margin-left: 84px;
+}
+@media (max-width: 760px) {
+  .role-dashboard--crew .crew-sidebar-toggle {
+    display: none;
+  }
+  .role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-sidebar {
+    width: 252px;
+  }
+  .role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-main {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Keep navigation icons and labels in separate, predictable columns.
+   The base selector assigns a fixed width to every span; override it for
+   the text label added by the collapsible sidebar. */
+.role-dashboard--crew .role-dashboard-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.role-dashboard--crew .role-dashboard-nav a > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  flex: 0 0 20px;
+}
+.role-dashboard--crew .role-dashboard-nav a > .crew-nav-label {
+  display: block;
+  width: auto;
+  min-width: 0;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-nav a > .crew-nav-label {
+  display: none;
+}
+.role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-nav a > span:first-child {
+  width: 20px;
+  min-width: 20px;
+  flex: 0 0 20px;
+}
+
+/* Crew navigation: consistent links and an accessible mobile drawer. */
+.role-dashboard--crew .role-dashboard-nav a {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #40566b;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+}
+.role-dashboard--crew .role-dashboard-nav a:hover {
+  color: #145db5;
+  background: #f3f7fc;
+  border-color: #e5edf7;
+}
+.role-dashboard--crew .role-dashboard-nav a.is-active {
+  color: #075fc5;
+  background: #eaf2ff;
+  border-color: #d7e6ff;
+  font-weight: 750;
+}
+.role-dashboard--crew .role-dashboard-nav a > .crew-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  color: inherit;
+  background: #f0f4f8;
+  font-size: 15px;
+  line-height: 1;
+}
+.role-dashboard--crew .role-dashboard-nav a.is-active > .crew-nav-icon {
+  background: #dceaff;
+}
+.role-dashboard--crew .role-dashboard-nav a > .crew-nav-label {
+  white-space: nowrap;
+}
+.crew-mobile-nav-toggle {
+  display: none;
+}
+@media (max-width: 760px) {
+  .role-dashboard--crew .role-dashboard-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 100;
+    display: flex;
+    width: min(290px, 84vw);
+    padding: 20px 15px 14px;
+    box-shadow: 12px 0 32px rgb(20 43 60 / 16%);
+    transform: translateX(-110%);
+    transition: transform 180ms ease;
+  }
+  .role-dashboard--crew.crew-mobile-nav-open .role-dashboard-sidebar {
+    transform: translateX(0);
+  }
+  .role-dashboard--crew .crew-sidebar-toggle {
+    display: none;
+  }
+  .role-dashboard--crew .role-dashboard-main,
+  .role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-main {
+    width: 100%;
+    margin-left: 0;
+  }
+  .role-dashboard--crew.crew-sidebar-collapsed .role-dashboard-sidebar {
+    width: min(290px, 84vw);
+    padding: 20px 15px 14px;
+  }
+  .role-dashboard--crew.crew-mobile-nav-open .role-dashboard-sidebar-label,
+  .role-dashboard--crew.crew-mobile-nav-open .role-dashboard-current strong,
+  .role-dashboard--crew.crew-mobile-nav-open .crew-nav-label,
+  .role-dashboard--crew.crew-mobile-nav-open .role-dashboard-help {
+    display: block;
+  }
+  .role-dashboard--crew.crew-mobile-nav-open .role-dashboard-current {
+    justify-content: flex-start;
+  }
+  .role-dashboard--crew.crew-mobile-nav-open .role-dashboard-nav a {
+    justify-content: flex-start;
+  }
+  .crew-mobile-nav-toggle {
+    display: grid;
+    flex: 0 0 38px;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid #dce5eb;
+    border-radius: 9px;
+    color: #24445e;
+    background: #fff;
+    cursor: pointer;
+    font-size: 19px;
+  }
+  .role-dashboard--crew .role-dashboard-topbar {
+    flex-direction: row;
+    align-items: center;
+  }
+  .role-dashboard--crew .role-dashboard-breadcrumb {
+    min-width: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .role-dashboard--crew .role-dashboard-sidebar {
+    transition: none;
+  }
+}
+
+/* Overview page navigation controls share the Crew Flights/Claims behaviour. */
+.role-dashboard--crew .role-dashboard-main {
+  position: relative;
+}
+.role-dashboard--crew .crew-dashboard-mobile-toggle {
+  display: none;
+}
+.role-dashboard--crew .crew-mobile-nav-backdrop {
+  display: none;
+}
+@media (max-width: 760px) {
+  .role-dashboard--crew .crew-dashboard-mobile-toggle {
+    position: static;
+    flex: 0 0 38px;
+    display: grid;
+    z-index: 102;
+  }
+  .role-dashboard--crew .role-dashboard-topbar {
+    padding-left: 12px;
+  }
+  .role-dashboard--crew .crew-mobile-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    display: block;
+    border: 0;
+    background: rgb(15 31 46 / 38%);
+  }
+}
+
+/* Crew mobile header: brand on the left, page context in the middle,
+   workspace/profile controls aligned to the far right. */
+.crew-topbar-brand {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-right: 2px;
+}
+.crew-topbar-brand img {
+  display: block;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+@media (max-width: 760px) {
+  .role-dashboard--crew .role-dashboard-topbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+  .role-dashboard--crew .crew-topbar-brand {
+    display: inline-flex;
+    width: 38px;
+    height: 38px;
+  }
+  .role-dashboard--crew .crew-topbar-brand img {
+    width: 38px;
+    height: 38px;
+  }
+  .role-dashboard--crew .role-dashboard-breadcrumb {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    gap: 6px;
+    font-size: 10px;
+  }
+  .role-dashboard--crew .role-dashboard-breadcrumb a,
+  .role-dashboard--crew .role-dashboard-breadcrumb span {
+    flex: 0 0 auto;
+  }
+  .role-dashboard--crew .role-dashboard-breadcrumb strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .role-dashboard--crew .role-dashboard-topbar-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    width: auto;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .role-dashboard--crew .workspace-switcher__trigger {
+    min-width: 0;
+    max-width: 126px;
+    padding: 5px 8px;
+    gap: 6px;
+  }
+  .role-dashboard--crew .workspace-switcher__trigger-copy {
+    min-width: 0;
+  }
+  .role-dashboard--crew .workspace-switcher__trigger-copy strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 420px) {
+  .role-dashboard--crew .role-dashboard-topbar {
+    gap: 7px;
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+  .role-dashboard--crew .crew-topbar-brand,
+  .role-dashboard--crew .crew-topbar-brand img {
+    width: 32px;
+    height: 32px;
+  }
+  .role-dashboard--crew .role-dashboard-breadcrumb a,
+  .role-dashboard--crew .role-dashboard-breadcrumb > span {
+    display: none;
+  }
+  .role-dashboard--crew .workspace-switcher__trigger {
+    max-width: 112px;
+  }
+}
+
+/* Overview mobile header: keep the brand and menu as separate controls. */
+@media (max-width: 760px) {
+  .role-dashboard--crew .role-dashboard-topbar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px 10px;
+  }
+  .role-dashboard--crew .crew-topbar-brand {
+    display: inline-flex;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 38px;
+    margin: 0;
+  }
+  .role-dashboard--crew .crew-topbar-brand img {
+    width: 34px;
+    height: 34px;
+  }
+  .role-dashboard--crew .crew-dashboard-mobile-toggle {
+    position: static;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+  }
+  .role-dashboard--crew .role-dashboard-breadcrumb {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .role-dashboard--crew .role-dashboard-topbar-actions {
+    flex: 0 0 auto;
+    margin-left: auto;
+    min-width: 0;
+  }
+}
+@media (max-width: 420px) {
+  .role-dashboard--crew .role-dashboard-topbar {
+    gap: 5px;
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+  .role-dashboard--crew .crew-topbar-brand,
+  .role-dashboard--crew .crew-topbar-brand img {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+  .role-dashboard--crew .crew-dashboard-mobile-toggle {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+  }
+  .role-dashboard--crew .role-dashboard-breadcrumb > span {
+    display: none;
+  }
+  .role-dashboard--crew .workspace-switcher__trigger {
+    max-width: 96px;
+    padding: 4px 6px;
+  }
+}
+
+/* Keep the profile control visible beside the workspace switcher on narrow screens. */
+.role-dashboard--crew .role-dashboard-topbar-actions {
+  position: relative;
+  z-index: 120;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: max-content;
+  gap: 8px;
+}
+.role-dashboard--crew .profile-menu {
+  display: block !important;
+  position: relative;
+  z-index: 130;
+  flex: 0 0 38px;
+  width: 38px;
+  min-width: 38px;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.role-dashboard--crew .profile-menu__trigger {
+  display: grid !important;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  border: 1px solid #dce7ef;
+  background: #f4f8fc;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.role-dashboard--crew .profile-menu__avatar {
+  display: grid;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+}
+.role-dashboard--crew .profile-menu__panel {
+  z-index: 1500;
+  right: 0;
+  width: min(310px, calc(100vw - 24px));
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+}
+@media (max-width: 760px) {
+  .role-dashboard--crew .role-dashboard-topbar-actions {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 0;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .role-dashboard--crew .profile-menu {
+    flex-basis: 36px;
+    width: 36px;
+    min-width: 36px;
+  }
+  .role-dashboard--crew .profile-menu__trigger {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+  }
+  .role-dashboard--crew .profile-menu__panel {
+    position: fixed;
+    top: 64px;
+    right: 12px;
+    left: auto;
+    width: min(310px, calc(100vw - 24px));
+  }
+}
+@media (max-width: 420px) {
+  .role-dashboard--crew .role-dashboard-topbar-actions {
+    gap: 5px;
+  }
+  .role-dashboard--crew .workspace-switcher__trigger {
+    max-width: 104px;
+  }
+  .role-dashboard--crew .profile-menu,
+  .role-dashboard--crew .profile-menu__trigger {
+    flex-basis: 34px;
+    width: 34px;
+    min-width: 34px;
+  }
+  .role-dashboard--crew .profile-menu__trigger {
+    height: 34px;
+  }
+  .role-dashboard--crew .profile-menu__avatar {
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
+  }
+  .role-dashboard--crew .profile-menu__panel {
+    top: 58px;
+    right: 8px;
+  }
+}
+
+/* ViLek Enterprise UI refresh — shared Crew workspace design system */
+.role-dashboard {
+  --rd-ink: #142b43;
+  --rd-muted: #64778b;
+  --rd-line: #dfe7ef;
+  --rd-accent: #1769c2;
+  --rd-accent-strong: #1255a0;
+  --rd-accent-soft: #edf4fc;
+  --rd-accent-line: #cbdcf0;
+  --rd-accent-glow: #f5f8fc;
+  color: var(--rd-ink);
+  background: #f3f6fa;
+  font-family: var(--font-geist-sans), Inter, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.role-dashboard-sidebar {
+  border-right-color: #e0e7ef;
+  box-shadow: 5px 0 24px rgba(20, 43, 67, 0.025);
+}
+.role-dashboard-brand {
+  margin-bottom: 30px;
+}
+.role-dashboard-current {
+  border-color: #d9e5f3;
+  color: #174f91;
+  background: #f3f7fc;
+}
+.role-dashboard-current span {
+  color: #1769c2;
+  background: #e5effb;
+}
+.role-dashboard-nav {
+  gap: 4px;
+}
+.role-dashboard-nav a {
+  min-height: 44px;
+  border-radius: 9px;
+  color: #52677d;
+  font-size: 13px;
+  font-weight: 620;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
+}
+.role-dashboard-nav a:hover {
+  color: #174f91;
+  background: #f3f7fc;
+}
+.role-dashboard-nav a.is-active,
+.role-dashboard-nav a[aria-current="page"] {
+  color: #1459a5;
+  background: #eaf2fc;
+  box-shadow: inset 3px 0 #1769c2;
+}
+.role-dashboard-topbar {
+  min-height: 72px;
+  border-bottom-color: #e1e8f0;
+  background: rgba(255, 255, 255, 0.97);
+}
+.role-dashboard-content {
+  max-width: 1600px;
+  padding-top: 32px;
+}
+.role-dashboard-eyebrow {
+  color: #1769c2;
+  font-size: 10px;
+  letter-spacing: 1.45px;
+}
+.role-dashboard-heading {
+  margin-bottom: 28px;
+}
+.role-dashboard-heading h1 {
+  color: #142b43;
+  font-size: clamp(29px, 2.5vw, 36px);
+  font-weight: 760;
+  letter-spacing: -0.9px;
+}
+.role-dashboard-heading p {
+  color: #63778d;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.role-dashboard-heading-icon {
+  color: #1769c2;
+  background: #eaf2fc;
+  border-color: #d7e5f6;
+}
+.role-dashboard-capabilities {
+  gap: 18px;
+}
+.role-dashboard-capability {
+  min-height: 220px;
+  padding: 22px;
+  border-color: #dfe7ef;
+  border-radius: 15px;
+  box-shadow: 0 4px 14px rgba(20, 43, 67, 0.035);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+.role-dashboard-capability:hover {
+  border-color: #cbd9e9;
+  box-shadow: 0 10px 26px rgba(20, 43, 67, 0.07);
+  transform: translateY(-1px);
+}
+.role-dashboard-capability-icon {
+  color: #1769c2;
+  background: #eaf2fc;
+}
+.role-dashboard-capability h2 {
+  color: #18334f;
+  font-size: 16px;
+  font-weight: 740;
+}
+.role-dashboard-capability p {
+  color: #667b90;
+  font-size: 12px;
+}
+.role-dashboard-capability-link {
+  color: #145eae;
+  font-size: 12px;
+}
+.role-dashboard-footer {
+  border-top-color: #e1e8f0;
+  color: #718399;
+  font-size: 11px;
+}
+.workspace-switcher__trigger {
+  border-color: #dce5ef;
+  border-radius: 11px;
+}
+.workspace-switcher__trigger:hover,
+.workspace-switcher__trigger[aria-expanded="true"] {
+  border-color: #b8cde6;
+  background: #f8fbff;
+}
+.workspace-switcher__trigger-icon,
+.workspace-switcher__item-icon {
+  color: #1769c2;
+  background: #eaf2fc;
+}
+.workspace-switcher__item.is-current {
+  background: #edf4fc;
+}
+.workspace-switcher__check,
+.workspace-switcher__menu-footer a {
+  color: #1769c2;
+}
+
+.crew-flight-overview-card,
+.crew-expense-overview-card,
+.crew-claims-overview-card {
+  min-width: 0;
+}
+.crew-flight-overview-header,
+.crew-expense-overview-header,
+.crew-claims-overview-header {
+  padding-bottom: 15px;
+  border-bottom-color: #e7edf4;
+}
+.crew-flight-overview-title h2,
+.crew-expense-overview-title h2,
+.crew-claims-overview-title h2 {
+  color: #18334f;
+  font-size: 16px;
+}
+.crew-flight-overview-stats,
+.crew-expense-overview-stats,
+.crew-claims-overview-stats {
+  padding: 16px 0;
+  border-bottom-color: #e7edf4;
+}
+.crew-flight-overview-stats strong,
+.crew-expense-overview-stats strong,
+.crew-claims-overview-stats strong {
+  color: #18334f;
+  font-size: 25px;
+  font-weight: 760;
+}
+.crew-flight-overview-stats span,
+.crew-expense-overview-stats span,
+.crew-claims-overview-stats span {
+  color: #718399;
+  font-size: 11px;
+}
+@media (max-width: 760px) {
+  .role-dashboard-content {
+    padding: 26px 18px 24px;
+  }
+  .role-dashboard-topbar {
+    min-height: 68px;
+  }
+  .role-dashboard-capabilities {
+    grid-template-columns: 1fr;
+  }
+  .role-dashboard-capability {
+    min-height: 0;
+  }
+}
