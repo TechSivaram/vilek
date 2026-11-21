@@ -1,0 +1,1217 @@
+/* Approver workspace — orange decision and review interface. */
+.role-dashboard--approver {
+  --approver-orange: #ea580c;
+  --approver-orange-strong: #c2410c;
+  --approver-orange-soft: #fff7ed;
+  --approver-orange-border: #fed7aa;
+}
+.role-dashboard--approver .role-dashboard-nav a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 44px;
+  white-space: nowrap;
+}
+.role-dashboard--approver .role-dashboard-nav a > .crew-nav-icon {
+  display: inline-flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 16px;
+  line-height: 1;
+}
+.role-dashboard--approver .role-dashboard-nav a > .crew-nav-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.role-dashboard--approver .role-dashboard-nav a.is-active {
+  border-left: 3px solid var(--approver-orange);
+  color: var(--approver-orange-strong);
+  background: var(--approver-orange-soft);
+}
+.role-dashboard--approver .role-dashboard-mobile-brand {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+}
+.role-dashboard--approver .role-dashboard-mobile-brand img {
+  display: block;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+.role-dashboard--approver .crew-sidebar-toggle,
+.role-dashboard--approver .crew-mobile-nav-toggle {
+  color: var(--approver-orange-strong);
+  border-color: var(--approver-orange-border);
+}
+.role-dashboard--approver .crew-sidebar-toggle:hover,
+.role-dashboard--approver .crew-mobile-nav-toggle:hover {
+  background: var(--approver-orange-soft);
+}
+
+.approver-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+.approver-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.approver-metric {
+  position: relative;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  min-height: 116px;
+  padding: 19px 20px;
+  border: 1px solid #e5eaf0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgb(20 43 67 / 3%);
+}
+.approver-metric__icon {
+  display: grid;
+  grid-row: span 3;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: var(--approver-orange-strong);
+  background: var(--approver-orange-soft);
+  font-size: 20px;
+  font-weight: 800;
+}
+.approver-metric__label {
+  color: #627488;
+  font-size: 12px;
+  font-weight: 700;
+}
+.approver-metric > strong {
+  color: #172f46;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.approver-metric > small {
+  color: #8391a0;
+  font-size: 10px;
+}
+.approver-metric--approved .approver-metric__icon {
+  color: #16803d;
+  background: #edf9f0;
+}
+.approver-metric--rejected .approver-metric__icon {
+  color: #b54708;
+  background: #fff5e9;
+}
+.approver-section {
+  min-width: 0;
+  scroll-margin-top: 22px;
+}
+.approver-section__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+.approver-section__eyebrow {
+  color: var(--approver-orange-strong);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 1.45px;
+}
+.approver-section__heading h2 {
+  margin: 6px 0 5px;
+  color: #1b3045;
+  font-size: 20px;
+  font-weight: 780;
+  letter-spacing: -0.35px;
+}
+.approver-section__heading p {
+  margin: 0;
+  color: #718296;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.approver-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(270px, 100%);
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #dfe7ed;
+  border-radius: 9px;
+  color: #8290a0;
+  background: #fff;
+}
+.approver-search:focus-within {
+  border-color: var(--approver-orange);
+  box-shadow: 0 0 0 3px rgb(234 88 12 / 10%);
+}
+.approver-search > span {
+  font-size: 20px;
+}
+.approver-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #243b50;
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+}
+.approver-claim-list,
+.approver-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.approver-claim-card {
+  overflow: hidden;
+  border: 1px solid #e2e9ef;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgb(20 43 67 / 3%);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+.approver-claim-card:hover,
+.approver-claim-card.is-expanded {
+  border-color: var(--approver-orange-border);
+  box-shadow: 0 8px 24px rgb(194 65 12 / 7%);
+}
+.approver-claim-card__main {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.15fr) minmax(170px, 1fr) minmax(150px, 0.8fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+}
+.approver-claim-card__identity {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.approver-claim-card__avatar {
+  display: grid;
+  flex: 0 0 38px;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--approver-orange-strong);
+  background: var(--approver-orange-soft);
+  font-size: 11px;
+  font-weight: 800;
+}
+.approver-claim-card__identity h3 {
+  overflow: hidden;
+  margin: 0 0 4px;
+  color: #24394e;
+  font-size: 12px;
+  font-weight: 780;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.approver-claim-card__identity p,
+.approver-claim-card__flight span,
+.approver-claim-card__flight small,
+.approver-claim-card__amount small {
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  color: #78899a;
+  font-size: 10px;
+  line-height: 1.55;
+  text-overflow: ellipsis;
+}
+.approver-claim-card__flight strong,
+.approver-claim-card__amount strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #2c4358;
+  font-size: 11px;
+  font-weight: 750;
+}
+.approver-claim-card__amount > span {
+  display: block;
+  color: #1f6841;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+.approver-review-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--approver-orange-border);
+  border-radius: 8px;
+  color: var(--approver-orange-strong);
+  background: var(--approver-orange-soft);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.approver-review-button:hover {
+  background: #ffedd5;
+}
+.approver-review-panel {
+  padding: 19px;
+  border-top: 1px solid #f0e5db;
+  background: #fffdfa;
+}
+.approver-review-panel__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 13px;
+}
+.approver-review-panel__heading h4 {
+  margin: 0 0 4px;
+  color: #24394e;
+  font-size: 13px;
+  font-weight: 780;
+}
+.approver-review-panel__heading p {
+  margin: 0;
+  color: #78899a;
+  font-size: 11px;
+}
+.approver-status,
+.approver-history-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: var(--approver-orange-strong);
+  background: var(--approver-orange-soft);
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.approver-expense-table-wrap {
+  overflow-x: auto;
+}
+.approver-expense-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 11px;
+}
+.approver-expense-table th {
+  padding: 10px 11px;
+  border-bottom: 1px solid #e8edf1;
+  color: #64778b;
+  background: #f7f9fb;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.45px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.approver-expense-table td {
+  padding: 11px;
+  border-bottom: 1px solid #edf1f4;
+  color: #43586c;
+  vertical-align: top;
+}
+.approver-expense-table td:last-child {
+  color: #245b3d;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.approver-comment-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 17px;
+}
+.approver-comment-field > span {
+  color: #30475c;
+  font-size: 11px;
+  font-weight: 750;
+}
+.approver-comment-field em {
+  margin-left: 6px;
+  color: #b54708;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+.approver-comment-field textarea {
+  width: 100%;
+  min-height: 76px;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  resize: vertical;
+  border: 1px solid #dfe7ed;
+  border-radius: 9px;
+  outline: 0;
+  color: #243b50;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.approver-comment-field textarea:focus {
+  border-color: var(--approver-orange);
+  box-shadow: 0 0 0 3px rgb(234 88 12 / 10%);
+}
+.approver-review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+.approver-review-actions > span {
+  color: #8996a3;
+  font-size: 10px;
+}
+.approver-review-actions > div {
+  display: flex;
+  gap: 9px;
+}
+.approver-button {
+  min-height: 37px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.approver-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.approver-button--reject {
+  border-color: #f3c5c0;
+  color: #b42318;
+  background: #fff5f4;
+}
+.approver-button--reject:hover:not(:disabled) {
+  background: #fee9e7;
+}
+.approver-button--approve {
+  color: #fff;
+  background: var(--approver-orange);
+  box-shadow: 0 3px 8px rgb(234 88 12 / 18%);
+}
+.approver-button--approve:hover:not(:disabled) {
+  background: var(--approver-orange-strong);
+}
+.approver-history-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 15px 17px;
+  border: 1px solid #e5eaf0;
+  border-radius: 11px;
+  background: #fff;
+}
+.approver-history-status {
+  display: inline-flex;
+  flex: 0 0 105px;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.approver-history-status.is-approved {
+  color: #16703a;
+  background: #edf8f0;
+}
+.approver-history-status.is-rejected {
+  color: #a33b20;
+  background: #fff1eb;
+}
+.approver-history-row__details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.approver-history-row__details strong {
+  color: #2a4055;
+  font-size: 11px;
+  font-weight: 750;
+}
+.approver-history-row__details > span,
+.approver-history-row__details small {
+  color: #78899a;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.approver-history-row__details small {
+  color: #586d80;
+}
+.approver-empty {
+  display: flex;
+  min-height: 145px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 25px;
+  border: 1px dashed #dce5ec;
+  border-radius: 12px;
+  color: #738497;
+  background: #fff;
+  text-align: center;
+  font-size: 11px;
+}
+.approver-empty strong {
+  color: #2c4358;
+  font-size: 13px;
+}
+.approver-empty p {
+  margin: 0;
+  color: #7c8c9b;
+  font-size: 11px;
+}
+.approver-empty__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 3px;
+  border-radius: 50%;
+  color: #16803d;
+  background: #edf9f0;
+  font-size: 17px;
+}
+.approver-empty--compact {
+  min-height: 95px;
+}
+.approver-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fbd4b4;
+  border-top-color: var(--approver-orange);
+  border-radius: 50%;
+  animation: approver-spin 0.75s linear infinite;
+}
+@keyframes approver-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.approver-alert {
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.approver-alert--error {
+  border: 1px solid #f3c5c0;
+  color: #a52a20;
+  background: #fff5f4;
+}
+.approver-alert--success {
+  border: 1px solid #b8e2c3;
+  color: #176b38;
+  background: #f0faf2;
+}
+.role-dashboard--approver .role-dashboard-content {
+  max-width: 1560px;
+}
+
+@media (max-width: 1100px) {
+  .approver-claim-card__main {
+    grid-template-columns: minmax(180px, 1fr) minmax(160px, 1fr);
+  }
+  .approver-review-button {
+    justify-self: start;
+  }
+}
+@media (max-width: 760px) {
+  .role-dashboard--approver .role-dashboard-content {
+    padding: 22px 18px;
+  }
+  .approver-metrics {
+    gap: 10px;
+  }
+  .approver-metric {
+    min-height: 100px;
+    padding: 14px;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 9px;
+  }
+  .approver-metric__icon {
+    width: 34px;
+    height: 34px;
+  }
+  .approver-metric > strong {
+    font-size: 23px;
+  }
+  .approver-section__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .approver-search {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 560px) {
+  .approver-workspace {
+    gap: 23px;
+  }
+  .approver-metrics {
+    grid-template-columns: 1fr;
+  }
+  .approver-metric {
+    min-height: 82px;
+  }
+  .approver-claim-card__main {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+  .approver-claim-card__flight,
+  .approver-claim-card__amount {
+    padding-left: 49px;
+  }
+  .approver-review-button {
+    width: 100%;
+  }
+  .approver-review-panel {
+    padding: 14px;
+  }
+  .approver-review-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .approver-review-actions > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .approver-button {
+    padding: 0 8px;
+  }
+  .approver-history-row {
+    flex-direction: column;
+    gap: 9px;
+  }
+  .approver-history-status {
+    flex-basis: auto;
+  }
+  .approver-history-count {
+    align-self: flex-start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .approver-spinner {
+    animation: none;
+  }
+  .approver-claim-card {
+    transition: none;
+  }
+}
+.approver-receipt-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 6px;
+}
+.approver-receipt-links a {
+  color: var(--approver-orange-strong);
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.approver-receipt-links a:hover {
+  color: #9a3412;
+}
+
+/* Flight timing summary: scheduled and actual departure/arrival. */
+.approver-claim-card__flight {
+  min-width: 0;
+}
+.approver-flight-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 10px;
+  margin-bottom: 4px;
+}
+.approver-flight-heading > strong {
+  margin: 0;
+}
+.approver-flight-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #9a3412;
+  background: #fff7ed;
+  font-size: 11px;
+  font-weight: 700;
+}
+.approver-flight-route {
+  display: block;
+  margin-bottom: 9px;
+  color: #334b63;
+  font-size: 13px;
+  font-weight: 700;
+}
+.approver-flight-times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 12px;
+}
+.approver-flight-time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.approver-flight-time > span {
+  color: #5f7184;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.approver-flight-time > strong {
+  color: #20384f;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.approver-flight-time > strong.is-recorded {
+  color: #176b42;
+}
+.approver-flight-time > strong.is-pending {
+  color: #8a5a32;
+  font-weight: 600;
+}
+@media (max-width: 1100px) {
+  .approver-claim-card__main {
+    grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.15fr) minmax(140px, 0.8fr);
+  }
+  .approver-review-button {
+    grid-column: 3;
+    justify-self: start;
+  }
+}
+@media (max-width: 760px) {
+  .approver-claim-card__main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .approver-review-button {
+    grid-column: auto;
+    justify-self: stretch;
+  }
+  .approver-flight-times {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Airport names and IATA codes share one horizontal route line. */
+.approver-flight-route {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin: 3px 0 9px;
+  color: #334b63;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+.approver-flight-airport {
+  min-width: 0;
+  white-space: nowrap;
+}
+.approver-flight-airport strong {
+  color: #172b45;
+  font-weight: 800;
+}
+.approver-flight-route-arrow {
+  flex: 0 0 auto;
+  color: #ea580c;
+  font-size: 15px;
+  font-weight: 800;
+}
+@media (max-width: 760px) {
+  .approver-flight-route {
+    flex-wrap: wrap;
+    gap: 5px 8px;
+  }
+  .approver-flight-airport {
+    white-space: normal;
+  }
+}
+
+/* Approver claim card: use the full available width with fixed, predictable
+   side columns and a flexible flight-information column. */
+.role-dashboard--approver .approver-claim-card__main {
+  display: grid;
+  width: 100%;
+  box-sizing: border-box;
+  grid-template-columns:
+    minmax(190px, 215px)
+    minmax(0, 1fr)
+    minmax(150px, 170px)
+    minmax(118px, 132px);
+  align-items: center;
+  justify-content: stretch;
+  gap: 20px;
+  padding: 20px 22px;
+}
+
+.role-dashboard--approver .approver-claim-card__identity,
+.role-dashboard--approver .approver-claim-card__flight,
+.role-dashboard--approver .approver-claim-card__amount {
+  min-width: 0;
+  width: 100%;
+}
+
+.role-dashboard--approver .approver-claim-card__identity h3 {
+  color: #172b45;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.role-dashboard--approver .approver-claim-card__identity p {
+  color: #40566d;
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.role-dashboard--approver .approver-flight-heading > strong {
+  color: #172b45;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.role-dashboard--approver .approver-flight-route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 5px 0 12px;
+}
+
+.role-dashboard--approver .approver-flight-airport {
+  min-width: 0;
+  color: #263e56;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.role-dashboard--approver .approver-flight-airport strong {
+  color: #172b45;
+  font-weight: 800;
+}
+
+.role-dashboard--approver .approver-flight-route-arrow {
+  justify-self: center;
+  color: #ea580c;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.role-dashboard--approver .approver-flight-times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  width: 100%;
+}
+
+.role-dashboard--approver .approver-flight-time {
+  min-width: 0;
+}
+
+.role-dashboard--approver .approver-flight-time > span {
+  color: #344b62;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.role-dashboard--approver .approver-flight-time > strong {
+  color: #172b45;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.role-dashboard--approver .approver-flight-time > strong.is-recorded {
+  color: #137044;
+}
+
+.role-dashboard--approver .approver-flight-time > strong.is-pending {
+  color: #8a4b13;
+  font-weight: 700;
+}
+
+.role-dashboard--approver .approver-claim-card__amount strong {
+  color: #172b45;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.role-dashboard--approver .approver-claim-card__amount > span {
+  color: #176b42;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.role-dashboard--approver .approver-claim-card__amount small {
+  color: #40566d;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.role-dashboard--approver .approver-review-button {
+  width: 100%;
+  min-width: 118px;
+  min-height: 40px;
+  padding-inline: 10px;
+  color: #9a3412;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Tablet: place crew and flight on the first row, totals and action below. */
+@media (max-width: 1120px) {
+  .role-dashboard--approver .approver-claim-card__main {
+    grid-template-columns: minmax(170px, 0.8fr) minmax(0, 1.7fr);
+    gap: 18px 24px;
+  }
+
+  .role-dashboard--approver .approver-claim-card__amount {
+    grid-column: 1;
+    padding-left: 49px;
+  }
+
+  .role-dashboard--approver .approver-review-button {
+    grid-column: 2;
+    justify-self: end;
+    width: auto;
+    min-width: 145px;
+  }
+}
+
+/* Mobile: stack the content and keep all flight data readable. */
+@media (max-width: 680px) {
+  .role-dashboard--approver .approver-claim-card__main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 15px;
+    padding: 16px;
+  }
+
+  .role-dashboard--approver .approver-claim-card__amount {
+    grid-column: auto;
+    padding-left: 49px;
+  }
+
+  .role-dashboard--approver .approver-review-button {
+    grid-column: auto;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .role-dashboard--approver .approver-flight-times {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+  }
+
+  .role-dashboard--approver .approver-flight-route {
+    grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr);
+  }
+}
+
+/* Readability pass: expense review, decision controls and review history.
+   Keep the Approver orange identity while enforcing high-contrast typography. */
+.approver-workspace .approver-review-panel {
+  padding: 24px;
+  background: #fffdfa;
+}
+
+.approver-workspace .approver-review-panel__heading {
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.approver-workspace .approver-review-panel__heading h4 {
+  margin-bottom: 6px;
+  color: #172b45;
+  font-size: 21px;
+  line-height: 1.3;
+  font-weight: 800;
+}
+
+.approver-workspace .approver-review-panel__heading p {
+  color: #40566d;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 550;
+}
+
+.approver-workspace .approver-status,
+.approver-workspace .approver-history-count {
+  padding: 8px 12px;
+  color: #9a3412;
+  background: #fff0e5;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.approver-workspace .approver-expense-table {
+  font-size: 14px;
+}
+
+.approver-workspace .approver-expense-table th {
+  padding: 13px 14px;
+  color: #263e56;
+  background: #f1f4f7;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.35px;
+}
+
+.approver-workspace .approver-expense-table td {
+  padding: 15px 14px;
+  color: #263e56;
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 550;
+}
+
+.approver-workspace .approver-expense-table td strong {
+  color: #172b45;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.approver-workspace .approver-expense-table td:last-child {
+  color: #176b42;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.approver-workspace .approver-expense-table a {
+  color: #b9380a;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+
+.approver-workspace .approver-comment-field {
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.approver-workspace .approver-comment-field > span {
+  color: #172b45;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.approver-workspace .approver-comment-field em {
+  color: #b9380a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.approver-workspace .approver-comment-field textarea {
+  min-height: 112px;
+  padding: 14px 15px;
+  color: #172b45;
+  border-color: #aebdca;
+  background: #ffffff;
+  font-size: 15px;
+  font-weight: 550;
+  line-height: 1.6;
+}
+
+.approver-workspace .approver-comment-field textarea::placeholder {
+  color: #53677b;
+  opacity: 1;
+  font-weight: 500;
+}
+
+.approver-workspace .approver-comment-field textarea:focus {
+  border-color: #ea580c;
+  box-shadow: 0 0 0 3px rgb(234 88 12 / 14%);
+}
+
+.approver-workspace .approver-review-actions {
+  margin-top: 16px;
+  gap: 16px;
+}
+
+.approver-workspace .approver-review-actions > span {
+  color: #40566d;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.approver-workspace .approver-button {
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.approver-workspace .approver-button:disabled {
+  opacity: 0.68;
+}
+
+.approver-workspace .approver-button--reject:disabled,
+.approver-workspace .approver-button--approve:disabled {
+  color: #713b27;
+}
+
+.approver-workspace .approver-section__heading h2 {
+  color: #172b45;
+  font-size: 24px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.approver-workspace .approver-section__heading p {
+  color: #40566d;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.55;
+}
+
+.approver-workspace .approver-history-row {
+  align-items: flex-start;
+  gap: 18px;
+  padding: 19px 20px;
+}
+
+.approver-workspace .approver-history-status {
+  flex-basis: 132px;
+  padding: 9px 11px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.approver-workspace .approver-history-status.is-approved {
+  color: #126338;
+  background: #e6f5eb;
+}
+
+.approver-workspace .approver-history-status.is-rejected {
+  color: #a52d1d;
+  background: #ffebe6;
+}
+
+.approver-workspace .approver-history-row__details {
+  gap: 7px;
+}
+
+.approver-workspace .approver-history-row__details strong {
+  color: #172b45;
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.approver-workspace .approver-history-row__details > span {
+  color: #344b62;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.approver-workspace .approver-history-row__details small {
+  color: #344b62;
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.55;
+}
+
+.approver-workspace .approver-alert {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+@media (max-width: 760px) {
+  .approver-workspace .approver-review-panel {
+    padding: 16px;
+  }
+
+  .approver-workspace .approver-review-panel__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .approver-workspace .approver-expense-table {
+    min-width: 680px;
+  }
+
+  .approver-workspace .approver-review-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .approver-workspace .approver-review-actions > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .approver-workspace .approver-button {
+    width: 100%;
+    padding-inline: 10px;
+    font-size: 13px;
+  }
+
+  .approver-workspace .approver-history-row {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .approver-workspace .approver-history-status {
+    flex-basis: auto;
+  }
+}

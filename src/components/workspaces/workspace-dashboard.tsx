@@ -6,6 +6,7 @@ import { getWorkspace } from "@/lib/workspaces";
 import { CrewFlightsOverviewCard } from "@/components/workspaces/crew-flights-overview-card";
 import { CrewExpensesOverviewCard } from "@/components/workspaces/crew-expenses-overview-card";
 import { CrewClaimsOverviewCard } from "@/components/workspaces/crew-claims-overview-card";
+import { ApproverWorkspace } from "@/components/approver/approver-workspace";
 import {
   CrewDashboardShell,
   CrewMobileNavToggle,
@@ -63,12 +64,14 @@ export function WorkspaceDashboard({
       }
     >
       <header className="role-dashboard-topbar">
-        {roleCode === "CREW" && (
-          <Link href="/crew" className="crew-topbar-brand" aria-label="ViLek home">
-            <Image src="/Branding/logo.png" alt="ViLek" width={42} height={42} priority />
-          </Link>
-        )}
-        {roleCode === "CREW" && <CrewMobileNavToggle />}
+        <CrewMobileNavToggle />
+        <Link
+          href={workspace.href}
+          className="role-dashboard-mobile-brand"
+          aria-label="ViLek dashboard"
+        >
+          <Image src="/Branding/logo.png" alt="ViLek" width={40} height={40} priority />
+        </Link>
         <div className="role-dashboard-breadcrumb">
           <span>Workspace</span>
           <span>/</span>
@@ -90,43 +93,49 @@ export function WorkspaceDashboard({
             {workspace.icon}
           </span>
         </div>
-        {workspace.code !== "CREW" && (
-          <div className="role-dashboard-note">
-            <span aria-hidden="true">ⓘ</span>
-            <p>
-              This workspace layout is ready. Live operational metrics and workflows will be
-              connected in the next implementation step.
-            </p>
-          </div>
+        {workspace.code === "APPROVER" ? (
+          <ApproverWorkspace />
+        ) : (
+          <>
+            {workspace.code !== "CREW" && (
+              <div className="role-dashboard-note">
+                <span aria-hidden="true">ⓘ</span>
+                <p>
+                  This workspace layout is ready. Live operational metrics and workflows will be
+                  connected in the next implementation step.
+                </p>
+              </div>
+            )}
+            <section
+              className="role-dashboard-capabilities"
+              aria-label={`${workspace.name} quick links`}
+            >
+              {workspace.capabilities.map((capability) =>
+                workspace.code === "CREW" && capability.title === "My flights" ? (
+                  <CrewFlightsOverviewCard key={capability.title} />
+                ) : workspace.code === "CREW" && capability.title === "My expenses" ? (
+                  <CrewExpensesOverviewCard key={capability.title} />
+                ) : workspace.code === "CREW" && capability.title === "My claims" ? (
+                  <CrewClaimsOverviewCard key={capability.title} />
+                ) : (
+                  <Link
+                    className="role-dashboard-capability"
+                    key={capability.title}
+                    href={capability.href}
+                    id={capability.href.split("#")[1]}
+                  >
+                    <span className="role-dashboard-capability-icon">{capability.icon}</span>
+                    <h2>{capability.title}</h2>
+                    <p>{capability.description}</p>
+                    <span className="role-dashboard-capability-link">
+                      Open section <span aria-hidden="true">→</span>
+                    </span>
+                  </Link>
+                ),
+              )}
+            </section>
+          </>
         )}
-        <section
-          className="role-dashboard-capabilities"
-          aria-label={`${workspace.name} quick links`}
-        >
-          {workspace.capabilities.map((capability) =>
-            workspace.code === "CREW" && capability.title === "My flights" ? (
-              <CrewFlightsOverviewCard key={capability.title} />
-            ) : workspace.code === "CREW" && capability.title === "My expenses" ? (
-              <CrewExpensesOverviewCard key={capability.title} />
-            ) : workspace.code === "CREW" && capability.title === "My claims" ? (
-              <CrewClaimsOverviewCard key={capability.title} />
-            ) : (
-              <Link
-                className="role-dashboard-capability"
-                key={capability.title}
-                href={capability.href}
-                id={capability.href.split("#")[1]}
-              >
-                <span className="role-dashboard-capability-icon">{capability.icon}</span>
-                <h2>{capability.title}</h2>
-                <p>{capability.description}</p>
-                <span className="role-dashboard-capability-link">
-                  Open section <span aria-hidden="true">→</span>
-                </span>
-              </Link>
-            ),
-          )}
-        </section>
       </main>
       <footer className="role-dashboard-footer">
         <span>© {new Date().getFullYear()} ViLek</span>

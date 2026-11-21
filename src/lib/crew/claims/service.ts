@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";
 import { db } from "@/lib/db";
 import {
@@ -13,6 +13,7 @@ import {
   crewMembers,
   currencies,
   expenseCategories,
+  expenseDocuments,
   expenses,
   flightCrew,
   flights,
@@ -37,19 +38,26 @@ const sqlAliasDestination = alias(airports, "claim_destination_airport");
 
 export const crewClaimsService = {
   reviewQueue() {
-    return db
+    const queue = db
       .select({
         claimId: claims.id,
         status: claims.status,
         createdAt: claims.createdAt,
+        updatedAt: claims.updatedAt,
         flightNumber: flights.flightNumber,
         airlineName: airlines.name,
         crewName: users.firstName,
         crewLastName: users.lastName,
         crewEmail: users.email,
         originCode: airports.iataCode,
+        originAirportName: airports.name,
         destinationCode: sqlAliasDestination.iataCode,
+        destinationAirportName: sqlAliasDestination.name,
         scheduledDeparture: flights.scheduledDeparture,
+        scheduledArrival: flights.scheduledArrival,
+        actualDeparture: flights.actualDeparture,
+        actualArrival: flights.actualArrival,
+        flightStatus: flights.status,
       })
       .from(claims)
       .innerJoin(flightCrew, eq(claims.flightCrewId, flightCrew.id))
@@ -62,6 +70,118 @@ export const crewClaimsService = {
       .where(eq(claims.status, "SUBMITTED"))
       .orderBy(asc(claims.createdAt))
       .all();
+
+    return queue.map((claim) => {
+      const claimExpenseRows = db
+        .select({
+          id: expenses.id,
+          description: expenses.description,
+          amount: expenses.amount,
+          currencyCode: currencies.code,
+          category: expenseCategories.name,
+          expenseDate: expenses.expenseDate,
+          location: expenses.location,
+        })
+        .from(claimExpenses)
+        .innerJoin(expenses, eq(claimExpenses.expenseId, expenses.id))
+        .innerJoin(currencies, eq(expenses.originalCurrencyId, currencies.id))
+        .innerJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
+        .where(eq(claimExpenses.claimId, claim.claimId))
+        .all();
+
+      return {
+        ...claim,
+        expenses: claimExpenseRows.map((expense) => ({
+          ...expense,
+          documents: db
+            .select({
+              id: expenseDocuments.id,
+              fileName: expenseDocuments.fileName,
+              contentType: expenseDocuments.contentType,
+              fileSizeBytes: expenseDocuments.fileSizeBytes,
+            })
+            .from(expenseDocuments)
+            .where(eq(expenseDocuments.expenseId, expense.id))
+            .all(),
+        })),
+      };
+    });
+  },
+
+  getReviewDocument(documentId: string) {
+    return db
+      .select({
+        id: expenseDocuments.id,
+        storageKey: expenseDocuments.storageKey,
+        fileName: expenseDocuments.fileName,
+        contentType: expenseDocuments.contentType,
+      })
+      .from(expenseDocuments)
+      .innerJoin(expenses, eq(expenseDocuments.expenseId, expenses.id))
+      .innerJoin(claimExpenses, eq(claimExpenses.expenseId, expenses.id))
+      .innerJoin(claims, eq(claimExpenses.claimId, claims.id))
+      .where(
+        and(
+          eq(expenseDocuments.id, documentId),
+          or(
+            eq(claims.status, "SUBMITTED"),
+            eq(claims.status, "APPROVED"),
+            eq(claims.status, "REJECTED"),
+          ),
+        ),
+      )
+      .get();
+  },
+
+  reviewHistory() {
+    const reviewed = db
+      .select({
+        claimId: claims.id,
+        status: claims.status,
+        createdAt: claims.createdAt,
+        updatedAt: claims.updatedAt,
+        flightNumber: flights.flightNumber,
+        airlineName: airlines.name,
+        crewName: users.firstName,
+        crewLastName: users.lastName,
+        crewEmail: users.email,
+        originCode: airports.iataCode,
+        originAirportName: airports.name,
+        destinationCode: sqlAliasDestination.iataCode,
+        destinationAirportName: sqlAliasDestination.name,
+        scheduledDeparture: flights.scheduledDeparture,
+        scheduledArrival: flights.scheduledArrival,
+        actualDeparture: flights.actualDeparture,
+        actualArrival: flights.actualArrival,
+        flightStatus: flights.status,
+      })
+      .from(claims)
+      .innerJoin(flightCrew, eq(claims.flightCrewId, flightCrew.id))
+      .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
+      .innerJoin(users, eq(crewMembers.userId, users.id))
+      .innerJoin(flights, eq(flightCrew.flightId, flights.id))
+      .innerJoin(airlines, eq(flights.airlineId, airlines.id))
+      .innerJoin(airports, eq(flights.originAirportId, airports.id))
+      .innerJoin(sqlAliasDestination, eq(flights.destinationAirportId, sqlAliasDestination.id))
+      .where(or(eq(claims.status, "APPROVED"), eq(claims.status, "REJECTED")))
+      .orderBy(desc(claims.updatedAt))
+      .all();
+
+    return reviewed.map((claim) => ({
+      ...claim,
+      latestComments: db
+        .select({
+          comment: claimComments.comment,
+          createdAt: claimComments.createdAt,
+          authorFirstName: users.firstName,
+          authorLastName: users.lastName,
+        })
+        .from(claimComments)
+        .innerJoin(users, eq(claimComments.userId, users.id))
+        .where(eq(claimComments.claimId, claim.claimId))
+        .orderBy(desc(claimComments.createdAt))
+        .all(),
+    }));
   },
 
   list(userId: string) {

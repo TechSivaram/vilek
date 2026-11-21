@@ -1,18 +1,20 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
-const CrewMobileNavContext = createContext<(() => void) | null>(null);
+const CrewMobileNavContext = createContext<{ toggle: () => void; open: boolean } | null>(null);
 
 export function CrewMobileNavToggle() {
-  const toggle = useContext(CrewMobileNavContext);
-  if (!toggle) return null;
+  const navigation = useContext(CrewMobileNavContext);
+  if (!navigation) return null;
   return (
     <button
       type="button"
       className="crew-mobile-nav-toggle crew-dashboard-mobile-toggle"
-      onClick={toggle}
-      aria-label="Open navigation menu"
+      onClick={navigation.toggle}
+      aria-label={navigation.open ? "Close navigation menu" : "Open navigation menu"}
+      aria-expanded={navigation.open}
+      aria-controls="workspace-primary-navigation"
     >
       <span aria-hidden="true">☰</span>
     </button>
@@ -31,12 +33,24 @@ export function CrewDashboardShell({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileNavOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileNavOpen]);
+
   return (
-    <CrewMobileNavContext.Provider value={() => setMobileNavOpen((value) => !value)}>
+    <CrewMobileNavContext.Provider
+      value={{ toggle: () => setMobileNavOpen((value) => !value), open: mobileNavOpen }}
+    >
       <div
         className={`role-dashboard ${className}${sidebarCollapsed ? " crew-sidebar-collapsed" : ""}${mobileNavOpen ? " crew-mobile-nav-open" : ""}`}
       >
         <aside
+          id="workspace-primary-navigation"
           className="role-dashboard-sidebar"
           onClick={(event) => {
             if ((event.target as HTMLElement).closest("a")) setMobileNavOpen(false);
