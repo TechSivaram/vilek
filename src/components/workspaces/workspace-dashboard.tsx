@@ -145,7 +145,7 @@ export function WorkspaceDashboard({
                   : "Search and review previously approved or returned claims and their recorded comments."
                 : workspace.code === "FINANCE" && financeView !== "overview"
                   ? financeView === "approved-claims"
-                    ? "Review approved reimbursement claims and record single or batch payments."
+                    ? "Review eligible approved claims and record single or batch reimbursements."
                     : "Track completed, processing and failed reimbursement transactions."
                   : workspace.summary}
             </p>

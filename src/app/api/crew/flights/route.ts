@@ -9,7 +9,9 @@ const querySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(10).max(100).default(20),
   search: z.string().trim().max(100).default(""),
-  status: z.enum(["", "SCHEDULED", "BOARDING", "DEPARTED", "COMPLETED", "CANCELLED"]).default(""),
+  status: z
+    .enum(["", "SCHEDULED", "BOARDING", "DEPARTED", "ARRIVAL_OVERDUE", "COMPLETED", "CANCELLED"])
+    .default(""),
   fromDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)

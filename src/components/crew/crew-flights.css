@@ -164,6 +164,10 @@
   color: #08766f;
   background: #e6f6f2;
 }
+.crew-flight-status.is-arrival-overdue {
+  color: #a12d20;
+  background: #fff0e8;
+}
 .crew-flight-status.is-cancelled {
   color: #9c3b3b;
   background: #fff0f0;

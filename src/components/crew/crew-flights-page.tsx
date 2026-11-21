@@ -289,6 +289,7 @@ export function CrewFlightsPage({
                   <option value="SCHEDULED">Scheduled</option>
                   <option value="BOARDING">Boarding</option>
                   <option value="DEPARTED">Departed</option>
+                  <option value="ARRIVAL_OVERDUE">Arrival overdue</option>
                   <option value="COMPLETED">Completed</option>
                   <option value="CANCELLED">Cancelled</option>
                 </select>

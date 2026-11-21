@@ -23,7 +23,24 @@ export type CrewFlightListParams = {
   sortOrder: "asc" | "desc";
 };
 
-const allowedStatuses = ["SCHEDULED", "BOARDING", "DEPARTED", "COMPLETED", "CANCELLED"] as const;
+const allowedStatuses = [
+  "SCHEDULED",
+  "BOARDING",
+  "DEPARTED",
+  "ARRIVAL_OVERDUE",
+  "COMPLETED",
+  "CANCELLED",
+] as const;
+
+// Actual operational timestamps take precedence over a stale manually stored status.
+// An elapsed scheduled arrival without an actual arrival is overdue, not completed.
+const effectiveFlightStatus = sql<string>`case
+  when ${flights.status} = 'CANCELLED' then 'CANCELLED'
+  when ${flights.actualArrival} is not null and trim(${flights.actualArrival}) <> '' then 'COMPLETED'
+  when datetime(${flights.scheduledArrival}) < datetime('now') then 'ARRIVAL_OVERDUE'
+  when ${flights.actualDeparture} is not null and trim(${flights.actualDeparture}) <> '' then 'DEPARTED'
+  else ${flights.status}
+end`;
 
 export const crewFlightsService = {
   listForEmployee(userId: string, params: CrewFlightListParams) {
@@ -38,7 +55,7 @@ export const crewFlightsService = {
       params.status &&
       allowedStatuses.includes(params.status as (typeof allowedStatuses)[number])
     ) {
-      filters.push(eq(flights.status, params.status));
+      filters.push(sql`${effectiveFlightStatus} = ${params.status}`);
     }
     if (params.fromDate)
       filters.push(gte(flights.scheduledDeparture, `${params.fromDate}T00:00:00`));
@@ -85,7 +102,7 @@ export const crewFlightsService = {
         scheduledArrival: flights.scheduledArrival,
         actualDeparture: flights.actualDeparture,
         actualArrival: flights.actualArrival,
-        flightStatus: flights.status,
+        flightStatus: effectiveFlightStatus,
         designation: crewDesignations.name,
       })
       .from(flightCrew)
@@ -106,8 +123,8 @@ export const crewFlightsService = {
     const aggregate = db
       .select({
         total: count(),
-        upcoming: sql<number>`coalesce(sum(case when ${flights.status} not in ('COMPLETED', 'CANCELLED') then 1 else 0 end), 0)`,
-        completed: sql<number>`coalesce(sum(case when ${flights.status} in ('COMPLETED', 'CANCELLED') then 1 else 0 end), 0)`,
+        upcoming: sql<number>`coalesce(sum(case when ${effectiveFlightStatus} not in ('COMPLETED', 'CANCELLED', 'ARRIVAL_OVERDUE') then 1 else 0 end), 0)`,
+        completed: sql<number>`coalesce(sum(case when ${effectiveFlightStatus} in ('COMPLETED', 'CANCELLED') then 1 else 0 end), 0)`,
       })
       .from(flightCrew)
       .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
@@ -181,7 +198,7 @@ export const crewFlightsService = {
         destinationCity: destinationAirports.city,
         scheduledDeparture: flights.scheduledDeparture,
         scheduledArrival: flights.scheduledArrival,
-        flightStatus: flights.status,
+        flightStatus: effectiveFlightStatus,
         designation: crewDesignations.name,
       })
       .from(flightCrew)

@@ -3,6 +3,15 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+type FinanceView = "overview" | "approved-claims" | "payment-history";
+
+type FinanceExpense = {
+  amount: string | number;
+  currencyCode: string;
+  category: string;
+  description: string | null;
+};
+
 type FinanceClaim = {
   claimId: string;
   createdAt: string;
@@ -11,10 +20,12 @@ type FinanceClaim = {
   crewEmail: string;
   flightNumber: string;
   airlineName: string;
+  expenses: FinanceExpense[];
   currencyTotals: { currencyCode: string; amount: number }[];
   canPay: boolean;
   activePayment: { status: string; paymentNumber: string } | null;
 };
+
 type FinancePayment = {
   id: string;
   paymentNumber: string;
@@ -30,6 +41,7 @@ type FinancePayment = {
   initiatedBy: string | null;
   claims: { claimId: string }[];
 };
+
 type FinanceData = {
   overview: {
     approvedClaims: number;
@@ -47,19 +59,20 @@ const money = (amount: number | string, currency: string) =>
     currency,
     maximumFractionDigits: 2,
   }).format(Number(amount));
-const dateLabel = (value: string | null) => (value ? new Date(value).toLocaleString() : "—");
 
-type FinanceView = "overview" | "approved-claims" | "payment-history";
+const dateLabel = (value: string | null) => (value ? new Date(value).toLocaleString() : "—");
 
 export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) {
   const [data, setData] = useState<FinanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
+  const [expandedClaims, setExpandedClaims] = useState<string[]>([]);
   const [mode, setMode] = useState<"MANUAL" | "BANK">("MANUAL");
   const [reference, setReference] = useState("");
   const [paidAt, setPaidAt] = useState(new Date().toISOString().slice(0, 16));
   const [submitting, setSubmitting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [notice, setNotice] = useState("");
 
   const refresh = useCallback(async () => {
@@ -70,6 +83,11 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "Unable to load Finance data.");
       setData(result as FinanceData);
+      setSelected((current) =>
+        current.filter((id) =>
+          result.approvedClaims.some((claim: FinanceClaim) => claim.claimId === id && claim.canPay),
+        ),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load Finance data.");
     } finally {
@@ -86,16 +104,31 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
     [data, selected],
   );
   const batchCurrencies = new Set(
-    selectedClaims.map((claim) => claim.currencyTotals[0]?.currencyCode),
+    selectedClaims
+      .map((claim) => claim.currencyTotals[0]?.currencyCode)
+      .filter((code): code is string => Boolean(code)),
+  );
+  const totalAmount = selectedClaims.reduce(
+    (sum, claim) => sum + (claim.currencyTotals[0]?.amount ?? 0),
+    0,
   );
   const canSubmit =
     selectedClaims.length > 0 &&
-    selectedClaims.every((claim) => claim.canPay) &&
+    selectedClaims.every((claim) => claim.canPay && claim.currencyTotals.length === 1) &&
     batchCurrencies.size === 1 &&
-    (mode === "BANK" || reference.trim().length > 0);
+    (mode === "BANK" || (reference.trim().length > 0 && !Number.isNaN(Date.parse(paidAt))));
 
   const toggleClaim = (id: string, checked: boolean) =>
-    setSelected((current) => (checked ? [...current, id] : current.filter((item) => item !== id)));
+    setSelected((current) =>
+      checked
+        ? [...current.filter((item) => item !== id), id]
+        : current.filter((item) => item !== id),
+    );
+
+  const toggleClaimDetails = (id: string) =>
+    setExpandedClaims((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+    );
 
   async function submitPayment() {
     if (!canSubmit || submitting) return;
@@ -114,13 +147,16 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
         }),
       });
       const result = await response.json();
-      if (!response.ok && response.status !== 202)
+      if (!response.ok && response.status !== 202) {
         throw new Error(result.error ?? "Payment could not be processed.");
+      }
       setNotice(result.warning ?? `${result.paymentNumber} created with status ${result.status}.`);
       setSelected([]);
       setReference("");
+      setConfirmOpen(false);
       await refresh();
     } catch (err) {
+      setConfirmOpen(false);
       setError(err instanceof Error ? err.message : "Payment could not be processed.");
     } finally {
       setSubmitting(false);
@@ -130,28 +166,57 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
   return (
     <div className="finance-workspace">
       {view === "overview" && (
-        <section className="finance-kpi-grid" aria-label="Finance summary">
-          <article className="finance-kpi">
-            <span>Approved claims</span>
-            <strong>{data?.overview.approvedClaims ?? "—"}</strong>
-            <small>Ready for finance review</small>
-          </article>
-          <article className="finance-kpi">
-            <span>Payments processing</span>
-            <strong>{data?.overview.processingPayments ?? "—"}</strong>
-            <small>{data ? "Across payment currencies" : "Awaiting confirmation"}</small>
-          </article>
-          <article className="finance-kpi">
-            <span>Paid payments</span>
-            <strong>{data?.overview.paidPayments ?? "—"}</strong>
-            <small>{data ? "Across payment currencies" : "Completed reimbursements"}</small>
-          </article>
-          <article className="finance-kpi">
-            <span>Failed payments</span>
-            <strong>{data?.overview.failedPayments ?? "—"}</strong>
-            <small>Require finance attention</small>
-          </article>
-        </section>
+        <>
+          <section className="finance-kpi-grid" aria-label="Finance summary">
+            <article className="finance-kpi">
+              <span>Approved claims</span>
+              <strong>{data?.overview.approvedClaims ?? "—"}</strong>
+              <small>Awaiting finance processing</small>
+            </article>
+            <article className="finance-kpi">
+              <span>Payments processing</span>
+              <strong>{data?.overview.processingPayments ?? "—"}</strong>
+              <small>Awaiting bank confirmation</small>
+            </article>
+            <article className="finance-kpi">
+              <span>Paid payments</span>
+              <strong>{data?.overview.paidPayments ?? "—"}</strong>
+              <small>Completed reimbursements</small>
+            </article>
+            <article className="finance-kpi">
+              <span>Failed payments</span>
+              <strong>{data?.overview.failedPayments ?? "—"}</strong>
+              <small>Require finance attention</small>
+            </article>
+          </section>
+
+          <section className="finance-shortcuts" aria-label="Finance sections">
+            <Link href="/finance/approved-claims" className="finance-shortcut">
+              <span className="finance-shortcut-icon" aria-hidden="true">
+                ₹
+              </span>
+              <span>
+                <strong>Approved claims</strong>
+                <small>Review eligible claims and process single or batch reimbursements.</small>
+              </span>
+              <span className="finance-shortcut-arrow" aria-hidden="true">
+                →
+              </span>
+            </Link>
+            <Link href="/finance/payment-history" className="finance-shortcut">
+              <span className="finance-shortcut-icon" aria-hidden="true">
+                ↗
+              </span>
+              <span>
+                <strong>Payment history</strong>
+                <small>Track completed, processing and failed transactions.</small>
+              </span>
+              <span className="finance-shortcut-arrow" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          </section>
+        </>
       )}
 
       {error && (
@@ -165,38 +230,16 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
         </div>
       )}
 
-      {view === "overview" && (
-        <section className="finance-shortcuts" aria-label="Finance sections">
-          <Link href="/finance/approved-claims" className="finance-shortcut">
-            <span className="finance-shortcut-icon">₹</span>
-            <span>
-              <strong>Approved claims</strong>
-              <small>Review eligible claims and process single or batch payments.</small>
-            </span>
-            <span className="finance-shortcut-arrow" aria-hidden="true">
-              →
-            </span>
-          </Link>
-          <Link href="/finance/payment-history" className="finance-shortcut">
-            <span className="finance-shortcut-icon">↗</span>
-            <span>
-              <strong>Payment history</strong>
-              <small>Review completed, processing and failed transactions.</small>
-            </span>
-            <span className="finance-shortcut-arrow" aria-hidden="true">
-              →
-            </span>
-          </Link>
-        </section>
-      )}
-
       {view === "approved-claims" && (
         <section className="finance-panel" id="approved">
           <div className="finance-panel-heading">
             <div>
               <span className="finance-eyebrow">PAYMENT QUEUE</span>
               <h2>Approved claims</h2>
-              <p>Select one claim for a single payment or multiple claims for a batch.</p>
+              <p>
+                Select one eligible claim for a single payment or multiple same-currency claims for
+                a batch.
+              </p>
             </div>
             <button
               className="finance-button finance-button-secondary"
@@ -204,9 +247,10 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
               onClick={() => void refresh()}
               disabled={loading}
             >
-              Refresh
+              {loading ? "Refreshing…" : "Refresh"}
             </button>
           </div>
+
           <div className="finance-table-wrap">
             <table className="finance-table">
               <thead>
@@ -217,167 +261,127 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                   <th>Claim</th>
                   <th>Approved amount</th>
                   <th>Payment state</th>
+                  <th>Details</th>
                 </tr>
               </thead>
               <tbody>
                 {loading && (
                   <tr>
-                    <td colSpan={6} className="finance-empty">
+                    <td colSpan={7} className="finance-empty">
                       Loading approved claims…
                     </td>
                   </tr>
                 )}
                 {!loading && data?.approvedClaims.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="finance-empty">
+                    <td colSpan={7} className="finance-empty">
                       No approved claims are awaiting payment.
                     </td>
                   </tr>
                 )}
                 {data?.approvedClaims.map((claim) => {
                   const total = claim.currencyTotals.length === 1 ? claim.currencyTotals[0] : null;
+                  const isExpanded = expandedClaims.includes(claim.claimId);
+                  const multiCurrency = claim.currencyTotals.length > 1;
                   return (
-                    <tr key={claim.claimId}>
-                      <td>
-                        <input
-                          aria-label={`Select claim ${claim.claimId}`}
-                          type="checkbox"
-                          checked={selected.includes(claim.claimId)}
-                          disabled={!claim.canPay}
-                          onChange={(event) => toggleClaim(claim.claimId, event.target.checked)}
-                        />
-                      </td>
-                      <td>
-                        <strong>
-                          {claim.crewFirstName} {claim.crewLastName}
-                        </strong>
-                        <small>{claim.crewEmail}</small>
-                      </td>
-                      <td>
-                        {claim.airlineName}
-                        <small>{claim.flightNumber}</small>
-                      </td>
-                      <td>
-                        <code>{claim.claimId.slice(0, 8).toUpperCase()}</code>
-                        <small>{dateLabel(claim.createdAt)}</small>
-                      </td>
-                      <td>
-                        {total ? (
-                          money(total.amount, total.currencyCode)
-                        ) : (
-                          <span className="finance-status finance-status-failed">
-                            Multiple currencies
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        {claim.activePayment ? (
-                          <span className="finance-status finance-status-processing">
-                            {claim.activePayment.status}
-                          </span>
-                        ) : claim.canPay ? (
-                          <span className="finance-status finance-status-ready">Ready</span>
-                        ) : (
-                          <span className="finance-status finance-status-failed">
-                            Review required
-                          </span>
-                        )}
-                      </td>
-                    </tr>
+                    <FragmentRow
+                      key={claim.claimId}
+                      claim={claim}
+                      total={total}
+                      isExpanded={isExpanded}
+                      multiCurrency={multiCurrency}
+                      selected={selected.includes(claim.claimId)}
+                      onSelect={(checked) => toggleClaim(claim.claimId, checked)}
+                      onToggleDetails={() => toggleClaimDetails(claim.claimId)}
+                    />
                   );
                 })}
               </tbody>
             </table>
           </div>
-          <div className="finance-payment-composer">
-            <div className="finance-composer-summary">
-              <strong>
-                {selectedClaims.length === 1
-                  ? "Single claim payment"
-                  : selectedClaims.length > 1
-                    ? "Batch payment"
-                    : "No claims selected"}
-              </strong>
-              <span>
-                {selectedClaims.length} claim{selectedClaims.length === 1 ? "" : "s"} selected
-              </span>
-              {selectedClaims.length > 0 && batchCurrencies.size === 1 && (
-                <b>
-                  {money(
-                    selectedClaims.reduce((sum, claim) => sum + claim.currencyTotals[0].amount, 0),
-                    [...batchCurrencies][0]!,
-                  )}
-                </b>
-              )}
-            </div>
-            <div className="finance-payment-fields">
-              <label>
-                Payment execution
-                <select
-                  value={mode}
-                  onChange={(event) => setMode(event.target.value as "MANUAL" | "BANK")}
+
+          {selectedClaims.length > 0 && (
+            <div className="finance-payment-composer">
+              <div className="finance-composer-summary">
+                <strong>
+                  {selectedClaims.length === 1 ? "Single claim payment" : "Batch payment"}
+                </strong>
+                <span>
+                  {selectedClaims.length} claim{selectedClaims.length === 1 ? "" : "s"} selected
+                </span>
+                {batchCurrencies.size === 1 && (
+                  <b>{money(totalAmount, [...batchCurrencies][0]!)}</b>
+                )}
+              </div>
+              <div className="finance-payment-fields">
+                <label>
+                  Payment execution
+                  <select
+                    value={mode}
+                    onChange={(event) => setMode(event.target.value as "MANUAL" | "BANK")}
+                  >
+                    <option value="MANUAL">Manual transfer (record completed payment)</option>
+                    <option value="BANK">Bank gateway (initiate transfer)</option>
+                  </select>
+                </label>
+                {mode === "MANUAL" ? (
+                  <>
+                    <label>
+                      Bank / transaction reference
+                      <input
+                        value={reference}
+                        onChange={(event) => setReference(event.target.value)}
+                        placeholder="Enter UTR or transaction reference"
+                        maxLength={120}
+                        required
+                      />
+                    </label>
+                    <label>
+                      Payment date
+                      <input
+                        type="datetime-local"
+                        value={paidAt}
+                        onChange={(event) => setPaidAt(event.target.value)}
+                        required
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <p className="finance-integration-note">
+                    Bank execution requires VILEK_BANK_PAYMENT_URL and an adapter-compatible bank
+                    endpoint. Unknown responses remain in Processing for reconciliation.
+                  </p>
+                )}
+              </div>
+              <div className="finance-composer-actions">
+                <button
+                  className="finance-button finance-button-secondary"
+                  type="button"
+                  onClick={() => setSelected([])}
+                  disabled={submitting}
                 >
-                  <option value="MANUAL">Manual transfer (record completed payment)</option>
-                  <option value="BANK">Bank gateway (initiate transfer)</option>
-                </select>
-              </label>
-              {mode === "MANUAL" ? (
-                <>
-                  <label>
-                    Bank / transaction reference
-                    <input
-                      value={reference}
-                      onChange={(event) => setReference(event.target.value)}
-                      placeholder="Enter UTR or transaction reference"
-                      maxLength={120}
-                    />
-                  </label>
-                  <label>
-                    Payment date
-                    <input
-                      type="datetime-local"
-                      value={paidAt}
-                      onChange={(event) => setPaidAt(event.target.value)}
-                    />
-                  </label>
-                </>
-              ) : (
-                <p className="finance-integration-note">
-                  Bank execution requires VILEK_BANK_PAYMENT_URL and an adapter-compatible bank
-                  endpoint. Unknown responses remain in Processing for reconciliation.
+                  Clear selection
+                </button>
+                <button
+                  className="finance-button finance-button-primary"
+                  type="button"
+                  onClick={() => setConfirmOpen(true)}
+                  disabled={!canSubmit || submitting}
+                >
+                  {mode === "BANK"
+                    ? "Review bank payment"
+                    : selectedClaims.length > 1
+                      ? "Review batch payment"
+                      : "Review payment"}
+                </button>
+              </div>
+              {selectedClaims.length > 1 && batchCurrencies.size > 1 && (
+                <p className="finance-validation">
+                  Batch payments must use one currency. Select claims with the same currency.
                 </p>
               )}
             </div>
-            <div className="finance-composer-actions">
-              <button
-                className="finance-button finance-button-secondary"
-                type="button"
-                onClick={() => setSelected([])}
-                disabled={!selected.length || submitting}
-              >
-                Clear selection
-              </button>
-              <button
-                className="finance-button finance-button-primary"
-                type="button"
-                onClick={() => void submitPayment()}
-                disabled={!canSubmit || submitting}
-              >
-                {submitting
-                  ? "Processing…"
-                  : mode === "BANK"
-                    ? "Initiate bank payment"
-                    : selectedClaims.length > 1
-                      ? "Record batch payment"
-                      : "Record payment"}
-              </button>
-            </div>
-            {selectedClaims.length > 1 && batchCurrencies.size > 1 && (
-              <p className="finance-validation">
-                Batch payments must use one currency. Select claims with the same currency.
-              </p>
-            )}
-          </div>
+          )}
         </section>
       )}
 
@@ -389,6 +393,14 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
               <h2>Payment history</h2>
               <p>Recent manual and bank-initiated reimbursement transactions.</p>
             </div>
+            <button
+              className="finance-button finance-button-secondary"
+              type="button"
+              onClick={() => void refresh()}
+              disabled={loading}
+            >
+              {loading ? "Refreshing…" : "Refresh"}
+            </button>
           </div>
           <div className="finance-table-wrap">
             <table className="finance-table">
@@ -404,6 +416,13 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                 </tr>
               </thead>
               <tbody>
+                {loading && (
+                  <tr>
+                    <td colSpan={7} className="finance-empty">
+                      Loading payment history…
+                    </td>
+                  </tr>
+                )}
                 {!loading && data?.payments.length === 0 && (
                   <tr>
                     <td colSpan={7} className="finance-empty">
@@ -437,6 +456,211 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
           </div>
         </section>
       )}
+
+      {confirmOpen && (
+        <div className="finance-dialog-backdrop" role="presentation">
+          <section
+            className="finance-confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="finance-confirm-title"
+            aria-describedby="finance-confirm-description"
+          >
+            <span className="finance-eyebrow">PAYMENT CONFIRMATION</span>
+            <h2 id="finance-confirm-title">
+              {mode === "BANK" ? "Initiate bank payment?" : "Record this payment?"}
+            </h2>
+            <p id="finance-confirm-description">
+              You are about to {mode === "BANK" ? "initiate" : "record"} a
+              {selectedClaims.length === 1
+                ? " payment for one claim"
+                : ` batch payment for ${selectedClaims.length} claims`}
+              . Confirm the details before continuing.
+            </p>
+            <dl className="finance-confirm-details">
+              <div>
+                <dt>Claims</dt>
+                <dd>{selectedClaims.length}</dd>
+              </div>
+              <div>
+                <dt>Total amount</dt>
+                <dd>
+                  {batchCurrencies.size === 1
+                    ? money(totalAmount, [...batchCurrencies][0]!)
+                    : "Mixed currencies"}
+                </dd>
+              </div>
+              <div>
+                <dt>Execution</dt>
+                <dd>{mode === "BANK" ? "Bank gateway" : "Manual transfer"}</dd>
+              </div>
+              {mode === "MANUAL" && (
+                <div>
+                  <dt>Reference</dt>
+                  <dd>{reference.trim()}</dd>
+                </div>
+              )}
+              {mode === "MANUAL" && (
+                <div>
+                  <dt>Payment date</dt>
+                  <dd>{dateLabel(new Date(paidAt).toISOString())}</dd>
+                </div>
+              )}
+            </dl>
+            <div className="finance-dialog-warning">
+              {mode === "BANK"
+                ? "The bank may process this transfer immediately. Do not submit it again if the response is uncertain; reconcile the transaction first."
+                : "Recording a manual payment marks the selected claims as paid. Verify the bank transfer and reference before confirming."}
+            </div>
+            <div className="finance-dialog-actions">
+              <button
+                className="finance-button finance-button-secondary"
+                type="button"
+                onClick={() => setConfirmOpen(false)}
+                disabled={submitting}
+              >
+                Go back
+              </button>
+              <button
+                className="finance-button finance-button-primary"
+                type="button"
+                onClick={() => void submitPayment()}
+                disabled={!canSubmit || submitting}
+              >
+                {submitting
+                  ? "Processing…"
+                  : mode === "BANK"
+                    ? "Confirm and initiate"
+                    : "Confirm payment"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
+  );
+}
+
+function FragmentRow({
+  claim,
+  total,
+  isExpanded,
+  multiCurrency,
+  selected,
+  onSelect,
+  onToggleDetails,
+}: {
+  claim: FinanceClaim;
+  total: { currencyCode: string; amount: number } | null;
+  isExpanded: boolean;
+  multiCurrency: boolean;
+  selected: boolean;
+  onSelect: (checked: boolean) => void;
+  onToggleDetails: () => void;
+}) {
+  return (
+    <>
+      <tr>
+        <td>
+          <input
+            aria-label={`Select claim ${claim.claimId}`}
+            type="checkbox"
+            checked={selected}
+            disabled={!claim.canPay}
+            onChange={(event) => onSelect(event.target.checked)}
+          />
+        </td>
+        <td>
+          <strong>
+            {claim.crewFirstName} {claim.crewLastName}
+          </strong>
+          <small>{claim.crewEmail}</small>
+        </td>
+        <td>
+          {claim.airlineName}
+          <small>{claim.flightNumber}</small>
+        </td>
+        <td>
+          <code>{claim.claimId.slice(0, 8).toUpperCase()}</code>
+          <small>{dateLabel(claim.createdAt)}</small>
+        </td>
+        <td>
+          {total ? (
+            money(total.amount, total.currencyCode)
+          ) : (
+            <span className="finance-status finance-status-failed">Multiple currencies</span>
+          )}
+        </td>
+        <td>
+          {claim.activePayment ? (
+            <span className="finance-status finance-status-processing">
+              {claim.activePayment.status}
+            </span>
+          ) : claim.canPay ? (
+            <span className="finance-status finance-status-ready">Ready</span>
+          ) : (
+            <span className="finance-status finance-status-failed">Review required</span>
+          )}
+        </td>
+        <td>
+          <button
+            className="finance-inline-link"
+            type="button"
+            onClick={onToggleDetails}
+            aria-expanded={isExpanded}
+          >
+            {isExpanded ? "Hide details" : multiCurrency ? "Review currencies" : "View details"}
+          </button>
+        </td>
+      </tr>
+      {isExpanded && (
+        <tr className="finance-claim-detail-row">
+          <td colSpan={7}>
+            <div className="finance-claim-details">
+              <div className="finance-claim-detail-heading">
+                <strong>Claim expense breakdown</strong>
+                {multiCurrency && (
+                  <span className="finance-status finance-status-failed">
+                    Payment blocked until currency amounts are resolved
+                  </span>
+                )}
+              </div>
+              {claim.currencyTotals.length > 0 ? (
+                <div className="finance-currency-breakdown">
+                  {claim.currencyTotals.map((item) => (
+                    <div key={item.currencyCode}>
+                      <span>{item.currencyCode}</span>
+                      <strong>{money(item.amount, item.currencyCode)}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="finance-validation">
+                  No payable expense totals were found for this claim.
+                </p>
+              )}
+              <div className="finance-expense-list">
+                {claim.expenses.map((expense, index) => (
+                  <div key={`${claim.claimId}-${index}`}>
+                    <span>
+                      {expense.category}
+                      {expense.description ? ` · ${expense.description}` : ""}
+                    </span>
+                    <strong>{money(expense.amount, expense.currencyCode)}</strong>
+                  </div>
+                ))}
+              </div>
+              {multiCurrency && (
+                <p className="finance-validation">
+                  This claim contains expenses in more than one currency. It cannot be selected for
+                  payment until the claim is reviewed and the payable currency treatment is
+                  resolved.
+                </p>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }

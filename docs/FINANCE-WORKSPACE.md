@@ -72,13 +72,3 @@ Expected JSON response fields:
 A confirmed success marks linked claims as paid. A pending/unknown response stays `PROCESSING`; a failed/rejected response is marked `FAILED`. A timeout or unparseable response is deliberately not treated as a failure, because the bank may have accepted the transfer. Finance must reconcile that outcome with the provider before attempting another payment.
 
 This is an adapter contract, not a connection to a particular bank. Provider authentication, signing, webhook verification, settlement/reconciliation APIs and bank-specific request mapping must be implemented in the adapter selected by the organization before production bank execution.
-
-## Finance workspace pages
-
-The Finance workspace is split into three dedicated routes:
-
-- `/finance` — overview KPIs and links to the operational sections.
-- `/finance/approved-claims` — approved claim queue, single/batch selection, manual payment recording and bank gateway initiation.
-- `/finance/payment-history` — payment transaction register with status, execution method, references and claim counts.
-
-All three routes use the existing authenticated Finance workspace shell and require the `FINANCE` role. The payment API continues to enforce `FINANCE_PROCESS` server-side.
