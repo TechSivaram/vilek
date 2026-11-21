@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { sqliteTable, text, integer, index, uniqueIndex, check } from "drizzle-orm/sqlite-core";
 
-// ViLek's finalized 21-entity schema. Dates/times are ISO-8601 text; money is
+// ViLek relational schema. Dates/times are ISO-8601 text; money is
 // stored as SQLite REAL to mirror DECIMAL(18,2) until a PostgreSQL migration.
 const createdAt = (name = "created_at") =>
   text(name)
@@ -610,6 +610,76 @@ export const claimComments = sqliteTable(
   ],
 );
 
+export const payments = sqliteTable(
+  "Payment",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    paymentNumber: text("payment_number").notNull().unique(),
+    mode: text("mode").notNull(),
+    status: text("status").notNull().default("PROCESSING"),
+    currencyCode: text("currency_code").notNull(),
+    amount: text("amount").notNull(),
+    paymentReference: text("payment_reference"),
+    providerReference: text("provider_reference"),
+    idempotencyKey: text("idempotency_key").notNull().unique(),
+    initiatedByUserId: text("initiated_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    paidAt: text("paid_at"),
+    failureReason: text("failure_reason"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("payment_status_created_idx").on(t.status, t.createdAt),
+    index("payment_mode_created_idx").on(t.mode, t.createdAt),
+    check("payment_mode_ck", sql`${t.mode} IN ('MANUAL', 'BANK')`),
+    check("payment_status_ck", sql`${t.status} IN ('PROCESSING', 'PAID', 'FAILED')`),
+    check("payment_amount_ck", sql`CAST(${t.amount} AS REAL) > 0`),
+  ],
+);
+
+export const paymentClaims = sqliteTable(
+  "Payment_Claim",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    paymentId: text("payment_id")
+      .notNull()
+      .references(() => payments.id, { onDelete: "restrict" }),
+    claimId: text("claim_id")
+      .notNull()
+      .references(() => claims.id, { onDelete: "restrict" }),
+    amount: text("amount").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex("payment_claim_payment_claim_uq").on(t.paymentId, t.claimId),
+    index("payment_claim_claim_idx").on(t.claimId),
+    check("payment_claim_amount_ck", sql`CAST(${t.amount} AS REAL) > 0`),
+  ],
+);
+
+export const paymentAuditEvents = sqliteTable(
+  "Payment_Audit_Event",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    paymentId: text("payment_id")
+      .notNull()
+      .references(() => payments.id, { onDelete: "restrict" }),
+    action: text("action").notNull(),
+    detailsJson: text("details_json"),
+    actorUserId: text("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("payment_audit_payment_date_idx").on(t.paymentId, t.createdAt)],
+);
+
 export const deploymentSetup = sqliteTable(
   "Deployment_Setup",
   {
@@ -726,6 +796,9 @@ export const schema = {
   claims,
   claimComments,
   claimExpenses,
+  payments,
+  paymentClaims,
+  paymentAuditEvents,
   deploymentSetup,
   systemSettings,
   allowedFileTypes,

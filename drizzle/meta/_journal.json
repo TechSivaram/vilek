@@ -43,6 +43,13 @@
       "when": 1795260000000,
       "tag": "0005_approver_queue_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1795290000000,
+      "tag": "0006_finance_payments",
+      "breakpoints": true
     }
   ]
 }

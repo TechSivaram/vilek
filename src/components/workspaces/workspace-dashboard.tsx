@@ -7,6 +7,7 @@ import { CrewFlightsOverviewCard } from "@/components/workspaces/crew-flights-ov
 import { CrewExpensesOverviewCard } from "@/components/workspaces/crew-expenses-overview-card";
 import { CrewClaimsOverviewCard } from "@/components/workspaces/crew-claims-overview-card";
 import { ApproverWorkspace } from "@/components/approver/approver-workspace";
+import { FinanceWorkspace } from "@/components/finance/finance-workspace";
 import {
   CrewDashboardShell,
   CrewMobileNavToggle,
@@ -19,6 +20,7 @@ export function WorkspaceDashboard({
   lastName,
   email,
   approverView = "dashboard",
+  financeView = "overview",
 }: {
   roleCode: string;
   roleCodes: string[];
@@ -26,6 +28,7 @@ export function WorkspaceDashboard({
   lastName: string;
   email: string;
   approverView?: "dashboard" | "pending" | "history";
+  financeView?: "overview" | "approved-claims" | "payment-history";
 }) {
   const workspace = getWorkspace(roleCode);
   if (!workspace) return null;
@@ -47,16 +50,29 @@ export function WorkspaceDashboard({
           <nav className="role-dashboard-nav" aria-label={`${workspace.name} navigation`}>
             <Link
               href={workspace.href}
-              className={approverView === "dashboard" ? "is-active" : undefined}
+              className={
+                workspace.code === "APPROVER"
+                  ? approverView === "dashboard"
+                    ? "is-active"
+                    : undefined
+                  : workspace.code === "FINANCE"
+                    ? financeView === "overview"
+                      ? "is-active"
+                      : undefined
+                    : "is-active"
+              }
             >
               <span className="crew-nav-icon">◫</span>
               <span className="crew-nav-label">Overview</span>
             </Link>
             {workspace.capabilities.map((capability) => {
               const isActive =
-                workspace.code === "APPROVER" &&
-                ((approverView === "pending" && capability.title === "Pending approvals") ||
-                  (approverView === "history" && capability.title === "Review history"));
+                (workspace.code === "APPROVER" &&
+                  ((approverView === "pending" && capability.title === "Pending approvals") ||
+                    (approverView === "history" && capability.title === "Review history"))) ||
+                (workspace.code === "FINANCE" &&
+                  ((financeView === "approved-claims" && capability.title === "Approved claims") ||
+                    (financeView === "payment-history" && capability.title === "Payment history")));
               return (
                 <Link
                   href={capability.href}
@@ -105,28 +121,42 @@ export function WorkspaceDashboard({
                 ? approverView === "pending"
                   ? "ACTION REQUIRED · CLAIM REVIEW"
                   : "DECISION RECORD · AUDIT HISTORY"
-                : workspace.eyebrow}
+                : workspace.code === "FINANCE" && financeView !== "overview"
+                  ? financeView === "approved-claims"
+                    ? "PAYMENT QUEUE · REIMBURSEMENTS"
+                    : "TRANSACTION REGISTER · AUDIT TRAIL"
+                  : workspace.eyebrow}
             </span>
             <h1>
               {workspace.code === "APPROVER" && approverView !== "dashboard"
                 ? approverView === "pending"
                   ? "Pending approvals"
                   : "Review history"
-                : workspace.heading}
+                : workspace.code === "FINANCE" && financeView !== "overview"
+                  ? financeView === "approved-claims"
+                    ? "Approved claims"
+                    : "Payment history"
+                  : workspace.heading}
             </h1>
             <p>
               {workspace.code === "APPROVER" && approverView !== "dashboard"
                 ? approverView === "pending"
                   ? "Review submitted claims, supporting receipts and record an approval decision."
                   : "Search and review previously approved or returned claims and their recorded comments."
-                : workspace.summary}
+                : workspace.code === "FINANCE" && financeView !== "overview"
+                  ? financeView === "approved-claims"
+                    ? "Review approved reimbursement claims and record single or batch payments."
+                    : "Track completed, processing and failed reimbursement transactions."
+                  : workspace.summary}
             </p>
           </div>
           <span className="role-dashboard-heading-icon" aria-hidden="true">
             {workspace.icon}
           </span>
         </div>
-        {workspace.code === "APPROVER" ? (
+        {workspace.code === "FINANCE" ? (
+          <FinanceWorkspace view={financeView} />
+        ) : workspace.code === "APPROVER" ? (
           <ApproverWorkspace view={approverView} />
         ) : (
           <>
