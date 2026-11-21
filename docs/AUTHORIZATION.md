@@ -46,3 +46,13 @@ For mutations, the wrapper requires a same-origin `Origin` header when authentic
 - `FLIGHT_OPERATIONS_MANAGER`: crew, designation, airline, airport, and flight operations permissions only; it does not grant user administration or claim approval.
 
 The administrator section currently requires the local `ADMIN` role. The existing `/api/auth/*` endpoints are authentication endpoints and keep their purpose-specific behavior; do not wrap the login, callback, or logout handlers with an administrator guard.
+
+## Claim conversation resource authorization
+
+The shared `/api/claims/[claimId]/conversation` endpoint derives the user ID and active local role codes exclusively from `getAuthorizationContext()` (session/token plus local role assignments). Do not accept `userId`, `ownerId`, or another identity field from request bodies or query strings for authorization.
+
+- `APPROVER` and `ADMIN` roles can access any claim conversation.
+- `CREW` can access a conversation only when `crewClaimsService.userOwnsClaim(claimId, auth.user.id)` succeeds.
+- Finance retains the existing `FINANCE_PROCESS` authorization rule.
+- Other roles are denied unless a separate existing resource authorization rule explicitly grants access.
+- Do not add database roles or permissions to implement these conversation rules.

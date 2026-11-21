@@ -4,6 +4,16 @@ import { crewClaimsService } from "@/lib/crew/claims/service";
 
 export const dynamic = "force-dynamic";
 
-export const GET = withRouteGuard({ permissions: ["CLAIM_REVIEW"] }, async () => {
-  return NextResponse.json({ claims: crewClaimsService.reviewHistory() });
+export const GET = withRouteGuard({ permissions: ["CLAIM_REVIEW"] }, async (request: Request) => {
+  const params = new URL(request.url).searchParams;
+  const statusParam = params.get("status");
+  const status = statusParam === "APPROVED" || statusParam === "REJECTED" ? statusParam : "ALL";
+  const result = crewClaimsService.reviewHistoryPage({
+    page: Number(params.get("page") ?? 1),
+    pageSize: Number(params.get("pageSize") ?? 25),
+    search: params.get("search") ?? "",
+    status,
+    sortOrder: params.get("sortOrder") === "asc" ? "asc" : "desc",
+  });
+  return NextResponse.json(result);
 });

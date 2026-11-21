@@ -1,0 +1,163 @@
+.claim-conversation {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #e87924;
+  border-radius: 14px;
+  background: #f4f7fb;
+  color: #172b45;
+  box-shadow: 0 5px 18px rgba(15, 35, 60, 0.06);
+}
+.claim-conversation__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.claim-conversation__header h3 {
+  margin: 0;
+  color: #142b46;
+  font-size: 17px;
+  font-weight: 750;
+}
+.claim-conversation__header p,
+.claim-conversation__updated {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 550;
+}
+.claim-conversation__header button,
+.claim-conversation__older {
+  border: 1px solid #b8c6d8;
+  background: #fff;
+  color: #17324f;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.claim-conversation__updated {
+  margin: 10px 0 14px;
+}
+.claim-conversation__list {
+  display: grid;
+  gap: 10px;
+  max-height: 480px;
+  overflow: auto;
+}
+.claim-conversation__message {
+  padding: 13px 14px;
+  background: #fff;
+  border: 1px solid #d7e0eb;
+  border-radius: 10px;
+}
+.claim-conversation__message p {
+  margin: 0 0 9px;
+  color: #172b45;
+  font-size: 14px;
+  line-height: 1.55;
+  font-weight: 550;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.claim-conversation__message.is-reply {
+  margin: 10px 0 0 22px;
+  background: #f8fafc;
+  border-left: 3px solid #94a3b8;
+}
+.claim-conversation__meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: #475569;
+  font-size: 12px;
+}
+.claim-conversation__meta strong {
+  color: #243b57;
+  font-weight: 750;
+}
+.claim-conversation__reply {
+  margin-top: 7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #a64c12;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.claim-conversation textarea {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #aebed0;
+  border-radius: 9px;
+  background: #fff;
+  color: #172b45;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  resize: vertical;
+}
+.claim-conversation textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+.claim-conversation footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 650;
+}
+.claim-conversation footer button {
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #c65d16;
+  color: #fff;
+  font-weight: 750;
+  cursor: pointer;
+}
+.claim-conversation button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.claim-conversation__empty,
+.claim-conversation__error {
+  padding: 12px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+}
+.claim-conversation__error {
+  color: #b42318;
+}
+.claim-conversation__replying {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  margin-top: 10px;
+  background: #fff4e8;
+  border-radius: 8px;
+  color: #713b16;
+  font-size: 12px;
+  font-weight: 700;
+}
+.claim-conversation__replying button {
+  border: 0;
+  background: none;
+  color: #8b4513;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.claim-conversation__reply-context {
+  color: #475569;
+  font-weight: 650;
+}

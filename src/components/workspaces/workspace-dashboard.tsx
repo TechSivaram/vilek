@@ -18,12 +18,14 @@ export function WorkspaceDashboard({
   firstName,
   lastName,
   email,
+  approverView = "dashboard",
 }: {
   roleCode: string;
   roleCodes: string[];
   firstName: string;
   lastName: string;
   email: string;
+  approverView?: "dashboard" | "pending" | "history";
 }) {
   const workspace = getWorkspace(roleCode);
   if (!workspace) return null;
@@ -43,16 +45,29 @@ export function WorkspaceDashboard({
             <strong>{workspace.name}</strong>
           </div>
           <nav className="role-dashboard-nav" aria-label={`${workspace.name} navigation`}>
-            <a href="#overview" className="is-active">
+            <Link
+              href={workspace.href}
+              className={approverView === "dashboard" ? "is-active" : undefined}
+            >
               <span className="crew-nav-icon">◫</span>
               <span className="crew-nav-label">Overview</span>
-            </a>
-            {workspace.capabilities.map((capability) => (
-              <Link href={capability.href} key={capability.title}>
-                <span className="crew-nav-icon">{capability.icon}</span>
-                <span className="crew-nav-label">{capability.title}</span>
-              </Link>
-            ))}
+            </Link>
+            {workspace.capabilities.map((capability) => {
+              const isActive =
+                workspace.code === "APPROVER" &&
+                ((approverView === "pending" && capability.title === "Pending approvals") ||
+                  (approverView === "history" && capability.title === "Review history"));
+              return (
+                <Link
+                  href={capability.href}
+                  key={capability.title}
+                  className={isActive ? "is-active" : undefined}
+                >
+                  <span className="crew-nav-icon">{capability.icon}</span>
+                  <span className="crew-nav-label">{capability.title}</span>
+                </Link>
+              );
+            })}
           </nav>
           <div className="role-dashboard-sidebar-bottom">
             <div className="role-dashboard-help">
@@ -85,16 +100,34 @@ export function WorkspaceDashboard({
       <main className="role-dashboard-content" id="overview">
         <div className="role-dashboard-heading">
           <div>
-            <span className="role-dashboard-eyebrow">{workspace.eyebrow}</span>
-            <h1>{workspace.heading}</h1>
-            <p>{workspace.summary}</p>
+            <span className="role-dashboard-eyebrow">
+              {workspace.code === "APPROVER" && approverView !== "dashboard"
+                ? approverView === "pending"
+                  ? "ACTION REQUIRED · CLAIM REVIEW"
+                  : "DECISION RECORD · AUDIT HISTORY"
+                : workspace.eyebrow}
+            </span>
+            <h1>
+              {workspace.code === "APPROVER" && approverView !== "dashboard"
+                ? approverView === "pending"
+                  ? "Pending approvals"
+                  : "Review history"
+                : workspace.heading}
+            </h1>
+            <p>
+              {workspace.code === "APPROVER" && approverView !== "dashboard"
+                ? approverView === "pending"
+                  ? "Review submitted claims, supporting receipts and record an approval decision."
+                  : "Search and review previously approved or returned claims and their recorded comments."
+                : workspace.summary}
+            </p>
           </div>
           <span className="role-dashboard-heading-icon" aria-hidden="true">
             {workspace.icon}
           </span>
         </div>
         {workspace.code === "APPROVER" ? (
-          <ApproverWorkspace />
+          <ApproverWorkspace view={approverView} />
         ) : (
           <>
             {workspace.code !== "CREW" && (

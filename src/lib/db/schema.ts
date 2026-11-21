@@ -564,6 +564,8 @@ export const claims = sqliteTable(
   },
   (t) => [
     index("claim_status_idx").on(t.status),
+    index("claim_status_created_idx").on(t.status, t.createdAt),
+    index("claim_status_updated_idx").on(t.status, t.updatedAt),
     uniqueIndex("claim_id_assignment_uq").on(t.id, t.flightCrewId),
   ],
 );
