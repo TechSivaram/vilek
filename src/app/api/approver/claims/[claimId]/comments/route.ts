@@ -4,17 +4,29 @@ import { withRouteGuard } from "@/lib/auth/route-protection";
 import { crewClaimsService } from "@/lib/crew/claims/service";
 
 type Context = { params: Promise<{ claimId: string }> };
-const schema = z.object({
-  comment: z.string().trim().min(1).max(2000),
-  parentCommentId: z.string().optional(),
-});
+const schema = z
+  .object({
+    comment: z.string().trim().min(1).max(2000),
+    parentCommentId: z.string().optional(),
+  })
+  .strict();
 
 export const GET = withRouteGuard<Context>(
   { permissions: ["CLAIM_REVIEW"] },
   async (_request, context) => {
     const { claimId } = await context.params;
     try {
-      return NextResponse.json({ comments: crewClaimsService.listClaimComments(claimId) });
+      const conversation = crewClaimsService.getConversation(claimId);
+      return NextResponse.json({
+        comments: conversation.messages.map((message) => ({
+          id: message.id,
+          comment: message.comment,
+          parentCommentId: message.parentCommentId,
+          createdAt: message.createdAt,
+          authorFirstName: message.firstName,
+          authorLastName: message.lastName,
+        })),
+      });
     } catch (error) {
       if (error instanceof Error && error.message === "CLAIM_NOT_FOUND")
         return NextResponse.json({ error: "Claim not found." }, { status: 404 });
@@ -40,7 +52,7 @@ export const POST = withRouteGuard<Context>(
         { status: 400 },
       );
     try {
-      crewClaimsService.postReviewerComment(
+      crewClaimsService.postConversationMessage(
         auth.user.id,
         claimId,
         parsed.data.comment,

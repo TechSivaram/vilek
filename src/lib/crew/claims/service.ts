@@ -676,6 +676,8 @@ export const crewClaimsService = {
 
   /** Shared claim-wide conversation history used by every authorised workspace. */
   getConversation(claimId: string, limit = 100, before?: string) {
+    const claim = db.select({ id: claims.id }).from(claims).where(eq(claims.id, claimId)).get();
+    if (!claim) throw new Error("CLAIM_NOT_FOUND");
     const safeLimit = Math.min(100, Math.max(1, Math.floor(limit)));
     const rows = db
       .select({

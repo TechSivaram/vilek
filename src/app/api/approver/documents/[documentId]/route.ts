@@ -14,6 +14,7 @@ export const GET = withRouteGuard<Context>(
     if (!document) return NextResponse.json({ error: "Receipt not found." }, { status: 404 });
 
     const root = path.resolve(
+      /*turbopackIgnore: true*/
       process.env.VILEK_DOCUMENT_STORAGE_PATH ||
         path.join(process.cwd(), "data", "expense-documents"),
     );
@@ -21,7 +22,9 @@ export const GET = withRouteGuard<Context>(
       return NextResponse.json({ error: "Receipt not found." }, { status: 404 });
 
     try {
-      const bytes = await readFile(path.join(root, document.storageKey));
+      const bytes = await readFile(
+        /*turbopackIgnore: true*/ path.join(/*turbopackIgnore: true*/ root, document.storageKey),
+      );
       return new NextResponse(bytes, {
         headers: {
           "Content-Type": document.contentType,
