@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import {
   airlines,
   claimExpenses,
+  claimCurrencyResolutions,
+  crewBankAccounts,
   claims,
   currencies,
   expenseCategories,
@@ -104,6 +106,54 @@ export function getApprovedFinanceClaims() {
       currencyCode,
       amount: total.amountMinor / 10 ** total.minorUnits,
     }));
+    const primaryAccount = db
+      .select({ currencyCode: crewBankAccounts.currencyCode })
+      .from(crewBankAccounts)
+      .where(
+        and(
+          eq(crewBankAccounts.crewMemberId, claim.crewMemberId),
+          eq(crewBankAccounts.isActive, true),
+          eq(crewBankAccounts.isPrimary, true),
+          eq(crewBankAccounts.verificationStatus, "VERIFIED"),
+        ),
+      )
+      .get();
+    const resolutionRow = db
+      .select()
+      .from(claimCurrencyResolutions)
+      .where(
+        and(
+          eq(claimCurrencyResolutions.claimId, claim.claimId),
+          eq(claimCurrencyResolutions.status, "APPROVED"),
+        ),
+      )
+      .get();
+    let resolution: {
+      payoutCurrencyCode: string;
+      convertedAmount: number;
+      rateSource: string;
+      effectiveDate: string;
+      rates: Record<string, number>;
+    } | null = null;
+    if (resolutionRow) {
+      try {
+        resolution = {
+          payoutCurrencyCode: resolutionRow.payoutCurrencyCode,
+          convertedAmount: Number(resolutionRow.convertedAmount),
+          rateSource: resolutionRow.rateSource,
+          effectiveDate: resolutionRow.effectiveDate,
+          rates: JSON.parse(resolutionRow.ratesJson) as Record<string, number>,
+        };
+      } catch {
+        resolution = null;
+      }
+    }
+    const resolvedForCurrentAccount = Boolean(
+      resolution &&
+      primaryAccount?.currencyCode === resolution.payoutCurrencyCode &&
+      Number.isFinite(resolution.convertedAmount) &&
+      resolution.convertedAmount > 0,
+    );
     const activePayment = db
       .select({ status: payments.status, paymentNumber: payments.paymentNumber })
       .from(paymentClaims)
@@ -120,10 +170,28 @@ export function getApprovedFinanceClaims() {
       expenses: items,
       currencyTotals,
       hasInvalidAmounts,
+      primaryPayoutCurrency: primaryAccount?.currencyCode ?? null,
+      currencyResolution: resolvedForCurrentAccount ? resolution : null,
+      payableCurrencyCode:
+        currencyTotals.length === 1 &&
+        primaryAccount?.currencyCode === currencyTotals[0].currencyCode
+          ? currencyTotals[0].currencyCode
+          : resolvedForCurrentAccount
+            ? resolution!.payoutCurrencyCode
+            : null,
+      payableAmount:
+        currencyTotals.length === 1 &&
+        primaryAccount?.currencyCode === currencyTotals[0].currencyCode
+          ? currencyTotals[0].amount
+          : resolvedForCurrentAccount
+            ? resolution!.convertedAmount
+            : null,
       canPay:
         !hasInvalidAmounts &&
-        currencyTotals.length === 1 &&
-        currencyTotals[0].amount > 0 &&
+        ((currencyTotals.length === 1 &&
+          currencyTotals[0].amount > 0 &&
+          primaryAccount?.currencyCode === currencyTotals[0].currencyCode) ||
+          resolvedForCurrentAccount) &&
         !activePayment,
       activePayment: activePayment ?? null,
     };

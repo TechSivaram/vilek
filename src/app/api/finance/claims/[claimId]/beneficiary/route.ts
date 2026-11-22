@@ -5,6 +5,7 @@ import { withRouteGuard } from "@/lib/auth/route-protection";
 import { db } from "@/lib/db";
 import {
   claimExpenses,
+  claimCurrencyResolutions,
   claims,
   currencies,
   crewBankAccountAuditEvents,
@@ -50,11 +51,25 @@ export const GET = withRouteGuard(
       .where(eq(claimExpenses.claimId, claimId))
       .all();
     const currencyCodes = [...new Set(claimCurrencies.map((item) => item.code))];
-    if (currencyCodes.length !== 1)
-      return NextResponse.json(
-        { error: "Claim must have one payable currency before beneficiary details can be shown." },
-        { status: 409 },
-      );
+    let payoutCurrencyCode = currencyCodes[0];
+    if (currencyCodes.length > 1) {
+      const resolution = db
+        .select({ payoutCurrencyCode: claimCurrencyResolutions.payoutCurrencyCode })
+        .from(claimCurrencyResolutions)
+        .where(
+          and(
+            eq(claimCurrencyResolutions.claimId, claimId),
+            eq(claimCurrencyResolutions.status, "APPROVED"),
+          ),
+        )
+        .get();
+      if (!resolution)
+        return NextResponse.json(
+          { error: "Approve the claim currency resolution before revealing beneficiary details." },
+          { status: 409 },
+        );
+      payoutCurrencyCode = resolution.payoutCurrencyCode;
+    }
 
     const account = db
       .select()
@@ -65,14 +80,14 @@ export const GET = withRouteGuard(
           eq(crewBankAccounts.isActive, true),
           eq(crewBankAccounts.isPrimary, true),
           eq(crewBankAccounts.verificationStatus, "VERIFIED"),
-          eq(crewBankAccounts.currencyCode, currencyCodes[0]),
+          eq(crewBankAccounts.currencyCode, payoutCurrencyCode),
         ),
       )
       .get();
 
     if (!account)
       return NextResponse.json(
-        { error: "No verified primary bank account is available in the claim currency." },
+        { error: "No verified primary bank account is available in the resolved payout currency." },
         { status: 404 },
       );
 
@@ -96,7 +111,11 @@ export const GET = withRouteGuard(
         bankAccountId: account.id,
         actorUserId: auth.user.id,
         action: "BANK_ACCOUNT_DETAILS_REVEALED_TO_FINANCE",
-        detailsJson: JSON.stringify({ claimId, purpose: "MANUAL_REIMBURSEMENT" }),
+        detailsJson: JSON.stringify({
+          claimId,
+          purpose: "MANUAL_REIMBURSEMENT",
+          payoutCurrencyCode,
+        }),
       })
       .run();
 

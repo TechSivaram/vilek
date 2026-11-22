@@ -47,12 +47,7 @@ export const PATCH = withRouteGuard(
         const duplicateReference = tx
           .select({ id: payments.id })
           .from(payments)
-          .where(
-            and(
-              eq(payments.paymentReference, paymentReference),
-              ne(payments.id, paymentId),
-            ),
-          )
+          .where(and(eq(payments.paymentReference, paymentReference), ne(payments.id, paymentId)))
           .get();
         if (duplicateReference)
           throw new Error("This UTR or transaction reference is already recorded.");

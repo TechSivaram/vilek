@@ -14,6 +14,7 @@ import {
   CrewDashboardShell,
   CrewMobileNavToggle,
 } from "@/components/workspaces/crew-dashboard-shell";
+import { CrewPrimaryNavigation } from "@/components/workspaces/crew-primary-navigation";
 
 export function WorkspaceDashboard({
   roleCode,
@@ -51,48 +52,51 @@ export function WorkspaceDashboard({
             <span>{workspace.icon}</span>
             <strong>{workspace.name}</strong>
           </div>
-          <nav className="role-dashboard-nav" aria-label={`${workspace.name} navigation`}>
-            <Link
-              href={workspace.href}
-              className={
-                workspace.code === "APPROVER"
-                  ? approverView === "dashboard"
-                    ? "is-active"
-                    : undefined
-                  : workspace.code === "FINANCE"
-                    ? financeView === "overview"
+          {workspace.code === "CREW" ? (
+            <CrewPrimaryNavigation />
+          ) : (
+            <nav className="role-dashboard-nav" aria-label={`${workspace.name} navigation`}>
+              <Link
+                href={workspace.href}
+                className={
+                  workspace.code === "APPROVER"
+                    ? approverView === "dashboard"
                       ? "is-active"
                       : undefined
-                    : "is-active"
-              }
-            >
-              <span className="crew-nav-icon">◫</span>
-              <span className="crew-nav-label">Overview</span>
-            </Link>
-            {workspace.capabilities.map((capability) => {
-              const isActive =
-                (workspace.code === "APPROVER" &&
-                  ((approverView === "pending" && capability.title === "Pending approvals") ||
-                    (approverView === "history" && capability.title === "Review history"))) ||
-                (workspace.code === "CREW" &&
-                  crewView === "bank-accounts" &&
-                  capability.title === "Bank accounts") ||
-                (workspace.code === "FINANCE" &&
-                  ((financeView === "approved-claims" && capability.title === "Approved claims") ||
-                    (financeView === "payment-history" && capability.title === "Payment history") ||
-                    (financeView === "bank-accounts" && capability.title === "Bank accounts")));
-              return (
-                <Link
-                  href={capability.href}
-                  key={capability.title}
-                  className={isActive ? "is-active" : undefined}
-                >
-                  <span className="crew-nav-icon">{capability.icon}</span>
-                  <span className="crew-nav-label">{capability.title}</span>
-                </Link>
-              );
-            })}
-          </nav>
+                    : workspace.code === "FINANCE"
+                      ? financeView === "overview"
+                        ? "is-active"
+                        : undefined
+                      : "is-active"
+                }
+              >
+                <span className="crew-nav-icon">◫</span>
+                <span className="crew-nav-label">Overview</span>
+              </Link>
+              {workspace.capabilities.map((capability) => {
+                const isActive =
+                  (workspace.code === "APPROVER" &&
+                    ((approverView === "pending" && capability.title === "Pending approvals") ||
+                      (approverView === "history" && capability.title === "Review history"))) ||
+                  (workspace.code === "FINANCE" &&
+                    ((financeView === "approved-claims" &&
+                      capability.title === "Approved claims") ||
+                      (financeView === "payment-history" &&
+                        capability.title === "Payment history") ||
+                      (financeView === "bank-accounts" && capability.title === "Bank accounts")));
+                return (
+                  <Link
+                    href={capability.href}
+                    key={capability.title}
+                    className={isActive ? "is-active" : undefined}
+                  >
+                    <span className="crew-nav-icon">{capability.icon}</span>
+                    <span className="crew-nav-label">{capability.title}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
           <div className="role-dashboard-sidebar-bottom">
             <div className="role-dashboard-help">
               <strong>Need a hand?</strong>

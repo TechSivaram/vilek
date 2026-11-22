@@ -5,6 +5,8 @@ import { withRouteGuard } from "@/lib/auth/route-protection";
 import { db } from "@/lib/db";
 import {
   claims,
+  claimCurrencyResolutions,
+  currencies,
   crewBankAccounts,
   paymentAuditEvents,
   paymentClaims,
@@ -90,7 +92,7 @@ export const POST = withRouteGuard(
             eq(crewBankAccounts.isActive, true),
             eq(crewBankAccounts.isPrimary, true),
             eq(crewBankAccounts.verificationStatus, "VERIFIED"),
-            eq(crewBankAccounts.currencyCode, approved[0].currencyTotals[0].currencyCode),
+            eq(crewBankAccounts.currencyCode, approved[0].payableCurrencyCode ?? ""),
           ),
         )
         .get();
@@ -102,11 +104,24 @@ export const POST = withRouteGuard(
       beneficiaryBankAccountId = beneficiary.id;
     }
 
-    const currencyCodes = new Set(approved.map((claim) => claim.currencyTotals[0].currencyCode));
-    if (currencyCodes.size !== 1)
-      return jsonError("A payment batch must contain claims in the same currency.");
-    const currencyCode = [...currencyCodes][0];
-    const amount = approved.reduce((total, claim) => total + claim.currencyTotals[0].amount, 0);
+    const currencyCodes = new Set(approved.map((claim) => claim.payableCurrencyCode));
+    if (currencyCodes.size !== 1 || [...currencyCodes].some((code) => !code))
+      return jsonError(
+        "A payment batch must contain claims with the same resolved payout currency.",
+      );
+    const currencyCode = [...currencyCodes][0] as string;
+    const payoutCurrency = db
+      .select({ minorUnits: currencies.minorUnits })
+      .from(currencies)
+      .where(eq(currencies.code, currencyCode))
+      .get();
+    if (!payoutCurrency) return jsonError("The payout currency is not configured.", 409);
+    const factor = 10 ** payoutCurrency.minorUnits;
+    const amountMinor = approved.reduce(
+      (total, claim) => total + Math.round((claim.payableAmount ?? 0) * factor),
+      0,
+    );
+    const amount = amountMinor / factor;
     if (!Number.isFinite(amount) || amount <= 0)
       return jsonError("The payment amount must be greater than zero.");
 
@@ -137,6 +152,49 @@ export const POST = withRouteGuard(
             .get();
           if (current?.status !== "APPROVED")
             throw new Error("A selected claim is no longer approved.");
+          const currentBeneficiary = tx
+            .select({ id: crewBankAccounts.id })
+            .from(crewBankAccounts)
+            .where(
+              and(
+                eq(crewBankAccounts.crewMemberId, claim.crewMemberId),
+                eq(crewBankAccounts.isActive, true),
+                eq(crewBankAccounts.isPrimary, true),
+                eq(crewBankAccounts.verificationStatus, "VERIFIED"),
+                eq(crewBankAccounts.currencyCode, claim.payableCurrencyCode ?? ""),
+              ),
+            )
+            .get();
+          if (!currentBeneficiary)
+            throw new Error(
+              "The verified primary beneficiary account changed. Refresh the payment queue.",
+            );
+          const sourceCurrencyCodes = new Set(
+            claim.currencyTotals.map((total) => total.currencyCode),
+          );
+          const needsFxResolution =
+            sourceCurrencyCodes.size !== 1 ||
+            !sourceCurrencyCodes.has(claim.payableCurrencyCode ?? "");
+          if (needsFxResolution) {
+            const resolution = tx
+              .select({
+                payoutCurrencyCode: claimCurrencyResolutions.payoutCurrencyCode,
+                convertedAmount: claimCurrencyResolutions.convertedAmount,
+                status: claimCurrencyResolutions.status,
+              })
+              .from(claimCurrencyResolutions)
+              .where(eq(claimCurrencyResolutions.claimId, claim.claimId))
+              .get();
+            if (
+              !resolution ||
+              resolution.status !== "APPROVED" ||
+              resolution.payoutCurrencyCode !== claim.payableCurrencyCode ||
+              Number(resolution.convertedAmount) !== claim.payableAmount
+            )
+              throw new Error(
+                "The approved currency resolution changed. Refresh the payment queue before continuing.",
+              );
+          }
         }
         tx.insert(payments)
           .values({
@@ -145,7 +203,7 @@ export const POST = withRouteGuard(
             mode,
             status: "PROCESSING",
             currencyCode,
-            amount: amount.toFixed(2),
+            amount: amount.toFixed(payoutCurrency.minorUnits),
             paymentReference: null,
             idempotencyKey,
             initiatedByUserId: auth.user.id,
@@ -159,7 +217,9 @@ export const POST = withRouteGuard(
               id: randomUUID(),
               paymentId: id,
               claimId: claim.claimId,
-              amount: claim.currencyTotals[0].amount.toFixed(2),
+              amount: (Math.round((claim.payableAmount ?? 0) * factor) / factor).toFixed(
+                payoutCurrency.minorUnits,
+              ),
             })),
           )
           .run();
@@ -210,7 +270,7 @@ export const POST = withRouteGuard(
         },
         body: JSON.stringify({
           paymentNumber,
-          amount: amount.toFixed(2),
+          amount: amount.toFixed(payoutCurrency.minorUnits),
           currency: currencyCode,
           reference: paymentNumber,
         }),
@@ -247,7 +307,10 @@ export const POST = withRouteGuard(
             providerReference,
             failureReason:
               status === "FAILED"
-                ? (result.message ?? `Bank provider returned HTTP ${response.status}.`).slice(0, 500)
+                ? (result.message ?? `Bank provider returned HTTP ${response.status}.`).slice(
+                    0,
+                    500,
+                  )
                 : null,
             paidAt: status === "PAID" ? now : null,
             updatedAt: now,

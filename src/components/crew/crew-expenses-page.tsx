@@ -6,6 +6,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProfileMenu } from "@/components/workspaces/profile-menu";
 import { WorkspaceSwitcher } from "@/components/workspaces/workspace-switcher";
+import { CrewPrimaryNavigation } from "@/components/workspaces/crew-primary-navigation";
 import "./crew-expenses.css";
 
 type Assignment = {
@@ -307,29 +308,7 @@ export function CrewExpensesPage({
           <span>♙</span>
           <strong>Crew workspace</strong>
         </div>
-        <nav className="role-dashboard-nav" aria-label="Crew navigation">
-          <Link href="/crew" onClick={() => setMobileNavOpen(false)}>
-            <span className="crew-nav-icon">◫</span>
-            <span className="crew-nav-label">Overview</span>
-          </Link>
-          <Link href="/crew/flights" onClick={() => setMobileNavOpen(false)}>
-            <span className="crew-nav-icon">✈</span>
-            <span className="crew-nav-label">My flights</span>
-          </Link>
-          <Link
-            href="/crew/expenses"
-            className="is-active"
-            aria-current="page"
-            onClick={() => setMobileNavOpen(false)}
-          >
-            <span className="crew-nav-icon">₹</span>
-            <span className="crew-nav-label">My expenses</span>
-          </Link>
-          <Link href="/crew/claims" onClick={() => setMobileNavOpen(false)}>
-            <span className="crew-nav-icon">▤</span>
-            <span className="crew-nav-label">My claims</span>
-          </Link>
-        </nav>
+        <CrewPrimaryNavigation onNavigate={() => setMobileNavOpen(false)} />
         <div className="role-dashboard-sidebar-bottom">
           <div className="role-dashboard-help">
             <strong>Need a hand?</strong>

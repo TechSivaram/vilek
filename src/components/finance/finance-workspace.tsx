@@ -23,6 +23,16 @@ type FinanceClaim = {
   airlineName: string;
   expenses: FinanceExpense[];
   currencyTotals: { currencyCode: string; amount: number }[];
+  primaryPayoutCurrency: string | null;
+  payableCurrencyCode: string | null;
+  payableAmount: number | null;
+  currencyResolution: {
+    payoutCurrencyCode: string;
+    convertedAmount: number;
+    rateSource: string;
+    effectiveDate: string;
+    rates: Record<string, number>;
+  } | null;
   hasInvalidAmounts: boolean;
   canPay: boolean;
   activePayment: { status: string; paymentNumber: string } | null;
@@ -129,16 +139,13 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
   );
   const batchCurrencies = new Set(
     selectedClaims
-      .map((claim) => claim.currencyTotals[0]?.currencyCode)
+      .map((claim) => claim.payableCurrencyCode)
       .filter((code): code is string => Boolean(code)),
   );
-  const totalAmount = selectedClaims.reduce(
-    (sum, claim) => sum + (claim.currencyTotals[0]?.amount ?? 0),
-    0,
-  );
+  const totalAmount = selectedClaims.reduce((sum, claim) => sum + (claim.payableAmount ?? 0), 0);
   const canSubmit =
     selectedClaims.length > 0 &&
-    selectedClaims.every((claim) => claim.canPay && claim.currencyTotals.length === 1) &&
+    selectedClaims.every((claim) => claim.canPay && Boolean(claim.payableCurrencyCode)) &&
     batchCurrencies.size === 1 &&
     (mode === "BANK" || selectedClaims.length === 1);
 
@@ -201,6 +208,37 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
       setError(err instanceof Error ? err.message : "Unable to retrieve beneficiary details.");
     } finally {
       setRevealingClaim("");
+    }
+  }
+
+  async function saveCurrencyResolution(
+    claimId: string,
+    rates: Record<string, number>,
+    rateSource: string,
+    effectiveDate: string,
+  ) {
+    setSubmitting(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(
+        `/api/finance/claims/${encodeURIComponent(claimId)}/currency-resolution`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ rates, rateSource, effectiveDate }),
+        },
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? "Unable to save currency resolution.");
+      setNotice(
+        `Currency resolution approved: ${money(result.convertedAmount, result.payoutCurrencyCode)}.`,
+      );
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to save currency resolution.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -348,7 +386,10 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                   </tr>
                 )}
                 {data?.approvedClaims.map((claim) => {
-                  const total = claim.currencyTotals.length === 1 ? claim.currencyTotals[0] : null;
+                  const total =
+                    claim.payableCurrencyCode && claim.payableAmount !== null
+                      ? { currencyCode: claim.payableCurrencyCode, amount: claim.payableAmount }
+                      : null;
                   const isExpanded = expandedClaims.includes(claim.claimId);
                   const multiCurrency = claim.currencyTotals.length > 1;
                   return (
@@ -364,6 +405,8 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                       beneficiary={beneficiaries[claim.claimId] ?? null}
                       revealing={revealingClaim === claim.claimId}
                       onRevealBeneficiary={() => void revealBeneficiary(claim.claimId)}
+                      onResolveCurrency={saveCurrencyResolution}
+                      resolving={submitting}
                     />
                   );
                 })}
@@ -644,6 +687,8 @@ function FragmentRow({
   beneficiary,
   revealing,
   onRevealBeneficiary,
+  onResolveCurrency,
+  resolving,
 }: {
   claim: FinanceClaim;
   total: { currencyCode: string; amount: number } | null;
@@ -655,7 +700,17 @@ function FragmentRow({
   beneficiary: BeneficiaryDetails | null;
   revealing: boolean;
   onRevealBeneficiary: () => void;
+  onResolveCurrency: (
+    claimId: string,
+    rates: Record<string, number>,
+    rateSource: string,
+    effectiveDate: string,
+  ) => void;
+  resolving: boolean;
 }) {
+  const [rates, setRates] = useState<Record<string, string>>({});
+  const [rateSource, setRateSource] = useState("");
+  const [effectiveDate, setEffectiveDate] = useState(new Date().toISOString().slice(0, 10));
   return (
     <>
       <tr>
@@ -707,7 +762,13 @@ function FragmentRow({
             onClick={onToggleDetails}
             aria-expanded={isExpanded}
           >
-            {isExpanded ? "Hide details" : multiCurrency ? "Review currencies" : "View details"}
+            {isExpanded
+              ? "Hide details"
+              : multiCurrency
+                ? claim.currencyResolution
+                  ? "View conversion"
+                  : "Resolve currencies"
+                : "View details"}
           </button>
         </td>
       </tr>
@@ -717,11 +778,16 @@ function FragmentRow({
             <div className="finance-claim-details">
               <div className="finance-claim-detail-heading">
                 <strong>Claim expense breakdown</strong>
-                {multiCurrency && (
-                  <span className="finance-status finance-status-failed">
-                    Payment blocked until currency amounts are resolved
-                  </span>
-                )}
+                {multiCurrency &&
+                  (claim.currencyResolution ? (
+                    <span className="finance-status finance-status-ready">
+                      Currency resolved · {claim.currencyResolution.payoutCurrencyCode}
+                    </span>
+                  ) : (
+                    <span className="finance-status finance-status-failed">
+                      Payment blocked until currency amounts are resolved
+                    </span>
+                  ))}
               </div>
               {claim.currencyTotals.length > 0 ? (
                 <div className="finance-currency-breakdown">
@@ -736,6 +802,260 @@ function FragmentRow({
                 <p className="finance-validation">
                   No payable expense totals were found for this claim.
                 </p>
+              )}
+              {multiCurrency && claim.primaryPayoutCurrency && !claim.currencyResolution && (
+                <section className="finance-fx-editor" aria-label="Resolve claim currencies">
+                  <div className="finance-fx-editor-header">
+                    <div>
+                      <span className="finance-fx-eyebrow">Foreign exchange</span>
+                      <h3>Convert expenses to {claim.primaryPayoutCurrency}</h3>
+                      <p>
+                        Enter the Finance-approved rate for each source currency. The beneficiary
+                        currency is fixed at 1. Original expenses are never changed.
+                      </p>
+                    </div>
+                    <span className="finance-status finance-status-processing">
+                      Approval required
+                    </span>
+                  </div>
+
+                  <div className="finance-fx-rate-list">
+                    {claim.currencyTotals.map((item) => {
+                      const isPayoutCurrency = item.currencyCode === claim.primaryPayoutCurrency;
+                      const rateText = isPayoutCurrency ? "1" : (rates[item.currencyCode] ?? "");
+                      const rate = isPayoutCurrency ? 1 : Number(rateText);
+                      const hasRate = Number.isFinite(rate) && rate > 0;
+                      const converted = hasRate ? item.amount * rate : null;
+                      return (
+                        <div className="finance-fx-rate-card" key={item.currencyCode}>
+                          <div className="finance-fx-source">
+                            <span className="finance-fx-field-label">Original expense</span>
+                            <strong>{money(item.amount, item.currencyCode)}</strong>
+                            <small>{item.currencyCode}</small>
+                          </div>
+                          <div className="finance-fx-rate-input">
+                            <label htmlFor={`fx-rate-${claim.claimId}-${item.currencyCode}`}>
+                              {`1 ${item.currencyCode} equals`}
+                            </label>
+                            <div className="finance-fx-input-wrap">
+                              <span>{claim.primaryPayoutCurrency}</span>
+                              <input
+                                id={`fx-rate-${claim.claimId}-${item.currencyCode}`}
+                                aria-label={`Exchange rate from ${item.currencyCode} to ${claim.primaryPayoutCurrency}`}
+                                type="number"
+                                inputMode="decimal"
+                                min="0.00000001"
+                                step="any"
+                                placeholder="Enter rate"
+                                value={rateText}
+                                disabled={isPayoutCurrency}
+                                onChange={(event) =>
+                                  setRates((current) => ({
+                                    ...current,
+                                    [item.currencyCode]: event.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <small>
+                              {isPayoutCurrency
+                                ? "Base payout currency · fixed rate"
+                                : "Use the approved rate for the effective date"}
+                            </small>
+                          </div>
+                          <div className="finance-fx-converted">
+                            <span className="finance-fx-field-label">Converted amount</span>
+                            <strong>
+                              {converted === null || !claim.primaryPayoutCurrency
+                                ? "—"
+                                : money(converted, claim.primaryPayoutCurrency)}
+                            </strong>
+                            <small>{hasRate ? "Live estimate" : "Enter a valid rate"}</small>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {(() => {
+                    const allRatesValid = claim.currencyTotals.every(
+                      (item) =>
+                        item.currencyCode === claim.primaryPayoutCurrency ||
+                        Number(rates[item.currencyCode]) > 0,
+                    );
+                    const previewTotal = claim.currencyTotals.reduce((sum, item) => {
+                      const rate =
+                        item.currencyCode === claim.primaryPayoutCurrency
+                          ? 1
+                          : Number(rates[item.currencyCode]);
+                      return sum + (Number.isFinite(rate) && rate > 0 ? item.amount * rate : 0);
+                    }, 0);
+                    return (
+                      <div className="finance-fx-preview">
+                        <div>
+                          <span>Estimated payable amount</span>
+                          <strong>
+                            {allRatesValid
+                              ? money(previewTotal, claim.primaryPayoutCurrency)
+                              : "Complete all exchange rates"}
+                          </strong>
+                        </div>
+                        <small>
+                          Preview only · Final amount is recorded after Finance approval
+                        </small>
+                      </div>
+                    );
+                  })()}
+
+                  <div className="finance-fx-metadata">
+                    <label>
+                      <span>Rate source / approval reference</span>
+                      <input
+                        value={rateSource}
+                        onChange={(event) => setRateSource(event.target.value)}
+                        maxLength={160}
+                        placeholder="e.g. Treasury rate sheet or bank quote reference"
+                      />
+                    </label>
+                    <label>
+                      <span>Effective date</span>
+                      <input
+                        type="date"
+                        value={effectiveDate}
+                        onChange={(event) => setEffectiveDate(event.target.value)}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="finance-fx-editor-footer">
+                    <p>
+                      Check the rate source and effective date before approving. This action is
+                      recorded in the Finance audit trail.
+                    </p>
+                    <button
+                      className="finance-button finance-button-primary"
+                      type="button"
+                      disabled={
+                        resolving ||
+                        !rateSource.trim() ||
+                        !effectiveDate ||
+                        claim.currencyTotals.some(
+                          (item) =>
+                            item.currencyCode !== claim.primaryPayoutCurrency &&
+                            !(Number(rates[item.currencyCode]) > 0),
+                        )
+                      }
+                      onClick={() =>
+                        onResolveCurrency(
+                          claim.claimId,
+                          Object.fromEntries(
+                            claim.currencyTotals.map((item) => [
+                              item.currencyCode,
+                              item.currencyCode === claim.primaryPayoutCurrency
+                                ? 1
+                                : Number(rates[item.currencyCode]),
+                            ]),
+                          ),
+                          rateSource,
+                          effectiveDate,
+                        )
+                      }
+                    >
+                      {resolving ? "Saving resolution…" : "Approve FX resolution"}
+                    </button>
+                  </div>
+                </section>
+              )}
+              {multiCurrency && !claim.primaryPayoutCurrency && (
+                <p className="finance-validation">
+                  A verified primary beneficiary bank account is required to determine the payout
+                  currency.
+                </p>
+              )}
+              {claim.currencyResolution && (
+                <section
+                  className="finance-beneficiary-panel"
+                  aria-label="Approved currency conversion details"
+                >
+                  <div className="finance-claim-detail-heading">
+                    <strong>Approved currency resolution</strong>
+                    <span className="finance-status finance-status-ready">Approved</span>
+                  </div>
+                  <div className="finance-fx-summary">
+                    <span>Final payable amount</span>
+                    <strong>
+                      {money(
+                        claim.currencyResolution.convertedAmount,
+                        claim.currencyResolution.payoutCurrencyCode,
+                      )}
+                    </strong>
+                    <small>Payout currency · {claim.currencyResolution.payoutCurrencyCode}</small>
+                  </div>
+                  <div className="finance-fx-table-wrap">
+                    <table className="finance-fx-table">
+                      <thead>
+                        <tr>
+                          <th scope="col">Original expense</th>
+                          <th scope="col">Approved exchange rate</th>
+                          <th scope="col">Converted amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {claim.currencyTotals.map((item) => {
+                          const rate = claim.currencyResolution!.rates[item.currencyCode];
+                          const isPayoutCurrency =
+                            item.currencyCode === claim.currencyResolution!.payoutCurrencyCode;
+                          const converted = item.amount * rate;
+                          return (
+                            <tr key={item.currencyCode}>
+                              <td>
+                                <strong>{money(item.amount, item.currencyCode)}</strong>
+                                <small>{item.currencyCode}</small>
+                              </td>
+                              <td>
+                                <strong>
+                                  {new Intl.NumberFormat(undefined, {
+                                    maximumFractionDigits: 8,
+                                  }).format(rate)}
+                                </strong>
+                                <small>
+                                  1 {item.currencyCode} ={" "}
+                                  {money(rate, claim.currencyResolution!.payoutCurrencyCode)}
+                                </small>
+                                {isPayoutCurrency && <small>Base payout currency</small>}
+                              </td>
+                              <td>
+                                <strong>
+                                  {money(converted, claim.currencyResolution!.payoutCurrencyCode)}
+                                </strong>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th scope="row" colSpan={2}>
+                            Total approved payable
+                          </th>
+                          <td>
+                            <strong>
+                              {money(
+                                claim.currencyResolution.convertedAmount,
+                                claim.currencyResolution.payoutCurrencyCode,
+                              )}
+                            </strong>
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  <p className="finance-integration-note">
+                    Rate source: {claim.currencyResolution.rateSource} · Effective:{" "}
+                    {claim.currencyResolution.effectiveDate}. Original expense amounts are
+                    preserved; converted line amounts are displayed using the approved rates.
+                  </p>
+                </section>
               )}
               <div className="finance-beneficiary-panel">
                 <div className="finance-claim-detail-heading">
@@ -803,7 +1123,7 @@ function FragmentRow({
                 ) : (
                   <p className="finance-integration-note">
                     Reveal is audited and available only for an approved claim with a verified
-                    primary account in the claim currency.
+                    primary beneficiary account in the payout currency.
                   </p>
                 )}
               </div>
@@ -818,11 +1138,17 @@ function FragmentRow({
                   </div>
                 ))}
               </div>
-              {multiCurrency && (
+              {multiCurrency && !claim.currencyResolution && (
                 <p className="finance-validation">
-                  This claim contains expenses in more than one currency. It cannot be selected for
-                  payment until the claim is reviewed and the payable currency treatment is
-                  resolved.
+                  The expense currency and verified beneficiary payout currency need reconciliation.
+                  Enter the Finance-approved exchange rate and approve the payable amount before
+                  payment.
+                </p>
+              )}
+              {!claim.primaryPayoutCurrency && !claim.hasInvalidAmounts && (
+                <p className="finance-validation">
+                  A verified primary beneficiary bank account is required before this claim can be
+                  paid. Add and verify the crew member’s primary bank account in Bank accounts.
                 </p>
               )}
               {claim.hasInvalidAmounts && (

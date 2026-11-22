@@ -630,6 +630,60 @@ export const claims = sqliteTable(
   ],
 );
 
+export const claimCurrencyResolutions = sqliteTable(
+  "Claim_Currency_Resolution",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    claimId: text("claim_id")
+      .notNull()
+      .unique()
+      .references(() => claims.id, { onDelete: "restrict" }),
+    payoutCurrencyCode: text("payout_currency_code")
+      .notNull()
+      .references(() => currencies.code, { onDelete: "restrict" }),
+    ratesJson: text("rates_json").notNull(),
+    convertedAmount: text("converted_amount").notNull(),
+    rateSource: text("rate_source").notNull(),
+    effectiveDate: text("effective_date").notNull(),
+    status: text("status").notNull().default("APPROVED"),
+    createdByUserId: text("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    approvedByUserId: text("approved_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    approvedAt: text("approved_at"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    check("claim_currency_resolution_status_ck", sql`${t.status} IN ('DRAFT','APPROVED')`),
+    check("claim_currency_resolution_amount_ck", sql`CAST(${t.convertedAmount} AS REAL) > 0`),
+  ],
+);
+
+export const claimCurrencyResolutionAuditEvents = sqliteTable(
+  "Claim_Currency_Resolution_Audit_Event",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    resolutionId: text("resolution_id")
+      .notNull()
+      .references(() => claimCurrencyResolutions.id, { onDelete: "restrict" }),
+    claimId: text("claim_id")
+      .notNull()
+      .references(() => claims.id, { onDelete: "restrict" }),
+    actorUserId: text("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    action: text("action").notNull(),
+    detailsJson: text("details_json").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("claim_currency_resolution_audit_idx").on(t.claimId, t.createdAt)],
+);
+
 export const claimExpenses = sqliteTable(
   "Claim_Expense",
   {

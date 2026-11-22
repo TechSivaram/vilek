@@ -57,6 +57,13 @@
       "when": 1795320000000,
       "tag": "0007_crew_bank_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1795410000000,
+      "tag": "0008_claim_currency_resolution",
+      "breakpoints": true
     }
   ]
 }
