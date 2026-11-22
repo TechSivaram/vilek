@@ -9,6 +9,8 @@ import {
   claims,
   currencies,
   crewBankAccounts,
+  paymentClaims,
+  payments,
 } from "@/lib/db/schema";
 import { getApprovedFinanceClaims } from "@/lib/finance/service";
 
@@ -18,7 +20,12 @@ export const POST = withRouteGuard(
   { permissions: ["FINANCE_PROCESS"] },
   async (request, context: Context, auth) => {
     const { claimId } = await context.params;
-    let body: { rates?: unknown; rateSource?: unknown; effectiveDate?: unknown };
+    let body: {
+      rates?: unknown;
+      rateSource?: unknown;
+      effectiveDate?: unknown;
+      correctionReason?: unknown;
+    };
     try {
       body = await request.json();
     } catch {
@@ -69,6 +76,8 @@ export const POST = withRouteGuard(
         },
         { status: 400 },
       );
+    const correctionReason =
+      typeof body.correctionReason === "string" ? body.correctionReason.trim().slice(0, 500) : "";
     const rates =
       body.rates && typeof body.rates === "object" && !Array.isArray(body.rates)
         ? (body.rates as Record<string, unknown>)
@@ -135,11 +144,42 @@ export const POST = withRouteGuard(
             "The verified primary beneficiary account changed. Refresh and try again.",
           );
         const active = tx
-          .select({ id: claimCurrencyResolutions.id })
+          .select()
           .from(claimCurrencyResolutions)
           .where(eq(claimCurrencyResolutions.claimId, claimId))
           .get();
+
+        const linkedPayments = tx
+          .select({ status: payments.status, paymentNumber: payments.paymentNumber })
+          .from(paymentClaims)
+          .innerJoin(payments, eq(paymentClaims.paymentId, payments.id))
+          .where(eq(paymentClaims.claimId, claimId))
+          .all();
+
+        if (linkedPayments.some((payment) => payment.status === "PAID")) {
+          throw new Error("FX rates are locked because this claim has already been paid.");
+        }
+        const processingPayment = linkedPayments.find((payment) => payment.status === "PROCESSING");
+        if (processingPayment) {
+          throw new Error(
+            `Payment ${processingPayment.paymentNumber} is still processing. Reconcile or resolve that payment before correcting FX rates.`,
+          );
+        }
+        if (active && !correctionReason) {
+          throw new Error("Enter a correction reason before changing an approved FX resolution.");
+        }
+
         const resolutionId = active?.id ?? randomUUID();
+        const previousResolution = active
+          ? {
+              payoutCurrencyCode: active.payoutCurrencyCode,
+              rates: JSON.parse(active.ratesJson),
+              convertedAmount: active.convertedAmount,
+              rateSource: active.rateSource,
+              effectiveDate: active.effectiveDate,
+              status: active.status,
+            }
+          : null;
         const values = {
           payoutCurrencyCode: account.currencyCode,
           ratesJson: JSON.stringify(normalized),
@@ -168,14 +208,19 @@ export const POST = withRouteGuard(
             claimId,
             actorUserId: auth.user.id,
             action: active
-              ? "CURRENCY_RESOLUTION_UPDATED_AND_APPROVED"
+              ? "CURRENCY_RESOLUTION_CORRECTED"
               : "CURRENCY_RESOLUTION_CREATED_AND_APPROVED",
             detailsJson: JSON.stringify({
-              payoutCurrencyCode: account.currencyCode,
-              rates: normalized,
-              convertedAmount,
-              rateSource,
-              effectiveDate,
+              correctionReason: active ? correctionReason : null,
+              previous: previousResolution,
+              revised: {
+                payoutCurrencyCode: account.currencyCode,
+                rates: normalized,
+                convertedAmount,
+                rateSource,
+                effectiveDate,
+                status: "APPROVED",
+              },
             }),
           })
           .run();

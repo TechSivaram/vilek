@@ -2456,3 +2456,36 @@ body :where(.finance-kpi strong) {
     width: 100%;
   }
 }
+
+/* Finance FX correction controls */
+.finance-fx-resolution-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.finance-fx-correction-reason {
+  display: grid;
+  gap: 0.45rem;
+  margin: 1rem 0;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.finance-fx-correction-reason textarea {
+  width: 100%;
+  min-height: 4.5rem;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+}
+@media (max-width: 640px) {
+  .finance-fx-resolution-actions {
+    justify-content: flex-start;
+  }
+}
