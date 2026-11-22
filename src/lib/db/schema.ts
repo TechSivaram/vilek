@@ -859,6 +859,8 @@ export const schema = {
   payments,
   paymentClaims,
   paymentAuditEvents,
+  crewBankAccounts,
+  crewBankAccountAuditEvents,
   deploymentSetup,
   systemSettings,
   allowedFileTypes,

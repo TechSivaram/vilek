@@ -50,6 +50,7 @@ export function getApprovedFinanceClaims() {
   const rows = db
     .select({
       claimId: claims.id,
+      crewMemberId: flightCrew.crewMemberId,
       createdAt: claims.createdAt,
       crewFirstName: users.firstName,
       crewLastName: users.lastName,
@@ -72,6 +73,7 @@ export function getApprovedFinanceClaims() {
       .select({
         amount: expenses.amount,
         currencyCode: currencies.code,
+        minorUnits: currencies.minorUnits,
         category: expenseCategories.name,
         description: expenses.description,
       })
@@ -81,12 +83,26 @@ export function getApprovedFinanceClaims() {
       .innerJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
       .where(eq(claimExpenses.claimId, claim.claimId))
       .all();
-    const totals = new Map<string, number>();
-    for (const item of items)
-      totals.set(item.currencyCode, (totals.get(item.currencyCode) ?? 0) + Number(item.amount));
-    const currencyTotals = [...totals.entries()].map(([currencyCode, amount]) => ({
+    // Sum in the currency's minor unit to avoid floating-point drift in payment amounts.
+    const totals = new Map<string, { minorUnits: number; amountMinor: number }>();
+    let hasInvalidAmounts = false;
+    for (const item of items) {
+      const factor = 10 ** item.minorUnits;
+      const amount = Number(item.amount);
+      if (!Number.isFinite(amount) || amount < 0) {
+        hasInvalidAmounts = true;
+        continue;
+      }
+      const current = totals.get(item.currencyCode) ?? {
+        minorUnits: item.minorUnits,
+        amountMinor: 0,
+      };
+      current.amountMinor += Math.round(amount * factor);
+      totals.set(item.currencyCode, current);
+    }
+    const currencyTotals = [...totals.entries()].map(([currencyCode, total]) => ({
       currencyCode,
-      amount: Number(amount.toFixed(2)),
+      amount: total.amountMinor / 10 ** total.minorUnits,
     }));
     const activePayment = db
       .select({ status: payments.status, paymentNumber: payments.paymentNumber })
@@ -103,7 +119,12 @@ export function getApprovedFinanceClaims() {
       ...claim,
       expenses: items,
       currencyTotals,
-      canPay: currencyTotals.length === 1 && currencyTotals[0].amount > 0 && !activePayment,
+      hasInvalidAmounts,
+      canPay:
+        !hasInvalidAmounts &&
+        currencyTotals.length === 1 &&
+        currencyTotals[0].amount > 0 &&
+        !activePayment,
       activePayment: activePayment ?? null,
     };
   });

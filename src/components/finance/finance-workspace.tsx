@@ -18,10 +18,12 @@ type FinanceClaim = {
   crewFirstName: string;
   crewLastName: string;
   crewEmail: string;
+  crewMemberId: string;
   flightNumber: string;
   airlineName: string;
   expenses: FinanceExpense[];
   currencyTotals: { currencyCode: string; amount: number }[];
+  hasInvalidAmounts: boolean;
   canPay: boolean;
   activePayment: { status: string; paymentNumber: string } | null;
 };
@@ -42,6 +44,16 @@ type FinancePayment = {
   claims: { claimId: string }[];
 };
 
+type BeneficiaryDetails = {
+  accountHolderName: string;
+  bankName: string;
+  countryCode: string;
+  currencyCode: string;
+  accountNumber: string;
+  routingCode: string | null;
+  verificationStatus: string;
+};
+
 type FinanceData = {
   overview: {
     approvedClaims: number;
@@ -60,7 +72,16 @@ const money = (amount: number | string, currency: string) =>
     maximumFractionDigits: 2,
   }).format(Number(amount));
 
-const dateLabel = (value: string | null) => (value ? new Date(value).toLocaleString() : "—");
+const dateLabel = (value: string | null) => {
+  if (!value) return "—";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString();
+};
+
+const localDateTimeInputValue = (date = new Date()) => {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 16);
+};
 
 export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) {
   const [data, setData] = useState<FinanceData | null>(null);
@@ -69,11 +90,14 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
   const [selected, setSelected] = useState<string[]>([]);
   const [expandedClaims, setExpandedClaims] = useState<string[]>([]);
   const [mode, setMode] = useState<"MANUAL" | "BANK">("MANUAL");
-  const [reference, setReference] = useState("");
-  const [paidAt, setPaidAt] = useState(new Date().toISOString().slice(0, 16));
   const [submitting, setSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [notice, setNotice] = useState("");
+  const [beneficiaries, setBeneficiaries] = useState<Record<string, BeneficiaryDetails>>({});
+  const [revealingClaim, setRevealingClaim] = useState("");
+  const [confirmingPaymentId, setConfirmingPaymentId] = useState("");
+  const [confirmationReference, setConfirmationReference] = useState("");
+  const [confirmationDate, setConfirmationDate] = useState(localDateTimeInputValue());
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -116,7 +140,7 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
     selectedClaims.length > 0 &&
     selectedClaims.every((claim) => claim.canPay && claim.currencyTotals.length === 1) &&
     batchCurrencies.size === 1 &&
-    (mode === "BANK" || (reference.trim().length > 0 && !Number.isNaN(Date.parse(paidAt))));
+    (mode === "BANK" || selectedClaims.length === 1);
 
   const toggleClaim = (id: string, checked: boolean) =>
     setSelected((current) =>
@@ -142,8 +166,6 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
         body: JSON.stringify({
           claimIds: selected,
           mode,
-          paymentReference: mode === "MANUAL" ? reference.trim() : undefined,
-          paidAt: mode === "MANUAL" ? new Date(paidAt).toISOString() : undefined,
         }),
       });
       const result = await response.json();
@@ -152,12 +174,58 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
       }
       setNotice(result.warning ?? `${result.paymentNumber} created with status ${result.status}.`);
       setSelected([]);
-      setReference("");
       setConfirmOpen(false);
       await refresh();
     } catch (err) {
       setConfirmOpen(false);
       setError(err instanceof Error ? err.message : "Payment could not be processed.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function revealBeneficiary(claimId: string) {
+    setRevealingClaim(claimId);
+    setError("");
+    try {
+      const response = await fetch(
+        `/api/finance/claims/${encodeURIComponent(claimId)}/beneficiary`,
+        {
+          cache: "no-store",
+        },
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? "Unable to retrieve beneficiary details.");
+      setBeneficiaries((current) => ({ ...current, [claimId]: result as BeneficiaryDetails }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to retrieve beneficiary details.");
+    } finally {
+      setRevealingClaim("");
+    }
+  }
+
+  async function confirmManualTransfer(paymentId: string) {
+    if (!confirmationReference.trim() || !confirmationDate || submitting) return;
+    setSubmitting(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(`/api/finance/payments/${encodeURIComponent(paymentId)}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          paymentReference: confirmationReference.trim(),
+          paidAt: new Date(confirmationDate).toISOString(),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? "Unable to confirm transfer.");
+      setNotice("Manual transfer confirmed and claim marked as paid.");
+      setConfirmationReference("");
+      setConfirmingPaymentId("");
+      await refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to confirm transfer.");
     } finally {
       setSubmitting(false);
     }
@@ -237,8 +305,8 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
               <span className="finance-eyebrow">PAYMENT QUEUE</span>
               <h2>Approved claims</h2>
               <p>
-                Select one eligible claim for a single payment or multiple same-currency claims for
-                a batch.
+                Review the approved amount and verified beneficiary details before preparing a
+                manual transfer or initiating a bank payment.
               </p>
             </div>
             <button
@@ -293,6 +361,9 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                       selected={selected.includes(claim.claimId)}
                       onSelect={(checked) => toggleClaim(claim.claimId, checked)}
                       onToggleDetails={() => toggleClaimDetails(claim.claimId)}
+                      beneficiary={beneficiaries[claim.claimId] ?? null}
+                      revealing={revealingClaim === claim.claimId}
+                      onRevealBeneficiary={() => void revealBeneficiary(claim.claimId)}
                     />
                   );
                 })}
@@ -320,32 +391,16 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                     value={mode}
                     onChange={(event) => setMode(event.target.value as "MANUAL" | "BANK")}
                   >
-                    <option value="MANUAL">Manual transfer (record completed payment)</option>
+                    <option value="MANUAL">Manual bank transfer</option>
                     <option value="BANK">Bank gateway (initiate transfer)</option>
                   </select>
                 </label>
                 {mode === "MANUAL" ? (
-                  <>
-                    <label>
-                      Bank / transaction reference
-                      <input
-                        value={reference}
-                        onChange={(event) => setReference(event.target.value)}
-                        placeholder="Enter UTR or transaction reference"
-                        maxLength={120}
-                        required
-                      />
-                    </label>
-                    <label>
-                      Payment date
-                      <input
-                        type="datetime-local"
-                        value={paidAt}
-                        onChange={(event) => setPaidAt(event.target.value)}
-                        required
-                      />
-                    </label>
-                  </>
+                  <p className="finance-integration-note">
+                    Prepare a single-crew transfer, reveal the verified beneficiary details below,
+                    complete the transfer in your bank portal, then confirm it in Payment History
+                    with the UTR. The claim will not be marked paid until that confirmation.
+                  </p>
                 ) : (
                   <p className="finance-integration-note">
                     Bank execution requires VILEK_BANK_PAYMENT_URL and an adapter-compatible bank
@@ -375,6 +430,12 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                       : "Review payment"}
                 </button>
               </div>
+              {mode === "MANUAL" && selectedClaims.length > 1 && (
+                <p className="finance-validation">
+                  Manual bank transfers are prepared one crew member at a time. Select a single
+                  claim.
+                </p>
+              )}
               {selectedClaims.length > 1 && batchCurrencies.size > 1 && (
                 <p className="finance-validation">
                   Batch payments must use one currency. Select claims with the same currency.
@@ -447,7 +508,50 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                       </span>
                       {payment.failureReason && <small>{payment.failureReason}</small>}
                     </td>
-                    <td>{payment.paymentReference ?? payment.providerReference ?? "—"}</td>
+                    <td>
+                      {payment.paymentReference ?? payment.providerReference ?? "—"}
+                      {payment.mode === "MANUAL" && payment.status === "PROCESSING" && (
+                        <div className="finance-manual-confirm">
+                          {confirmingPaymentId === payment.id ? (
+                            <>
+                              <input
+                                aria-label="UTR or transaction reference"
+                                value={confirmationReference}
+                                onChange={(event) => setConfirmationReference(event.target.value)}
+                                placeholder="Enter UTR"
+                                maxLength={120}
+                              />
+                              <input
+                                aria-label="Transfer date and time"
+                                type="datetime-local"
+                                value={confirmationDate}
+                                onChange={(event) => setConfirmationDate(event.target.value)}
+                              />
+                              <button
+                                className="finance-button finance-button-primary"
+                                type="button"
+                                disabled={!confirmationReference.trim() || submitting}
+                                onClick={() => void confirmManualTransfer(payment.id)}
+                              >
+                                Confirm transfer
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              className="finance-inline-link"
+                              type="button"
+                              onClick={() => {
+                                setConfirmingPaymentId(payment.id);
+                                setConfirmationReference("");
+                                setConfirmationDate(localDateTimeInputValue());
+                              }}
+                            >
+                              Record completed transfer
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </td>
                     <td>{dateLabel(payment.paidAt ?? payment.createdAt)}</td>
                   </tr>
                 ))}
@@ -471,7 +575,7 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
               {mode === "BANK" ? "Initiate bank payment?" : "Record this payment?"}
             </h2>
             <p id="finance-confirm-description">
-              You are about to {mode === "BANK" ? "initiate" : "record"} a
+              You are about to {mode === "BANK" ? "initiate" : "prepare"} a
               {selectedClaims.length === 1
                 ? " payment for one claim"
                 : ` batch payment for ${selectedClaims.length} claims`}
@@ -494,23 +598,11 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                 <dt>Execution</dt>
                 <dd>{mode === "BANK" ? "Bank gateway" : "Manual transfer"}</dd>
               </div>
-              {mode === "MANUAL" && (
-                <div>
-                  <dt>Reference</dt>
-                  <dd>{reference.trim()}</dd>
-                </div>
-              )}
-              {mode === "MANUAL" && (
-                <div>
-                  <dt>Payment date</dt>
-                  <dd>{dateLabel(new Date(paidAt).toISOString())}</dd>
-                </div>
-              )}
             </dl>
             <div className="finance-dialog-warning">
               {mode === "BANK"
                 ? "The bank may process this transfer immediately. Do not submit it again if the response is uncertain; reconcile the transaction first."
-                : "Recording a manual payment marks the selected claims as paid. Verify the bank transfer and reference before confirming."}
+                : "This prepares a manual transfer and keeps the claim approved. Complete the transfer in your bank portal, then confirm the UTR in Payment History to mark it paid."}
             </div>
             <div className="finance-dialog-actions">
               <button
@@ -531,7 +623,7 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                   ? "Processing…"
                   : mode === "BANK"
                     ? "Confirm and initiate"
-                    : "Confirm payment"}
+                    : "Prepare transfer"}
               </button>
             </div>
           </section>
@@ -549,6 +641,9 @@ function FragmentRow({
   selected,
   onSelect,
   onToggleDetails,
+  beneficiary,
+  revealing,
+  onRevealBeneficiary,
 }: {
   claim: FinanceClaim;
   total: { currencyCode: string; amount: number } | null;
@@ -557,6 +652,9 @@ function FragmentRow({
   selected: boolean;
   onSelect: (checked: boolean) => void;
   onToggleDetails: () => void;
+  beneficiary: BeneficiaryDetails | null;
+  revealing: boolean;
+  onRevealBeneficiary: () => void;
 }) {
   return (
     <>
@@ -639,6 +737,76 @@ function FragmentRow({
                   No payable expense totals were found for this claim.
                 </p>
               )}
+              <div className="finance-beneficiary-panel">
+                <div className="finance-claim-detail-heading">
+                  <strong>Beneficiary bank details</strong>
+                  <button
+                    className="finance-inline-link"
+                    type="button"
+                    onClick={onRevealBeneficiary}
+                    disabled={revealing}
+                  >
+                    {revealing
+                      ? "Retrieving…"
+                      : beneficiary
+                        ? "Refresh full details"
+                        : "Reveal verified details"}
+                  </button>
+                </div>
+                {beneficiary ? (
+                  <div className="finance-currency-breakdown">
+                    <button
+                      className="finance-inline-link"
+                      type="button"
+                      onClick={() =>
+                        void navigator.clipboard.writeText(
+                          [
+                            `Account holder: ${beneficiary.accountHolderName}`,
+                            `Bank: ${beneficiary.bankName}`,
+                            `Account number: ${beneficiary.accountNumber}`,
+                            `IFSC / routing: ${beneficiary.routingCode ?? "Not provided"}`,
+                            `Country: ${beneficiary.countryCode}`,
+                            `Currency: ${beneficiary.currencyCode}`,
+                          ].join("\\n"),
+                        )
+                      }
+                    >
+                      Copy beneficiary details
+                    </button>
+                    <div>
+                      <span>Account holder</span>
+                      <strong>{beneficiary.accountHolderName}</strong>
+                    </div>
+                    <div>
+                      <span>Bank</span>
+                      <strong>{beneficiary.bankName}</strong>
+                    </div>
+                    <div>
+                      <span>Account number</span>
+                      <strong>{beneficiary.accountNumber}</strong>
+                    </div>
+                    <div>
+                      <span>IFSC / routing</span>
+                      <strong>{beneficiary.routingCode ?? "Not provided"}</strong>
+                    </div>
+                    <div>
+                      <span>Country / currency</span>
+                      <strong>
+                        {beneficiary.countryCode} · {beneficiary.currencyCode}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Verification</span>
+                      <strong>{beneficiary.verificationStatus}</strong>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="finance-integration-note">
+                    Reveal is audited and available only for an approved claim with a verified
+                    primary account in the claim currency.
+                  </p>
+                )}
+              </div>
               <div className="finance-expense-list">
                 {claim.expenses.map((expense, index) => (
                   <div key={`${claim.claimId}-${index}`}>
@@ -655,6 +823,12 @@ function FragmentRow({
                   This claim contains expenses in more than one currency. It cannot be selected for
                   payment until the claim is reviewed and the payable currency treatment is
                   resolved.
+                </p>
+              )}
+              {claim.hasInvalidAmounts && (
+                <p className="finance-validation">
+                  One or more expense amounts are invalid. Payment is blocked until the claim data
+                  is corrected.
                 </p>
               )}
             </div>

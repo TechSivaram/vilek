@@ -3,7 +3,13 @@ import { NextResponse } from "next/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import { db } from "@/lib/db";
-import { claims, paymentAuditEvents, paymentClaims, payments } from "@/lib/db/schema";
+import {
+  claims,
+  crewBankAccounts,
+  paymentAuditEvents,
+  paymentClaims,
+  payments,
+} from "@/lib/db/schema";
 import {
   getApprovedFinanceClaims,
   getFinanceOverview,
@@ -52,8 +58,6 @@ export const POST = withRouteGuard(
     const mode = body.mode;
     const paymentReference =
       typeof body.paymentReference === "string" ? body.paymentReference.trim() : "";
-    if (mode === "MANUAL" && !paymentReference)
-      return jsonError("A bank transfer or transaction reference is required for manual payments.");
     if (paymentReference.length > 120)
       return jsonError("Payment reference must be 120 characters or fewer.");
     if (mode === "BANK" && !process.env.VILEK_BANK_PAYMENT_URL) {
@@ -62,6 +66,9 @@ export const POST = withRouteGuard(
         503,
       );
     }
+
+    if (mode === "MANUAL" && claimIds.length !== 1)
+      return jsonError("Manual transfers must be prepared one crew claim at a time.");
 
     const approved = getApprovedFinanceClaims().filter((claim) => claimIds.includes(claim.claimId));
     if (approved.length !== claimIds.length)
@@ -72,6 +79,29 @@ export const POST = withRouteGuard(
         409,
       );
     }
+    let beneficiaryBankAccountId: string | null = null;
+    if (mode === "MANUAL") {
+      const beneficiary = db
+        .select({ id: crewBankAccounts.id })
+        .from(crewBankAccounts)
+        .where(
+          and(
+            eq(crewBankAccounts.crewMemberId, approved[0].crewMemberId),
+            eq(crewBankAccounts.isActive, true),
+            eq(crewBankAccounts.isPrimary, true),
+            eq(crewBankAccounts.verificationStatus, "VERIFIED"),
+            eq(crewBankAccounts.currencyCode, approved[0].currencyTotals[0].currencyCode),
+          ),
+        )
+        .get();
+      if (!beneficiary)
+        return jsonError(
+          "This crew member has no verified primary bank account in the claim currency.",
+          409,
+        );
+      beneficiaryBankAccountId = beneficiary.id;
+    }
+
     const currencyCodes = new Set(approved.map((claim) => claim.currencyTotals[0].currencyCode));
     if (currencyCodes.size !== 1)
       return jsonError("A payment batch must contain claims in the same currency.");
@@ -84,11 +114,6 @@ export const POST = withRouteGuard(
     const idempotencyKey = randomUUID();
     const paymentNumber = `VLK-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${id.slice(0, 8).toUpperCase()}`;
     const now = new Date().toISOString();
-    const manualPaidAt =
-      typeof body.paidAt === "string" && !Number.isNaN(Date.parse(body.paidAt))
-        ? new Date(body.paidAt).toISOString()
-        : now;
-
     try {
       db.transaction((tx) => {
         // Re-check inside the write transaction to close the duplicate-submit race.
@@ -118,13 +143,13 @@ export const POST = withRouteGuard(
             id,
             paymentNumber,
             mode,
-            status: mode === "MANUAL" ? "PAID" : "PROCESSING",
+            status: "PROCESSING",
             currencyCode,
             amount: amount.toFixed(2),
-            paymentReference: mode === "MANUAL" ? paymentReference : null,
+            paymentReference: null,
             idempotencyKey,
             initiatedByUserId: auth.user.id,
-            paidAt: mode === "MANUAL" ? manualPaidAt : null,
+            paidAt: null,
             updatedAt: now,
           })
           .run();
@@ -142,24 +167,32 @@ export const POST = withRouteGuard(
           .values({
             id: randomUUID(),
             paymentId: id,
-            action: mode === "MANUAL" ? "MANUAL_PAYMENT_RECORDED" : "BANK_PAYMENT_INITIATED",
+            action: mode === "MANUAL" ? "MANUAL_TRANSFER_PREPARED" : "BANK_PAYMENT_INITIATED",
             actorUserId: auth.user.id,
-            detailsJson: JSON.stringify({ claimIds, currencyCode, amount }),
+            detailsJson: JSON.stringify({
+              claimIds,
+              currencyCode,
+              amount,
+              beneficiaryBankAccountId,
+            }),
           })
           .run();
-        if (mode === "MANUAL") {
-          tx.update(claims)
-            .set({ status: "PAID", updatedAt: now })
-            .where(inArray(claims.id, claimIds))
-            .run();
-        }
       });
     } catch (error) {
       return jsonError(error instanceof Error ? error.message : "Unable to create payment.", 409);
     }
 
     if (mode === "MANUAL") {
-      return NextResponse.json({ paymentId: id, paymentNumber, status: "PAID" }, { status: 201 });
+      return NextResponse.json(
+        {
+          paymentId: id,
+          paymentNumber,
+          status: "PROCESSING",
+          message:
+            "Transfer prepared. Complete the bank transfer, then confirm it in Payment History using the UTR.",
+        },
+        { status: 201 },
+      );
     }
 
     // Provider-neutral bank adapter contract. A timeout/invalid response deliberately
@@ -191,43 +224,69 @@ export const POST = withRouteGuard(
         message?: string;
       };
       const providerStatus = (result.status ?? "").toUpperCase();
+      const providerReference =
+        typeof result.reference === "string" && result.reference.trim()
+          ? result.reference.trim().slice(0, 160)
+          : typeof result.transactionId === "string" && result.transactionId.trim()
+            ? result.transactionId.trim().slice(0, 160)
+            : null;
+      // A success label without a provider transaction reference is not sufficient
+      // evidence to mark a reimbursement as paid.
+      const providerReportedSuccess = ["PAID", "SUCCESS", "COMPLETED"].includes(providerStatus);
       const status =
-        response.ok && ["PAID", "SUCCESS", "COMPLETED"].includes(providerStatus)
+        response.ok && providerReportedSuccess && providerReference
           ? "PAID"
           : !response.ok || ["FAILED", "REJECTED", "DECLINED"].includes(providerStatus)
             ? "FAILED"
             : "PROCESSING";
-      const providerReference = result.reference ?? result.transactionId ?? null;
-      db.update(payments)
-        .set({
-          status,
-          providerReference,
-          failureReason:
-            status === "FAILED"
-              ? (result.message ?? `Bank provider returned HTTP ${response.status}.`).slice(0, 500)
-              : null,
-          paidAt: status === "PAID" ? new Date().toISOString() : null,
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(payments.id, id))
-        .run();
-      if (status === "PAID")
-        db.update(claims)
-          .set({ status: "PAID", updatedAt: new Date().toISOString() })
-          .where(inArray(claims.id, claimIds))
+      const now = new Date().toISOString();
+      db.transaction((tx) => {
+        tx.update(payments)
+          .set({
+            status,
+            providerReference,
+            failureReason:
+              status === "FAILED"
+                ? (result.message ?? `Bank provider returned HTTP ${response.status}.`).slice(0, 500)
+                : null,
+            paidAt: status === "PAID" ? now : null,
+            updatedAt: now,
+          })
+          .where(eq(payments.id, id))
           .run();
-      db.insert(paymentAuditEvents)
-        .values({
-          id: randomUUID(),
-          paymentId: id,
-          action: `BANK_PAYMENT_${status}`,
-          actorUserId: auth.user.id,
-          detailsJson: JSON.stringify({ providerReference, httpStatus: response.status }),
-        })
-        .run();
+        if (status === "PAID") {
+          tx.update(claims)
+            .set({ status: "PAID", updatedAt: now })
+            .where(inArray(claims.id, claimIds))
+            .run();
+        }
+        tx.insert(paymentAuditEvents)
+          .values({
+            id: randomUUID(),
+            paymentId: id,
+            action: `BANK_PAYMENT_${status}`,
+            actorUserId: auth.user.id,
+            detailsJson: JSON.stringify({
+              providerReference,
+              httpStatus: response.status,
+              providerStatus,
+            }),
+          })
+          .run();
+      });
       return NextResponse.json(
-        { paymentId: id, paymentNumber, status },
-        { status: status === "FAILED" ? 502 : 201 },
+        {
+          paymentId: id,
+          paymentNumber,
+          status,
+          ...(status === "PROCESSING"
+            ? {
+                warning:
+                  "The provider did not return a confirmed transaction reference. Reconcile this payment before retrying.",
+              }
+            : {}),
+        },
+        { status: status === "FAILED" ? 502 : status === "PROCESSING" ? 202 : 201 },
       );
     } catch {
       db.insert(paymentAuditEvents)

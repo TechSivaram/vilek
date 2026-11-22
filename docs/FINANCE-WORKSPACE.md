@@ -83,3 +83,12 @@ This is an adapter contract, not a connection to a particular bank. Provider aut
 - Finance can verify or reject accounts from `/finance/bank-accounts`.
 - Only verified accounts can be designated primary. A partial unique index permits at most one primary account per crew member.
 - Payment execution has not yet been connected to beneficiary selection; that is the next implementation step.
+
+## Manual beneficiary transfer workflow
+
+- Finance can expand an approved claim and reveal the crew member's verified primary bank account in the claim currency.
+- Revealing full beneficiary details is restricted by `FINANCE_PROCESS` and creates a `BANK_ACCOUNT_DETAILS_REVEALED_TO_FINANCE` bank-account audit event. The audit record stores the claim and purpose, not the decrypted account details.
+- Manual transfers are prepared one claim/crew member at a time. Preparing a transfer creates a `PROCESSING` payment and does not mark the claim paid.
+- Finance completes the transfer in the organization's bank portal, then opens Payment History and records the UTR/reference and transfer date/time.
+- Only the confirmation action changes the payment to `PAID` and the associated claim to `PAID`.
+- The existing provider-based `BANK` payment path remains separate and unchanged.
