@@ -49,6 +49,12 @@ export const WORKSPACES: WorkspaceDefinition[] = [
         description: "Prepare claims and follow their progress.",
         href: "/crew/claims",
       },
+      {
+        icon: "⌑",
+        title: "Bank accounts",
+        description: "Register beneficiary accounts and manage verification and payout currency.",
+        href: "/crew/bank-accounts",
+      },
     ],
   },
   {
@@ -98,6 +104,12 @@ export const WORKSPACES: WorkspaceDefinition[] = [
         title: "Payment history",
         description: "Review processed reimbursements and exceptions.",
         href: "/finance/payment-history",
+      },
+      {
+        icon: "⌑",
+        title: "Bank accounts",
+        description: "Review crew beneficiary account verification.",
+        href: "/finance/bank-accounts",
       },
     ],
   },

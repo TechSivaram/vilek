@@ -479,6 +479,66 @@ export const auditRetentionActions = sqliteTable(
   ],
 );
 
+export const crewBankAccounts = sqliteTable(
+  "Crew_Bank_Account",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    crewMemberId: text("crew_member_id")
+      .notNull()
+      .references(() => crewMembers.id, { onDelete: "restrict" }),
+    accountHolderName: text("account_holder_name").notNull(),
+    bankName: text("bank_name").notNull(),
+    countryCode: text("country_code").notNull(),
+    currencyCode: text("currency_code")
+      .notNull()
+      .references(() => currencies.code, { onDelete: "restrict" }),
+    accountNumberEncrypted: text("account_number_encrypted").notNull(),
+    accountNumberLast4: text("account_number_last4").notNull(),
+    routingCodeEncrypted: text("routing_code_encrypted"),
+    routingCodeMasked: text("routing_code_masked"),
+    verificationStatus: text("verification_status").notNull().default("PENDING"),
+    verificationMethod: text("verification_method"),
+    verificationReference: text("verification_reference"),
+    isPrimary: integer("is_primary", { mode: "boolean" }).notNull().default(false),
+    isActive: active(),
+    verifiedAt: text("verified_at"),
+    verifiedByUserId: text("verified_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [
+    index("crew_bank_account_crew_idx").on(t.crewMemberId, t.isActive),
+    uniqueIndex("crew_bank_account_primary_uq")
+      .on(t.crewMemberId)
+      .where(sql`${t.isPrimary} = 1`),
+    check(
+      "crew_bank_account_verification_ck",
+      sql`${t.verificationStatus} IN ('PENDING','VERIFIED','REJECTED','NEEDS_REVIEW')`,
+    ),
+  ],
+);
+
+export const crewBankAccountAuditEvents = sqliteTable(
+  "Crew_Bank_Account_Audit_Event",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    bankAccountId: text("bank_account_id")
+      .notNull()
+      .references(() => crewBankAccounts.id, { onDelete: "restrict" }),
+    actorUserId: text("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    action: text("action").notNull(),
+    detailsJson: text("details_json"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("crew_bank_account_audit_date_idx").on(t.bankAccountId, t.createdAt)],
+);
+
 export const currencies = sqliteTable(
   "Currency",
   {

@@ -2000,3 +2000,92 @@ body :where(.finance-kpi strong) {
     align-items: flex-start;
   }
 }
+
+/* Crew beneficiary bank accounts */
+.crew-bank-accounts {
+  display: grid;
+  gap: 1.25rem;
+}
+.crew-bank-account-list {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+}
+.crew-bank-account {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid #e1e8ef;
+  border-radius: 12px;
+  background: #fff;
+}
+.crew-bank-account-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.crew-bank-account-main > div:first-child {
+  display: grid;
+  gap: 0.3rem;
+}
+.crew-bank-account-main strong {
+  color: #172b42;
+  font-size: 15px;
+  font-weight: 750;
+}
+.crew-bank-account-main span,
+.crew-bank-account-main small {
+  color: #526579;
+  font-size: 13px;
+}
+.crew-bank-account-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.crew-bank-account-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+}
+.crew-bank-account-form label {
+  display: grid;
+  gap: 0.4rem;
+  color: #263d51;
+  font-size: 13px;
+  font-weight: 700;
+}
+.crew-bank-account-form input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d5e0e8;
+  border-radius: 8px;
+  background: #fff;
+  color: #172b42;
+  font: inherit;
+  font-size: 14px;
+}
+.crew-bank-account-form-note {
+  grid-column: 1/-1;
+  padding: 0.8rem;
+  border-radius: 8px;
+  background: #f4f8fb;
+  color: #526579;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.crew-bank-account-form > .finance-button {
+  justify-self: start;
+}
+@media (max-width: 680px) {
+  .crew-bank-account-form {
+    grid-template-columns: 1fr;
+  }
+  .crew-bank-account-form-note {
+    grid-column: auto;
+  }
+}

@@ -6,8 +6,10 @@ import { getWorkspace } from "@/lib/workspaces";
 import { CrewFlightsOverviewCard } from "@/components/workspaces/crew-flights-overview-card";
 import { CrewExpensesOverviewCard } from "@/components/workspaces/crew-expenses-overview-card";
 import { CrewClaimsOverviewCard } from "@/components/workspaces/crew-claims-overview-card";
+import { CrewBankAccounts } from "@/components/crew/bank-accounts";
 import { ApproverWorkspace } from "@/components/approver/approver-workspace";
 import { FinanceWorkspace } from "@/components/finance/finance-workspace";
+import { FinanceBankAccountReview } from "@/components/finance/bank-account-review";
 import {
   CrewDashboardShell,
   CrewMobileNavToggle,
@@ -21,6 +23,7 @@ export function WorkspaceDashboard({
   email,
   approverView = "dashboard",
   financeView = "overview",
+  crewView = "dashboard",
 }: {
   roleCode: string;
   roleCodes: string[];
@@ -28,7 +31,8 @@ export function WorkspaceDashboard({
   lastName: string;
   email: string;
   approverView?: "dashboard" | "pending" | "history";
-  financeView?: "overview" | "approved-claims" | "payment-history";
+  financeView?: "overview" | "approved-claims" | "payment-history" | "bank-accounts";
+  crewView?: "dashboard" | "bank-accounts";
 }) {
   const workspace = getWorkspace(roleCode);
   if (!workspace) return null;
@@ -70,9 +74,13 @@ export function WorkspaceDashboard({
                 (workspace.code === "APPROVER" &&
                   ((approverView === "pending" && capability.title === "Pending approvals") ||
                     (approverView === "history" && capability.title === "Review history"))) ||
+                (workspace.code === "CREW" &&
+                  crewView === "bank-accounts" &&
+                  capability.title === "Bank accounts") ||
                 (workspace.code === "FINANCE" &&
                   ((financeView === "approved-claims" && capability.title === "Approved claims") ||
-                    (financeView === "payment-history" && capability.title === "Payment history")));
+                    (financeView === "payment-history" && capability.title === "Payment history") ||
+                    (financeView === "bank-accounts" && capability.title === "Bank accounts")));
               return (
                 <Link
                   href={capability.href}
@@ -121,33 +129,45 @@ export function WorkspaceDashboard({
                 ? approverView === "pending"
                   ? "ACTION REQUIRED · CLAIM REVIEW"
                   : "DECISION RECORD · AUDIT HISTORY"
-                : workspace.code === "FINANCE" && financeView !== "overview"
-                  ? financeView === "approved-claims"
-                    ? "PAYMENT QUEUE · REIMBURSEMENTS"
-                    : "TRANSACTION REGISTER · AUDIT TRAIL"
-                  : workspace.eyebrow}
+                : workspace.code === "CREW" && crewView === "bank-accounts"
+                  ? "BANKING · BENEFICIARY DETAILS"
+                  : workspace.code === "FINANCE" && financeView !== "overview"
+                    ? financeView === "approved-claims"
+                      ? "PAYMENT QUEUE · REIMBURSEMENTS"
+                      : financeView === "payment-history"
+                        ? "TRANSACTION REGISTER · AUDIT TRAIL"
+                        : "BENEFICIARY CONTROL · VERIFICATION"
+                    : workspace.eyebrow}
             </span>
             <h1>
               {workspace.code === "APPROVER" && approverView !== "dashboard"
                 ? approverView === "pending"
                   ? "Pending approvals"
                   : "Review history"
-                : workspace.code === "FINANCE" && financeView !== "overview"
-                  ? financeView === "approved-claims"
-                    ? "Approved claims"
-                    : "Payment history"
-                  : workspace.heading}
+                : workspace.code === "CREW" && crewView === "bank-accounts"
+                  ? "Bank accounts"
+                  : workspace.code === "FINANCE" && financeView !== "overview"
+                    ? financeView === "approved-claims"
+                      ? "Approved claims"
+                      : financeView === "payment-history"
+                        ? "Payment history"
+                        : "Bank accounts"
+                    : workspace.heading}
             </h1>
             <p>
               {workspace.code === "APPROVER" && approverView !== "dashboard"
                 ? approverView === "pending"
                   ? "Review submitted claims, supporting receipts and record an approval decision."
                   : "Search and review previously approved or returned claims and their recorded comments."
-                : workspace.code === "FINANCE" && financeView !== "overview"
-                  ? financeView === "approved-claims"
-                    ? "Review eligible approved claims and record single or batch reimbursements."
-                    : "Track completed, processing and failed reimbursement transactions."
-                  : workspace.summary}
+                : workspace.code === "CREW" && crewView === "bank-accounts"
+                  ? "Register beneficiary accounts, track verification and choose your primary reimbursement account."
+                  : workspace.code === "FINANCE" && financeView !== "overview"
+                    ? financeView === "approved-claims"
+                      ? "Review eligible approved claims and record single or batch reimbursements."
+                      : financeView === "payment-history"
+                        ? "Track completed, processing and failed reimbursement transactions."
+                        : "Review crew beneficiary account verification."
+                    : workspace.summary}
             </p>
           </div>
           <span className="role-dashboard-heading-icon" aria-hidden="true">
@@ -155,9 +175,15 @@ export function WorkspaceDashboard({
           </span>
         </div>
         {workspace.code === "FINANCE" ? (
-          <FinanceWorkspace view={financeView} />
+          financeView === "bank-accounts" ? (
+            <FinanceBankAccountReview />
+          ) : (
+            <FinanceWorkspace view={financeView} />
+          )
         ) : workspace.code === "APPROVER" ? (
           <ApproverWorkspace view={approverView} />
+        ) : workspace.code === "CREW" && crewView === "bank-accounts" ? (
+          <CrewBankAccounts />
         ) : (
           <>
             {workspace.code !== "CREW" && (
