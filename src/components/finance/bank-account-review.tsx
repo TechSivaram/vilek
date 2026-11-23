@@ -1,5 +1,132 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+
+function BankAccountDetailsReveal({
+  accountId,
+  workspace,
+}: {
+  accountId: string;
+  workspace: "crew" | "finance";
+}) {
+  const [details, setDetails] = useState<{
+    accountHolderName: string;
+    bankName: string;
+    countryCode: string;
+    currencyCode: string;
+    accountNumber: string;
+    routingCode: string | null;
+  } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function toggle() {
+    if (details) {
+      setDetails(null);
+      setError("");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `/api/${workspace}/bank-accounts/${encodeURIComponent(accountId)}/details`,
+        {
+          cache: "no-store",
+          headers: { "cache-control": "no-cache" },
+        },
+      );
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? "Unable to reveal account details.");
+      setDetails(result.details);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to reveal account details.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="bank-account-sensitive-details">
+      <button
+        type="button"
+        className="bank-account-reveal-button bank-account-reveal-icon-button"
+        onClick={() => void toggle()}
+        disabled={busy}
+        aria-label={
+          busy
+            ? "Loading account details"
+            : details
+              ? "Hide account details"
+              : "Reveal account details"
+        }
+        title={
+          busy
+            ? "Loading account details"
+            : details
+              ? "Hide account details"
+              : "Reveal account details"
+        }
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {details ? (
+            <>
+              <path d="M3 3l18 18" />
+              <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+              <path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a15 15 0 0 1-3.1 3.8M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7c1 0 2-.2 2.8-.5" />
+            </>
+          ) : (
+            <>
+              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+              <circle cx="12" cy="12" r="3" />
+            </>
+          )}
+        </svg>
+      </button>
+      {error && (
+        <p className="bank-account-reveal-error" role="alert">
+          {error}
+        </p>
+      )}
+      {details && (
+        <dl className="bank-account-reveal-grid">
+          <div>
+            <dt>Account holder</dt>
+            <dd>{details.accountHolderName}</dd>
+          </div>
+          <div>
+            <dt>Bank</dt>
+            <dd>{details.bankName}</dd>
+          </div>
+          <div>
+            <dt>Account number</dt>
+            <dd className="bank-account-sensitive-value">{details.accountNumber}</dd>
+          </div>
+          <div>
+            <dt>IFSC / SWIFT / routing code</dt>
+            <dd className="bank-account-sensitive-value">
+              {details.routingCode || "Not provided"}
+            </dd>
+          </div>
+          <div>
+            <dt>Country / currency</dt>
+            <dd>
+              {details.countryCode} · {details.currencyCode}
+            </dd>
+          </div>
+        </dl>
+      )}
+    </div>
+  );
+}
+
 type EvidenceItem = {
   id: string;
   fileName: string;
@@ -296,6 +423,7 @@ export function FinanceBankAccountReview() {
                       Verification: {a.verificationStatus} · {a.verificationMethod ?? "Manual"}
                     </small>
                   </div>
+                  <BankAccountDetailsReveal accountId={a.id} workspace="finance" />
                 </div>
                 <FinanceEvidenceList accountId={a.id} refreshToken={evidenceRefreshToken} />
                 <div className="finance-dialog-actions">

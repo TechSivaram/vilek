@@ -5551,3 +5551,265 @@ body :where(.finance-kpi strong) {
     grid-column: 1 / -1;
   }
 }
+
+/* On-demand sensitive bank details: visible only after an explicit reveal action. */
+.bank-account-sensitive-details {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.bank-account-reveal-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid #9bbce0;
+  border-radius: 9px;
+  background: #f3f8fe;
+  color: #155a9d;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.bank-account-reveal-button:hover:not(:disabled) {
+  background: #e8f2ff;
+  border-color: #6e9fd2;
+  box-shadow: 0 2px 6px rgba(28, 82, 135, 0.1);
+}
+.bank-account-reveal-button:focus-visible {
+  outline: 2px solid #1d70c9;
+  outline-offset: 2px;
+}
+.bank-account-reveal-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.bank-account-reveal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  width: 100%;
+  margin: 0;
+  padding: 13px;
+  border: 1px solid #d6e3f0;
+  border-radius: 10px;
+  background: #f8fbff;
+  box-sizing: border-box;
+}
+.bank-account-reveal-grid > div {
+  min-width: 0;
+}
+.bank-account-reveal-grid dt {
+  margin: 0 0 4px;
+  color: #6b8095;
+  font-size: 11px;
+  font-weight: 700;
+}
+.bank-account-reveal-grid dd {
+  margin: 0;
+  color: #203a55;
+  font-size: 13px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.bank-account-reveal-grid .bank-account-sensitive-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.025em;
+  user-select: text;
+}
+.bank-account-reveal-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  .bank-account-reveal-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+    padding: 11px;
+  }
+  .bank-account-reveal-button {
+    width: 100%;
+    min-height: 42px;
+  }
+}
+
+/* Keep the reveal control beside the account identity/status in the top row. */
+.bank-account-sensitive-details {
+  display: contents !important;
+}
+.bank-account-reveal-icon-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 34px !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  margin: 0 0 0 6px !important;
+  border: 1px solid #c9dced !important;
+  border-radius: 9px !important;
+  background: #f3f8fe !important;
+  color: #155a9d !important;
+  box-shadow: none !important;
+}
+.bank-account-reveal-icon-button svg {
+  width: 17px !important;
+  height: 17px !important;
+}
+.bank-account-reveal-icon-button:hover:not(:disabled) {
+  background: #e5f1ff !important;
+  border-color: #8fb6df !important;
+}
+.bank-account-reveal-grid {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  margin-top: 8px !important;
+}
+.crew-bank-account-main .crew-bank-account-tags {
+  align-items: center !important;
+}
+.finance-bank-account-row .crew-bank-account-main {
+  align-items: center !important;
+}
+
+/* Mobile account header: keep reveal eye beside status, never on a separate row. */
+@media (max-width: 680px) {
+  .crew-bank-account-main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: start !important;
+    column-gap: 8px !important;
+    row-gap: 6px !important;
+  }
+  .crew-bank-account-main > div:first-child {
+    min-width: 0 !important;
+    grid-column: 1 / 2 !important;
+  }
+  .crew-bank-account-main > .crew-bank-account-tags {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: start !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    max-width: 150px !important;
+  }
+  .crew-bank-account-main .bank-account-sensitive-details {
+    display: contents !important;
+    width: auto !important;
+  }
+  .crew-bank-account-main .bank-account-reveal-icon-button {
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+    grid-column: auto !important;
+  }
+  .finance-bank-account-row .crew-bank-account-main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: start !important;
+    column-gap: 8px !important;
+  }
+  .finance-bank-account-row .crew-bank-account-main > div:first-child {
+    grid-column: 1 / 2 !important;
+    min-width: 0 !important;
+  }
+  .finance-bank-account-row .crew-bank-account-main > .bank-account-sensitive-details {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: start !important;
+    display: contents !important;
+  }
+  .finance-bank-account-row
+    .crew-bank-account-main
+    > .bank-account-sensitive-details
+    .bank-account-reveal-icon-button {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+  }
+}
+
+/* Keep the Make primary action in the account identity/header row. */
+.crew-bank-account-tags .crew-bank-make-primary-header {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+  min-height: 34px !important;
+  width: auto !important;
+  padding: 0 11px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  font-size: 0.78rem !important;
+  line-height: 1 !important;
+}
+.crew-bank-account-tags .crew-bank-make-primary-header svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+@media (max-width: 680px) {
+  .crew-bank-account-main .crew-bank-account-tags {
+    max-width: min(62vw, 250px) !important;
+    gap: 5px !important;
+  }
+  .crew-bank-account-tags .crew-bank-make-primary-header {
+    min-height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 0.72rem !important;
+  }
+}
+
+/* Make-primary uses the same compact icon-only affordance as Reveal. */
+.crew-bank-account-tags .crew-bank-make-primary-header {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 10px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+.crew-bank-account-tags .crew-bank-make-primary-header svg {
+  width: 17px !important;
+  height: 17px !important;
+  flex: 0 0 17px !important;
+}
+@media (max-width: 680px) {
+  .crew-bank-account-tags .crew-bank-make-primary-header {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+}
