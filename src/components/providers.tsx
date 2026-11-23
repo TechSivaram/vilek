@@ -2,6 +2,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { GlobalLoadingOverlay } from "@/components/global-loading-overlay";
+import { PwaRuntime } from "@/components/pwa/pwa-runtime";
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
     () =>
@@ -16,6 +17,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={client}>
       {children}
       <GlobalLoadingOverlay />
+      <PwaRuntime />
     </QueryClientProvider>
   );
 }

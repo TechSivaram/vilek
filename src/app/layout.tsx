@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@/components/workspaces/workspace-ui.css";
 import "@/components/approver/approver-workspace.css";
+import "@/components/pwa/pwa.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -14,7 +15,28 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ViLek | Crew Expense Management",
   description:
-    "A calmer way for flight crews to track expenses, receipts, and reimbursement claims.",
+    "Manage crew expenses, finance, approvals and aviation operations in one secure workspace.",
+  manifest: "/manifest.webmanifest",
+  applicationName: "ViLek",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ViLek",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+  themeColor: "#092d50",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

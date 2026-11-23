@@ -1,0 +1,60 @@
+.pwa-network-banner,
+.pwa-update-banner {
+  position: fixed;
+  z-index: 1200;
+  top: 12px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  padding: 10px 14px;
+  border: 1px solid #dbe4ed;
+  border-radius: 999px;
+  background: #fff;
+  color: #31445a;
+  box-shadow: 0 8px 28px rgba(23, 43, 66, 0.12);
+  font-size: 12px;
+  transform: translateX(-50%);
+}
+.pwa-network-banner { border-color: #f2d5a6; background: #fff8eb; color: #80520b; }
+.pwa-status-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #d58a18; }
+.pwa-update-banner button,
+.pwa-install-card button {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #092d50;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pwa-install-card {
+  position: fixed;
+  z-index: 1100;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(390px, calc(100vw - 32px));
+  padding: 14px;
+  border: 1px solid #e2e8ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(23, 43, 66, 0.16);
+}
+.pwa-install-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 3px; }
+.pwa-install-copy strong { color: #172b42; font-size: 13px; }
+.pwa-install-copy span { color: #778597; font-size: 11px; line-height: 1.4; }
+.pwa-install-card .pwa-dismiss { padding: 3px 7px; background: transparent; color: #778597; font-size: 20px; }
+.pwa-ios-help { position: absolute; right: 0; bottom: calc(100% + 8px); width: 100%; margin: 0; padding: 12px 14px; border: 1px solid #e2e8ef; border-radius: 12px; background: #fff; color: #526276; box-shadow: 0 8px 28px rgba(23, 43, 66, 0.12); font-size: 12px; line-height: 1.5; }
+.pwa-install-card button:focus-visible,
+.pwa-update-banner button:focus-visible { outline: 3px solid #12a9a0; outline-offset: 2px; }
+@media (max-width: 480px) {
+  .pwa-install-card { right: 10px; bottom: max(10px, env(safe-area-inset-bottom)); width: calc(100vw - 20px); }
+  .pwa-network-banner, .pwa-update-banner { top: 8px; border-radius: 12px; font-size: 11px; }
+}
