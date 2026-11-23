@@ -23,11 +23,17 @@ export const dynamic = "force-dynamic";
 const jsonError = (message: string, status = 400) =>
   NextResponse.json({ error: message }, { status });
 
-export const GET = withRouteGuard({ permissions: ["FINANCE_PROCESS"] }, async () => {
+export const GET = withRouteGuard({ permissions: ["FINANCE_PROCESS"] }, async (request) => {
+  const url = new URL(request.url);
+  const page = Math.max(1, Number(url.searchParams.get("page") || 1));
+  const pageSize = Math.min(50, Math.max(1, Number(url.searchParams.get("pageSize") || 10)));
+  const search = (url.searchParams.get("search") || "").trim().slice(0, 120);
+  const status = (url.searchParams.get("status") || "").trim();
+  const options = { page, pageSize, search, status };
   return NextResponse.json({
     overview: getFinanceOverview(),
-    approvedClaims: getApprovedFinanceClaims(),
-    payments: getFinancePayments(),
+    approvedClaims: getApprovedFinanceClaims(options),
+    payments: getFinancePayments(options),
   });
 });
 
@@ -72,7 +78,7 @@ export const POST = withRouteGuard(
     if (mode === "MANUAL" && claimIds.length !== 1)
       return jsonError("Manual transfers must be prepared one crew claim at a time.");
 
-    const approved = getApprovedFinanceClaims().filter((claim) => claimIds.includes(claim.claimId));
+    const approved = getApprovedFinanceClaims({ page: 1, pageSize: 100, claimIds }).items;
     if (approved.length !== claimIds.length)
       return jsonError("One or more claims are no longer approved or are unavailable.", 409);
     if (approved.some((claim) => !claim.canPay)) {

@@ -1,12 +1,16 @@
 import { randomUUID } from "node:crypto";
+import { unlink } from "node:fs/promises";
+import path from "node:path";
 import { NextResponse } from "next/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { withRouteGuard } from "@/lib/auth/route-protection";
 import { db } from "@/lib/db";
 import {
   crewBankAccountAuditEvents,
+  crewBankAccountEvidence,
   crewBankAccounts,
   crewMembers,
+  paymentAuditEvents,
   currencies,
 } from "@/lib/db/schema";
 import { encryptBankValue, maskBankValue } from "@/lib/crew/bank-accounts/crypto";
@@ -68,42 +72,33 @@ async function attemptProviderVerification(input: {
   }
 }
 
-export const GET = withRouteGuard(
-  { roles: ["CREW", "FINANCE", "ADMIN"] },
-  async (_request, _context, auth) => {
-    const isFinance = auth.roleCodes.some((role) => ["FINANCE", "ADMIN"].includes(role));
-    const crewId = isFinance ? null : crewIdFor(auth.user.id);
-    if (!isFinance && !crewId) return error("Crew profile was not found.", 404);
-    const baseQuery = db
-      .select({
-        id: crewBankAccounts.id,
-        crewMemberId: crewBankAccounts.crewMemberId,
-        accountHolderName: crewBankAccounts.accountHolderName,
-        bankName: crewBankAccounts.bankName,
-        countryCode: crewBankAccounts.countryCode,
-        currencyCode: crewBankAccounts.currencyCode,
-        accountNumberLast4: crewBankAccounts.accountNumberLast4,
-        routingCodeMasked: crewBankAccounts.routingCodeMasked,
-        verificationStatus: crewBankAccounts.verificationStatus,
-        verificationMethod: crewBankAccounts.verificationMethod,
-        isPrimary: crewBankAccounts.isPrimary,
-        isActive: crewBankAccounts.isActive,
-        verifiedAt: crewBankAccounts.verifiedAt,
-        createdAt: crewBankAccounts.createdAt,
-      })
-      .from(crewBankAccounts);
-    const rows = (
-      isFinance
-        ? baseQuery
-        : baseQuery.where(
-            and(eq(crewBankAccounts.crewMemberId, crewId!), eq(crewBankAccounts.isActive, true)),
-          )
-    )
-      .orderBy(desc(crewBankAccounts.createdAt))
-      .all();
-    return NextResponse.json({ accounts: rows });
-  },
-);
+export const GET = withRouteGuard({ roles: ["CREW"] }, async (_request, _context, auth) => {
+  const crewId = crewIdFor(auth.user.id);
+  if (!crewId) return error("Crew profile was not found.", 404);
+  const baseQuery = db
+    .select({
+      id: crewBankAccounts.id,
+      crewMemberId: crewBankAccounts.crewMemberId,
+      accountHolderName: crewBankAccounts.accountHolderName,
+      bankName: crewBankAccounts.bankName,
+      countryCode: crewBankAccounts.countryCode,
+      currencyCode: crewBankAccounts.currencyCode,
+      accountNumberLast4: crewBankAccounts.accountNumberLast4,
+      routingCodeMasked: crewBankAccounts.routingCodeMasked,
+      verificationStatus: crewBankAccounts.verificationStatus,
+      verificationMethod: crewBankAccounts.verificationMethod,
+      isPrimary: crewBankAccounts.isPrimary,
+      isActive: crewBankAccounts.isActive,
+      verifiedAt: crewBankAccounts.verifiedAt,
+      createdAt: crewBankAccounts.createdAt,
+    })
+    .from(crewBankAccounts);
+  const rows = baseQuery
+    .where(and(eq(crewBankAccounts.crewMemberId, crewId), eq(crewBankAccounts.isActive, true)))
+    .orderBy(desc(crewBankAccounts.createdAt))
+    .all();
+  return NextResponse.json({ accounts: rows });
+});
 
 export const POST = withRouteGuard({ roles: ["CREW"] }, async (request, _context, auth) => {
   const crewId = crewIdFor(auth.user.id);
@@ -189,66 +184,172 @@ export const POST = withRouteGuard({ roles: ["CREW"] }, async (request, _context
   return NextResponse.json({ id, verificationStatus: verification.status }, { status: 201 });
 });
 
-export const PATCH = withRouteGuard(
-  { roles: ["CREW", "FINANCE", "ADMIN"] },
-  async (request, _context, auth) => {
-    let body: Record<string, unknown>;
-    try {
-      body = await request.json();
-    } catch {
-      return error("Invalid JSON body.");
-    }
-    const id = typeof body.id === "string" ? body.id : "";
-    if (!id) return error("Bank account id is required.");
-    const account = db.select().from(crewBankAccounts).where(eq(crewBankAccounts.id, id)).get();
-    if (!account || !account.isActive) return error("Bank account not found.", 404);
-    const finance = auth.roleCodes.some((role) => ["FINANCE", "ADMIN"].includes(role));
-    if (body.action === "VERIFY" || body.action === "REJECT") {
-      if (!finance) return error("Only Finance can manually verify bank accounts.", 403);
-      const status = body.action === "VERIFY" ? "VERIFIED" : "REJECTED";
-      db.update(crewBankAccounts)
-        .set({
-          verificationStatus: status,
-          verificationMethod: "MANUAL",
-          verifiedAt: status === "VERIFIED" ? new Date().toISOString() : null,
-          verifiedByUserId: auth.user.id,
-          updatedAt: new Date().toISOString(),
-        })
-        .where(eq(crewBankAccounts.id, id))
+export const DELETE = withRouteGuard({ roles: ["CREW"] }, async (request, _context, auth) => {
+  const crewId = crewIdFor(auth.user.id);
+  if (!crewId) return error("Crew profile was not found.", 404);
+
+  let body: { id?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return error("Invalid JSON body.");
+  }
+  const id = typeof body.id === "string" ? body.id : "";
+  if (!id) return error("Bank account id is required.");
+
+  // Keep the private file paths so their bytes can be removed only after the
+  // database transaction commits successfully.
+  const evidenceFiles = db
+    .select({ storageKey: crewBankAccountEvidence.storageKey })
+    .from(crewBankAccountEvidence)
+    .where(eq(crewBankAccountEvidence.bankAccountId, id))
+    .all();
+
+  try {
+    db.transaction((tx) => {
+      // Scope the lookup by both resource ID and authenticated ownership.
+      // Do not reveal whether another crew member's account ID exists.
+      const account = tx
+        .select({ id: crewBankAccounts.id, isPrimary: crewBankAccounts.isPrimary })
+        .from(crewBankAccounts)
+        .where(
+          and(
+            eq(crewBankAccounts.id, id),
+            eq(crewBankAccounts.crewMemberId, crewId),
+            eq(crewBankAccounts.isActive, true),
+          ),
+        )
+        .get();
+      if (!account) throw new Error("BANK_ACCOUNT_NOT_FOUND");
+      if (account.isPrimary) throw new Error("BANK_ACCOUNT_PRIMARY");
+
+      const accountCount =
+        tx
+          .select({ value: sql<number>`count(*)` })
+          .from(crewBankAccounts)
+          .where(
+            and(eq(crewBankAccounts.crewMemberId, crewId), eq(crewBankAccounts.isActive, true)),
+          )
+          .get()?.value ?? 0;
+      if (accountCount <= 1) throw new Error("BANK_ACCOUNT_LAST");
+
+      // Payment audit records retain the selected beneficiary ID. The reveal
+      // event also protects accounts used for manually prepared reimbursements.
+      const paymentUse = tx
+        .select({ id: paymentAuditEvents.id })
+        .from(paymentAuditEvents)
+        .where(
+          sql`json_valid(${paymentAuditEvents.detailsJson}) AND json_extract(${paymentAuditEvents.detailsJson}, '$.beneficiaryBankAccountId') = ${id}`,
+        )
+        .get();
+      const financeReveal = tx
+        .select({ id: crewBankAccountAuditEvents.id })
+        .from(crewBankAccountAuditEvents)
+        .where(
+          and(
+            eq(crewBankAccountAuditEvents.bankAccountId, id),
+            eq(crewBankAccountAuditEvents.action, "BANK_ACCOUNT_DETAILS_REVEALED_TO_FINANCE"),
+          ),
+        )
+        .get();
+      if (paymentUse || financeReveal) throw new Error("BANK_ACCOUNT_USED");
+
+      // Evidence and audit rows have restrictive foreign keys to the account.
+      // The account has passed all eligibility checks, so remove their metadata
+      // in this same transaction before deleting the account itself.
+      tx.delete(crewBankAccountEvidence).where(eq(crewBankAccountEvidence.bankAccountId, id)).run();
+      tx.delete(crewBankAccountAuditEvents)
+        .where(eq(crewBankAccountAuditEvents.bankAccountId, id))
         .run();
-      audit(id, auth.user.id, `BANK_ACCOUNT_${status}`, { method: "MANUAL" });
-      return NextResponse.json({ success: true, verificationStatus: status });
-    }
-    if (!finance) {
-      const crewId = crewIdFor(auth.user.id);
-      if (account.crewMemberId !== crewId) return error("Forbidden.", 403);
-    }
-    if (body.action === "SET_PRIMARY") {
-      if (account.verificationStatus !== "VERIFIED")
-        return error("Only verified bank accounts can be primary.");
-      db.transaction((tx) => {
-        tx.update(crewBankAccounts)
-          .set({ isPrimary: false, updatedAt: new Date().toISOString() })
-          .where(eq(crewBankAccounts.crewMemberId, account.crewMemberId))
-          .run();
-        tx.update(crewBankAccounts)
-          .set({ isPrimary: true, updatedAt: new Date().toISOString() })
-          .where(eq(crewBankAccounts.id, id))
-          .run();
+
+      // Physical deletion is intentional: the account has no transaction
+      // history, and the checks above run atomically with the delete.
+      tx.delete(crewBankAccounts)
+        .where(
+          and(
+            eq(crewBankAccounts.id, id),
+            eq(crewBankAccounts.crewMemberId, crewId),
+            eq(crewBankAccounts.isPrimary, false),
+            eq(crewBankAccounts.isActive, true),
+          ),
+        )
+        .run();
+    });
+  } catch (cause) {
+    const reason = cause instanceof Error ? cause.message : "";
+    if (reason === "BANK_ACCOUNT_NOT_FOUND") return error("Bank account not found.", 404);
+    if (reason === "BANK_ACCOUNT_PRIMARY")
+      return error("The primary reimbursement account cannot be deleted.", 409);
+    if (reason === "BANK_ACCOUNT_LAST")
+      return error("You must keep at least one registered bank account.", 409);
+    if (reason === "BANK_ACCOUNT_USED")
+      return error(
+        "This bank account cannot be deleted because it has been used in a previous transaction.",
+        409,
+      );
+    console.error("[BANK-ACCOUNT] Account deletion failed:", cause);
+    return error("Unable to delete bank account.", 500);
+  }
+
+  // Remove private evidence files after the database commit. A missing file is
+  // harmless; cleanup failures are logged without reversing the account delete.
+  const documentRoot = process.env.VILEK_DOCUMENT_STORAGE_PATH || path.join(process.cwd(), "data");
+  const evidenceRoot = path.resolve(documentRoot, "bank-account-evidence");
+  await Promise.all(
+    evidenceFiles.map(async ({ storageKey }) => {
+      const fullPath = path.resolve(evidenceRoot, storageKey);
+      if (!fullPath.startsWith(evidenceRoot + path.sep)) return;
+      await unlink(fullPath).catch((cause) => {
+        const code = (cause as NodeJS.ErrnoException).code;
+        if (code !== "ENOENT") console.error("[BANK-ACCOUNT] Evidence file cleanup failed:", cause);
       });
-      audit(id, auth.user.id, "BANK_ACCOUNT_SET_PRIMARY");
-      return NextResponse.json({ success: true });
-    }
-    if (body.action === "DEACTIVATE") {
-      if (account.isPrimary)
-        return error("Choose another verified primary account before deactivating this account.");
-      db.update(crewBankAccounts)
-        .set({ isActive: false, updatedAt: new Date().toISOString() })
+    }),
+  );
+
+  return NextResponse.json({ success: true, message: "Bank account deleted successfully." });
+});
+
+export const PATCH = withRouteGuard({ roles: ["CREW"] }, async (request, _context, auth) => {
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return error("Invalid JSON body.");
+  }
+  const id = typeof body.id === "string" ? body.id : "";
+  if (!id) return error("Bank account id is required.");
+  const account = db.select().from(crewBankAccounts).where(eq(crewBankAccounts.id, id)).get();
+  if (!account || !account.isActive) return error("Bank account not found.", 404);
+  const crewId = crewIdFor(auth.user.id);
+  if (!crewId) return error("Crew profile was not found.", 404);
+  if (account.crewMemberId !== crewId) return error("Forbidden.", 403);
+  if (body.action === "VERIFY" || body.action === "REJECT")
+    return error("Only Finance can verify or reject bank accounts.", 403);
+  if (body.action === "SET_PRIMARY") {
+    if (account.verificationStatus !== "VERIFIED")
+      return error("Only verified bank accounts can be primary.");
+    db.transaction((tx) => {
+      tx.update(crewBankAccounts)
+        .set({ isPrimary: false, updatedAt: new Date().toISOString() })
+        .where(eq(crewBankAccounts.crewMemberId, account.crewMemberId))
+        .run();
+      tx.update(crewBankAccounts)
+        .set({ isPrimary: true, updatedAt: new Date().toISOString() })
         .where(eq(crewBankAccounts.id, id))
         .run();
-      audit(id, auth.user.id, "BANK_ACCOUNT_DEACTIVATED");
-      return NextResponse.json({ success: true });
-    }
-    return error("Unsupported bank account action.");
-  },
-);
+    });
+    audit(id, auth.user.id, "BANK_ACCOUNT_SET_PRIMARY");
+    return NextResponse.json({ success: true });
+  }
+  if (body.action === "DEACTIVATE") {
+    if (account.isPrimary)
+      return error("Choose another verified primary account before deactivating this account.");
+    db.update(crewBankAccounts)
+      .set({ isActive: false, updatedAt: new Date().toISOString() })
+      .where(eq(crewBankAccounts.id, id))
+      .run();
+    audit(id, auth.user.id, "BANK_ACCOUNT_DEACTIVATED");
+    return NextResponse.json({ success: true });
+  }
+  return error("Unsupported bank account action.");
+});

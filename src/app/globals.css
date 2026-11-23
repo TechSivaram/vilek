@@ -2489,3 +2489,3065 @@ body :where(.finance-kpi strong) {
     justify-content: flex-start;
   }
 }
+
+.crew-bank-account-add-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+.crew-bank-account-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Finance bank-account supporting evidence */
+.finance-evidence-list {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.85rem;
+  padding: 0.9rem;
+  border: 1px solid #e3eaf0;
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+.finance-evidence-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.finance-evidence-heading strong {
+  color: #243b53;
+  font-size: 0.85rem;
+  font-weight: 750;
+}
+.finance-evidence-heading > span {
+  color: #718399;
+  font-size: 0.75rem;
+}
+.finance-evidence-items {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.finance-evidence-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid #e5ebf1;
+  border-radius: 10px;
+  background: #fff;
+}
+.finance-evidence-file-icon {
+  display: inline-flex;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: #1764a0;
+  background: #edf5ff;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+.finance-evidence-file-info {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.finance-evidence-file-info strong {
+  overflow: hidden;
+  color: #243b53;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.finance-evidence-file-info > span {
+  color: #718399;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.finance-evidence-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.45rem;
+}
+.finance-evidence-action {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #087f7a;
+  border-radius: 8px;
+  color: #fff;
+  background: #087f7a;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.finance-evidence-action:hover {
+  border-color: #066d69;
+  color: #fff;
+  background: #066d69;
+}
+.finance-evidence-action-secondary {
+  border-color: #dce5eb;
+  color: #40576a;
+  background: #fff;
+}
+.finance-evidence-action-secondary:hover {
+  border-color: #b9c9d6;
+  color: #243b53;
+  background: #f4f7fa;
+}
+.finance-evidence-empty,
+.finance-evidence-error {
+  margin: 0;
+  font-size: 0.78rem;
+}
+.finance-evidence-empty {
+  color: #718399;
+}
+.finance-evidence-error {
+  color: #a43d3d;
+}
+@media (max-width: 640px) {
+  .finance-evidence-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .finance-evidence-file-info {
+    flex-basis: calc(100% - 58px);
+  }
+  .finance-evidence-actions {
+    width: 100%;
+    padding-left: 58px;
+  }
+}
+
+/* Crew bank-account evidence actions */
+.crew-bank-evidence-list ul {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.crew-bank-evidence-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #e3eaf0;
+  border-radius: 9px;
+  background: #fff;
+}
+.crew-bank-evidence-item > span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: #243b53;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.crew-bank-evidence-item > small {
+  color: #718399;
+  font-size: 0.72rem;
+}
+.crew-bank-evidence-actions {
+  display: flex;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+.crew-bank-evidence-actions a {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #087f7a;
+  border-radius: 8px;
+  background: #087f7a;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+.crew-bank-evidence-actions a:last-child {
+  border-color: #dce5eb;
+  background: #fff;
+  color: #40576a;
+}
+
+/* Clear visual grouping for Crew bank-account evidence */
+.crew-bank-evidence-list {
+  display: grid;
+  gap: 0.85rem;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 1rem;
+  border: 1px solid #d9e5ee;
+  border-radius: 13px;
+  background: #f7fafc;
+}
+.crew-bank-evidence-heading,
+.crew-bank-evidence-heading > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.35rem 0.8rem;
+}
+.crew-bank-evidence-heading > div {
+  flex-direction: column;
+}
+.crew-bank-evidence-heading strong {
+  color: #20384f;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+.crew-bank-evidence-heading > div > span {
+  color: #718399;
+  font-size: 0.74rem;
+}
+.crew-bank-evidence-count {
+  flex: 0 0 auto;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid #dbe6ee;
+  border-radius: 999px;
+  color: #49647a;
+  background: #fff;
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+.crew-bank-evidence-list ul {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crew-bank-evidence-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid #e0e8ef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(20 45 70 / 4%);
+}
+.crew-bank-evidence-file-icon {
+  display: inline-flex;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: #1764a0;
+  background: #edf5ff;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+.crew-bank-evidence-file-info {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.crew-bank-evidence-file-info strong {
+  overflow: hidden;
+  color: #243b53;
+  font-size: 0.8rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.crew-bank-evidence-file-info span {
+  color: #718399;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+.crew-bank-evidence-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+.crew-bank-evidence-actions a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid #087f7a;
+  border-radius: 8px;
+  color: #fff;
+  background: #087f7a;
+  font-size: 0.74rem;
+  font-weight: 750;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.crew-bank-evidence-actions a:hover {
+  color: #fff;
+  background: #066d69;
+}
+.crew-bank-evidence-actions a:last-child {
+  border-color: #dce5eb;
+  color: #40576a;
+  background: #fff;
+}
+.crew-bank-evidence-actions a:last-child:hover {
+  border-color: #b9c9d6;
+  background: #f4f7fa;
+}
+.crew-bank-evidence-empty,
+.crew-bank-evidence-error {
+  margin: 0;
+  padding: 0.7rem;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.78rem;
+}
+.crew-bank-evidence-empty {
+  color: #718399;
+}
+.crew-bank-evidence-error {
+  color: #a43d3d;
+}
+.crew-bank-evidence-section {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px dashed #b9cbd8;
+  border-radius: 13px;
+  background: #fbfdff;
+}
+.crew-bank-evidence-section-heading {
+  display: grid;
+  gap: 0.3rem;
+}
+.crew-bank-evidence-section-heading strong {
+  color: #20384f;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.crew-bank-evidence-section-heading p {
+  margin: 0;
+  color: #667d91;
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+.crew-bank-evidence-upload-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(240px, 1.2fr);
+  align-items: end;
+  gap: 0.8rem 1rem;
+  padding: 1rem;
+  border: 1px solid #e2eaf0;
+  border-radius: 10px;
+  background: #fff;
+}
+.crew-bank-evidence-upload-heading {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 0.2rem;
+}
+.crew-bank-evidence-upload-heading strong {
+  color: #29445b;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.crew-bank-evidence-upload-heading span {
+  color: #718399;
+  font-size: 0.72rem;
+}
+.crew-bank-evidence-upload-form input[type="file"],
+.crew-bank-evidence-upload-form select {
+  min-height: 42px;
+  width: 100%;
+}
+.crew-bank-evidence-upload-form > .finance-button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+@media (max-width: 680px) {
+  .crew-bank-evidence-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .crew-bank-evidence-file-info {
+    flex-basis: calc(100% - 58px);
+  }
+  .crew-bank-evidence-actions {
+    width: 100%;
+    padding-left: 58px;
+  }
+  .crew-bank-evidence-upload-form {
+    grid-template-columns: 1fr;
+  }
+  .crew-bank-evidence-upload-heading,
+  .crew-bank-evidence-upload-form > .finance-button {
+    grid-column: auto;
+  }
+}
+
+/* Consistent, icon-led evidence actions in Crew and Finance workspaces */
+.crew-bank-evidence-actions .crew-bank-evidence-action {
+  display: inline-flex;
+  min-width: 88px;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #087f7a;
+  border-radius: 9px;
+  color: #fff;
+  background: #087f7a;
+  font-size: 0.76rem;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.crew-bank-evidence-actions .crew-bank-evidence-action-view:hover {
+  color: #fff;
+  border-color: #066d69;
+  background: #066d69;
+}
+.crew-bank-evidence-actions .crew-bank-evidence-action-download {
+  color: #344b60;
+  border-color: #d5e0e8;
+  background: #fff;
+}
+.crew-bank-evidence-actions .crew-bank-evidence-action-download:hover {
+  color: #20384f;
+  border-color: #aebfcd;
+  background: #f3f7fa;
+}
+.crew-bank-evidence-actions .crew-bank-evidence-action:focus-visible {
+  outline: 3px solid rgb(8 127 122 / 25%);
+  outline-offset: 2px;
+}
+.crew-bank-evidence-actions .crew-bank-evidence-action svg {
+  display: block;
+  flex: 0 0 auto;
+}
+@media (max-width: 560px) {
+  .crew-bank-evidence-item {
+    align-items: flex-start;
+  }
+  .crew-bank-evidence-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+  .crew-bank-evidence-actions .crew-bank-evidence-action {
+    flex: 1 1 0;
+  }
+}
+
+/* Keep the primary View action readable even when global link/button styles apply. */
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view,
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view:visited,
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view:hover,
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view:active {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff;
+  border-color: #087f7a;
+  background-color: #087f7a;
+}
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view:hover {
+  border-color: #066d69;
+  background-color: #066d69;
+}
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view span,
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view svg {
+  color: #fff !important;
+  stroke: #fff;
+  -webkit-text-fill-color: #fff;
+  opacity: 1;
+}
+.crew-bank-evidence-actions a.crew-bank-evidence-action-view:focus-visible {
+  outline: 3px solid rgb(8 127 122 / 30%);
+  outline-offset: 2px;
+}
+
+/* Collapsible uploaded-evidence document list (Crew and Finance) */
+.crew-bank-evidence-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+.crew-bank-evidence-collapse-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 34px;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #d8e3ee;
+  border-radius: 8px;
+  background: #fff;
+  color: #31516d;
+  font-size: 0.78rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.crew-bank-evidence-collapse-toggle:hover {
+  background: #f1f6fb;
+  border-color: #a9bfd4;
+}
+.crew-bank-evidence-collapse-toggle:focus-visible {
+  outline: 2px solid #0b827e;
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  .crew-bank-evidence-heading-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Collapsed upload panel and accessible drag/drop evidence picker */
+.crew-bank-evidence-upload-toggle {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 0.75rem;
+  justify-content: center;
+  color: #31516d;
+  background: #fff;
+}
+.crew-bank-evidence-upload-form {
+  margin-top: 0.75rem;
+}
+.crew-bank-evidence-dropzone {
+  grid-column: 1 / -1;
+  position: relative;
+  min-height: 142px;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border: 1.5px dashed #9db4c8;
+  border-radius: 12px;
+  background: #fbfdff;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.crew-bank-evidence-dropzone.is-dragging {
+  border-color: #087f7a;
+  background: #effaf9;
+  box-shadow: 0 0 0 3px rgb(8 127 122 / 12%);
+}
+.crew-bank-evidence-dropzone-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #31516d;
+  text-align: center;
+  cursor: pointer;
+}
+.crew-bank-evidence-dropzone-label svg {
+  color: #668197;
+}
+.crew-bank-evidence-dropzone-label strong {
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.crew-bank-evidence-dropzone-label span {
+  color: #718399;
+  font-size: 0.76rem;
+}
+.crew-bank-evidence-dropzone input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+.crew-bank-evidence-selected-files {
+  grid-column: 1 / -1;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #e0e8ef;
+  border-radius: 9px;
+  background: #fff;
+}
+.crew-bank-evidence-selected-heading,
+.crew-bank-evidence-selected-files li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.crew-bank-evidence-selected-heading strong {
+  color: #29445b;
+  font-size: 0.78rem;
+}
+.crew-bank-evidence-selected-heading button {
+  color: #a43d3d;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.crew-bank-evidence-selected-files ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.crew-bank-evidence-selected-files li {
+  min-width: 0;
+  color: #536b80;
+  font-size: 0.74rem;
+}
+.crew-bank-evidence-selected-files li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.crew-bank-evidence-selected-files li small {
+  flex: 0 0 auto;
+  color: #718399;
+}
+.crew-bank-evidence-actions .crew-bank-evidence-action-delete {
+  color: #b42318;
+  border-color: #f1c7c3;
+  background: #fff7f6;
+}
+.crew-bank-evidence-actions .crew-bank-evidence-action-delete:hover {
+  color: #8f1d14;
+  border-color: #e7aaa4;
+  background: #ffefed;
+}
+.crew-bank-evidence-upload-message {
+  display: block;
+  margin-top: 0.5rem;
+  color: #536b80;
+}
+@media (max-width: 680px) {
+  .crew-bank-evidence-dropzone {
+    min-height: 128px;
+  }
+  .crew-bank-evidence-selected-files li {
+    align-items: flex-start;
+  }
+}
+
+/* Finance evidence rows: contain long filenames without stretching cards */
+.crew-bank-evidence-item {
+  display: grid !important;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem 0.8rem;
+  min-width: 0;
+  width: 100%;
+}
+.crew-bank-evidence-item .crew-bank-evidence-file-icon {
+  grid-column: 1;
+  grid-row: 1;
+}
+.crew-bank-evidence-item .crew-bank-evidence-file-info {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.crew-bank-evidence-item .crew-bank-evidence-file-info strong {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.crew-bank-evidence-item .crew-bank-evidence-file-info span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.crew-bank-evidence-item .crew-bank-evidence-actions {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  min-width: max-content;
+  margin-left: 0;
+}
+.finance-refresh-button {
+  display: inline-flex;
+  min-height: 40px;
+  min-width: 104px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #d7e2ec;
+  border-radius: 10px;
+  background: #fff;
+  color: #34536d;
+  font-size: 0.82rem;
+  font-weight: 750;
+  box-shadow: 0 1px 2px rgb(15 35 55 / 5%);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.finance-refresh-button:hover:not(:disabled) {
+  background: #f3f8fb;
+  border-color: #aebfce;
+  box-shadow: 0 2px 6px rgb(15 35 55 / 8%);
+}
+.finance-refresh-button:focus-visible {
+  outline: 2px solid #0b827e;
+  outline-offset: 2px;
+}
+.finance-refresh-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.finance-refresh-icon.is-spinning {
+  animation: finance-refresh-spin 0.8s linear infinite;
+}
+@keyframes finance-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 640px) {
+  .crew-bank-evidence-item {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-actions {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    flex-wrap: wrap;
+  }
+}
+
+/* Bank-account workspaces: compact, overflow-safe mobile layout */
+@media (max-width: 640px) {
+  .finance-panel-heading {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  .finance-panel-heading > div {
+    min-width: 0;
+  }
+  .finance-panel-heading h2 {
+    font-size: 1.05rem;
+  }
+  .finance-panel-heading p {
+    max-width: 100%;
+    line-height: 1.45;
+  }
+  .finance-panel-heading > button,
+  .finance-panel-heading .finance-refresh-button {
+    align-self: flex-end;
+    min-height: 38px;
+    min-width: 96px;
+  }
+
+  .crew-bank-account-list {
+    gap: 0.75rem;
+    padding: 0.65rem;
+  }
+  .crew-bank-account {
+    min-width: 0;
+    gap: 0.75rem;
+    padding: 0.8rem;
+    border-radius: 13px;
+  }
+  .crew-bank-account-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+  }
+  .crew-bank-account-main > div:first-child {
+    min-width: 0;
+  }
+  .crew-bank-account-main strong,
+  .crew-bank-account-main span,
+  .crew-bank-account-main small {
+    overflow-wrap: anywhere;
+  }
+  .crew-bank-account-tags {
+    align-items: flex-start;
+  }
+  .crew-bank-account > .finance-button,
+  .crew-bank-account > button.finance-button {
+    width: 100%;
+  }
+  .crew-bank-account-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .crew-bank-account-actions > button {
+    max-width: 100%;
+  }
+
+  .crew-bank-evidence-list {
+    min-width: 0;
+    padding: 0.75rem;
+    gap: 0.65rem;
+  }
+  .crew-bank-evidence-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+  }
+  .crew-bank-evidence-heading > div {
+    min-width: 0;
+  }
+  .crew-bank-evidence-heading-actions {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .crew-bank-evidence-collapse-toggle {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .crew-bank-evidence-item {
+    display: grid !important;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: start;
+    gap: 0.55rem;
+    min-width: 0;
+    padding: 0.65rem;
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-file-icon {
+    grid-column: 1;
+    grid-row: 1;
+    width: 36px;
+    height: 36px;
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-file-info {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    width: 100%;
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-file-info strong {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-file-info span {
+    display: -webkit-box;
+    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    gap: 0.45rem;
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-actions .crew-bank-evidence-action {
+    display: inline-flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 0.45rem 0.35rem;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+  }
+
+  .crew-bank-evidence-section {
+    min-width: 0;
+    padding: 0.75rem;
+  }
+  .crew-bank-evidence-upload-form {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    padding: 0.75rem;
+  }
+  .crew-bank-evidence-upload-form > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .crew-bank-evidence-dropzone {
+    min-width: 0;
+    width: 100%;
+  }
+  .crew-bank-evidence-upload-form > .finance-button {
+    width: 100%;
+  }
+
+  .finance-dialog-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .finance-dialog-actions .finance-button {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 0.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .crew-bank-account {
+    padding: 0.65rem;
+  }
+  .crew-bank-evidence-list {
+    padding: 0.6rem;
+  }
+  .crew-bank-evidence-item .crew-bank-evidence-actions .crew-bank-evidence-action {
+    font-size: 0.7rem;
+  }
+  .finance-panel-heading {
+    padding: 0.8rem;
+  }
+}
+
+/* Entire uploaded-document panel is a single, clearly clickable disclosure control. */
+.crew-bank-evidence-panel-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.15rem;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.crew-bank-evidence-panel-toggle:hover .crew-bank-evidence-collapse-toggle {
+  border-color: #9bb5ca;
+  background: #edf4fa;
+}
+.crew-bank-evidence-panel-toggle:focus-visible {
+  outline: 2px solid #0b827e;
+  outline-offset: 4px;
+}
+.crew-bank-evidence-panel-title {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.crew-bank-evidence-panel-title strong {
+  color: #20384f;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+.crew-bank-evidence-panel-title > span {
+  color: #718399;
+  font-size: 0.74rem;
+}
+.crew-bank-evidence-panel-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+.crew-bank-evidence-panel-toggle .crew-bank-evidence-collapse-toggle {
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .crew-bank-evidence-panel-toggle {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .crew-bank-evidence-panel-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Compact, single-line beneficiary account rows with click-to-expand details. */
+.crew-bank-account {
+  display: block;
+  padding: 0.7rem 0.85rem;
+}
+.crew-bank-account-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.crew-bank-account-toolbar .crew-bank-account-main {
+  flex: 1 1 260px;
+  min-width: 210px;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.35rem 0.9rem;
+}
+.crew-bank-account-toolbar .crew-bank-account-main > div:first-child {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.65rem;
+  min-width: 0;
+}
+.crew-bank-account-toolbar .crew-bank-account-main > div:first-child > strong,
+.crew-bank-account-toolbar .crew-bank-account-main > div:first-child > span,
+.crew-bank-account-toolbar .crew-bank-account-main > div:first-child > small {
+  white-space: nowrap;
+}
+.crew-bank-account-toolbar .crew-bank-account-tags {
+  flex-wrap: nowrap;
+}
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar .crew-bank-account-actions > button,
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  min-height: 36px;
+  white-space: nowrap;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-list,
+.crew-bank-account-toolbar .crew-bank-evidence-section {
+  display: contents;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-list > div[id],
+.crew-bank-account-toolbar .crew-bank-evidence-upload-form,
+.crew-bank-account-toolbar .crew-bank-evidence-section-heading {
+  flex: 1 0 100%;
+  min-width: 0;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-list > div[id] {
+  order: 20;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-form {
+  order: 21;
+}
+.crew-bank-account-toolbar .crew-bank-account-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #dce6ef;
+  border-radius: 9px;
+  background: #f7fafc;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title > span {
+  display: none;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-count {
+  white-space: nowrap;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-item {
+  min-width: 0;
+}
+.finance-bank-account-row .crew-bank-account-main {
+  flex: 1 1 300px;
+}
+.finance-bank-account-row .crew-bank-account-main > div:first-child {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+.finance-bank-account-row .crew-bank-account-main > div:first-child > strong,
+.finance-bank-account-row .crew-bank-account-main > div:first-child > span,
+.finance-bank-account-row .crew-bank-account-main > div:first-child > small {
+  white-space: nowrap;
+}
+.finance-bank-account-row .finance-dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+}
+.finance-bank-account-row .crew-bank-evidence-panel-title > span {
+  display: none;
+}
+.finance-bank-account-row .crew-bank-evidence-panel-toggle {
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #dce6ef;
+  border-radius: 9px;
+  background: #f7fafc;
+}
+.finance-bank-account-row .crew-bank-evidence-list {
+  display: contents;
+}
+.finance-bank-account-row .crew-bank-evidence-list > div[id] {
+  flex: 1 0 100%;
+  order: 20;
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .crew-bank-account-toolbar {
+    align-items: stretch;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-main {
+    flex: 1 1 100%;
+    min-width: 0;
+    align-items: flex-start;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child > strong,
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child > span,
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child > small {
+    white-space: normal;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-tags {
+    flex-wrap: wrap;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-actions {
+    margin-left: 0;
+  }
+  .crew-bank-account-toolbar .finance-dialog-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+  .crew-bank-account-toolbar .finance-dialog-actions .finance-button {
+    flex: 1;
+  }
+}
+
+/* Keep dependent evidence controls on the account's compact toolbar row. */
+.crew-bank-account-toolbar .crew-bank-evidence-list,
+.finance-bank-account-row .crew-bank-evidence-list {
+  display: contents;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+.finance-bank-account-row .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  width: auto;
+  max-width: 100%;
+  flex: 0 0 auto;
+  margin: 0;
+}
+.crew-bank-account-toolbar .crew-bank-account-main {
+  flex: 1 1 280px;
+}
+.crew-bank-account-toolbar .crew-bank-account-actions,
+.finance-bank-account-row .finance-dialog-actions {
+  flex: 0 0 auto;
+}
+@media (max-width: 760px) {
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+  .finance-bank-account-row .crew-bank-evidence-panel-toggle,
+  .crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+    width: auto;
+    align-self: flex-start;
+  }
+}
+
+/* Mobile refinement: keep beneficiary cards compact without sacrificing tap targets. */
+@media (max-width: 640px) {
+  .crew-bank-accounts .finance-panel-heading {
+    align-items: center;
+    flex-direction: row;
+    gap: 0.6rem;
+    padding: 0.8rem 0.9rem;
+  }
+  .crew-bank-accounts .finance-panel-heading > div {
+    min-width: 0;
+  }
+  .crew-bank-accounts .finance-panel-heading h2 {
+    font-size: 1rem;
+  }
+  .crew-bank-accounts .finance-panel-heading p {
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+  .crew-bank-accounts .finance-panel-heading > button {
+    flex: 0 0 auto;
+    align-self: center;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .crew-bank-account-list {
+    gap: 0.55rem;
+    padding: 0.55rem;
+  }
+  .crew-bank-account {
+    padding: 0.7rem;
+    gap: 0.55rem;
+    border-radius: 11px;
+  }
+  .crew-bank-account-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-main {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.45rem;
+    min-width: 0;
+    width: 100%;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.12rem 0.45rem;
+    min-width: 0;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child > strong {
+    flex: 0 0 100%;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child > span,
+  .crew-bank-account-toolbar .crew-bank-account-main > div:first-child > small {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-tags {
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-tags .finance-status {
+    padding: 0.22rem 0.45rem;
+    font-size: 0.68rem;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .crew-bank-account-toolbar > .finance-button {
+    grid-column: 1 / -1;
+    justify-self: start;
+    width: auto;
+    min-height: 34px;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.76rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-list,
+  .crew-bank-account-toolbar .crew-bank-evidence-section {
+    display: contents;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+  .crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 40px;
+    padding: 0.5rem 0.6rem;
+    gap: 0.45rem;
+    text-align: left;
+    font-size: 0.76rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-title {
+    min-width: 0;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-title strong {
+    font-size: 0.76rem;
+    line-height: 1.25;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+    flex: 0 0 auto;
+    width: auto;
+    gap: 0.35rem;
+    align-items: center;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-count {
+    padding: 0.18rem 0.4rem;
+    font-size: 0.65rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-list > div[id],
+  .crew-bank-account-toolbar .crew-bank-evidence-upload-form,
+  .crew-bank-account-toolbar .crew-bank-evidence-section-heading {
+    grid-column: 1 / -1;
+    min-width: 0;
+    width: 100%;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-item {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 0.45rem;
+    padding: 0.55rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-file-info strong {
+    overflow-wrap: anywhere;
+    font-size: 0.75rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-file-info > span {
+    font-size: 0.68rem;
+    overflow-wrap: anywhere;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-actions {
+    grid-column: 2;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-action {
+    min-height: 32px;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin: 0;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-actions > button {
+    min-height: 34px;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.74rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-actions > small {
+    font-size: 0.72rem;
+    text-align: right;
+  }
+
+  /* Finance review rows use the same compact mobile rhythm. */
+  .finance-bank-account-row .crew-bank-account-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+  }
+  .finance-bank-account-row .crew-bank-account-main {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+  .finance-bank-account-row .crew-bank-account-main > div:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.45rem;
+    min-width: 0;
+  }
+  .finance-bank-account-row .crew-bank-account-main > div:first-child > strong {
+    flex: 0 0 100%;
+    font-size: 0.88rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .finance-bank-account-row .crew-bank-account-main > div:first-child > span,
+  .finance-bank-account-row .crew-bank-account-main > div:first-child > small {
+    font-size: 0.74rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .finance-bank-account-row .crew-bank-evidence-list {
+    display: contents;
+  }
+  .finance-bank-account-row .crew-bank-evidence-panel-toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 40px;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.76rem;
+  }
+  .finance-bank-account-row .crew-bank-evidence-panel-actions {
+    width: auto;
+    gap: 0.35rem;
+  }
+  .finance-bank-account-row .crew-bank-evidence-count {
+    font-size: 0.65rem;
+  }
+  .finance-bank-account-row .crew-bank-evidence-collapse-toggle {
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+  .finance-bank-account-row .crew-bank-evidence-list > div[id] {
+    width: 100%;
+    min-width: 0;
+  }
+  .finance-bank-account-row .finance-dialog-actions {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    gap: 0.45rem;
+  }
+  .finance-bank-account-row .finance-dialog-actions .finance-button {
+    flex: 1 1 0;
+    min-height: 36px;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.76rem;
+  }
+}
+
+/* Bank account cards: information row above a distinct actions row. */
+.crew-bank-account-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+}
+.crew-bank-account-toolbar > .crew-bank-account-main {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid #e8eef4;
+}
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar > .crew-bank-evidence-list,
+.crew-bank-account-toolbar > .crew-bank-evidence-section,
+.crew-bank-account-toolbar > .crew-bank-account-actions,
+.crew-bank-account-toolbar > .finance-dialog-actions {
+  min-width: 0;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list,
+.crew-bank-account-toolbar > .crew-bank-evidence-section {
+  display: contents;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list > .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-collapse-toggle,
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar > .crew-bank-account-actions,
+.crew-bank-account-toolbar > .finance-dialog-actions {
+  grid-row: 2;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list > div[id],
+.crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-upload-form,
+.crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-section-heading {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  width: 100%;
+}
+.crew-bank-account-toolbar > .crew-bank-account-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: 0;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle,
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar .crew-bank-account-actions > button,
+.crew-bank-account-toolbar .finance-dialog-actions > button {
+  min-height: 38px;
+  border-radius: 9px;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  width: auto;
+  justify-content: space-between;
+}
+@media (max-width: 760px) {
+  .crew-bank-account-toolbar {
+    gap: 0.6rem;
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-main {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-main > div:first-child {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-tags {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .crew-bank-account-toolbar > .finance-button,
+  .crew-bank-account-toolbar > .crew-bank-evidence-list > .crew-bank-evidence-panel-toggle,
+  .crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-collapse-toggle,
+  .crew-bank-account-toolbar > .crew-bank-account-actions,
+  .crew-bank-account-toolbar > .finance-dialog-actions {
+    grid-row: auto;
+    width: 100%;
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-actions {
+    justify-content: stretch;
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-actions > button {
+    width: 100%;
+    justify-content: center;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+    width: 100%;
+  }
+  .crew-bank-account-toolbar .finance-dialog-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .crew-bank-account-toolbar .finance-dialog-actions > button {
+    width: 100%;
+  }
+}
+
+/* Distinguish each bank account as a separate, clearly grouped card. */
+.crew-bank-account-list {
+  gap: 1rem;
+}
+.crew-bank-account-list > .crew-bank-account {
+  position: relative;
+  padding: 0.9rem 1rem;
+  border: 1px solid #cbd9e8;
+  border-left: 4px solid #6b9bc7;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+  box-shadow: 0 3px 12px rgba(31, 61, 92, 0.07);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+.crew-bank-account-list > .crew-bank-account:hover {
+  border-color: #9bb9d6;
+  border-left-color: #2869a8;
+  box-shadow: 0 6px 18px rgba(31, 61, 92, 0.11);
+}
+.crew-bank-account-list > .crew-bank-account .crew-bank-account-main {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e1eaf3;
+}
+@media (max-width: 760px) {
+  .crew-bank-account-list {
+    gap: 0.85rem;
+    padding: 0.75rem;
+  }
+  .crew-bank-account-list > .crew-bank-account {
+    padding: 0.85rem;
+    border-radius: 14px;
+  }
+}
+
+/* Final crew bank-account layout: all status information stays in the header;
+   all available actions are grouped in a distinct footer row. */
+.crew-bank-account-toolbar {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(170px, max-content));
+  align-items: center;
+  column-gap: 0.65rem;
+  row-gap: 0.75rem;
+}
+.crew-bank-account-toolbar > .crew-bank-account-main {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid #e3ebf4;
+}
+.crew-bank-account-main .crew-bank-account-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+.crew-bank-account-status-note {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list,
+.crew-bank-account-toolbar > .crew-bank-evidence-section {
+  display: contents;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list > .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-collapse-toggle,
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar > .crew-bank-account-actions,
+.crew-bank-account-toolbar > .finance-dialog-actions {
+  grid-row: 2;
+  grid-column: auto;
+  width: auto;
+  min-width: 0;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 42px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #b9d8d5;
+  border-radius: 10px;
+  background: #effaf8;
+  color: #087f78;
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle:hover {
+  background: #e1f5f1;
+  border-color: #79bdb5;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  min-height: 42px;
+  width: auto;
+}
+.crew-bank-account-toolbar > .crew-bank-account-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: 0;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list > div[id],
+.crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-upload-form,
+.crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-section-heading {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  width: 100%;
+}
+@media (max-width: 760px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-main {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .crew-bank-account-toolbar > .crew-bank-evidence-list > .crew-bank-evidence-panel-toggle,
+  .crew-bank-account-toolbar > .crew-bank-evidence-section > .crew-bank-evidence-collapse-toggle,
+  .crew-bank-account-toolbar > .finance-button,
+  .crew-bank-account-toolbar > .crew-bank-account-actions,
+  .crew-bank-account-toolbar > .finance-dialog-actions {
+    grid-row: auto;
+    width: 100%;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+    white-space: normal;
+  }
+}
+
+/* Fix action-row overlap: keep each control in its own intrinsic grid column. */
+.crew-bank-account-toolbar {
+  grid-template-columns: minmax(220px, 1fr) max-content max-content max-content !important;
+  align-items: center;
+  column-gap: 0.65rem;
+  row-gap: 0.75rem;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 220px;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  white-space: normal;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title > span {
+  display: none;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+  min-width: 0;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+  white-space: nowrap;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  min-width: 190px;
+  white-space: nowrap;
+}
+.crew-bank-account-toolbar > .crew-bank-account-actions {
+  min-width: max-content;
+}
+@media (max-width: 760px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+  .crew-bank-account-toolbar .crew-bank-evidence-upload-toggle,
+  .crew-bank-account-toolbar > .crew-bank-account-actions,
+  .crew-bank-account-toolbar > .finance-button,
+  .crew-bank-account-toolbar > .finance-dialog-actions {
+    width: 100%;
+    min-width: 0;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+    justify-content: flex-end;
+  }
+}
+
+/* Bank account secondary actions: consistent, icon-led button treatment. */
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  border: 1px solid #cbdced !important;
+  border-radius: 12px !important;
+  background: #f7faff !important;
+  color: #294b6b !important;
+  box-shadow: 0 1px 2px rgba(25, 55, 85, 0.05);
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle:hover {
+  background: #edf5ff !important;
+  border-color: #8fb7df !important;
+  box-shadow: 0 3px 9px rgba(35, 78, 120, 0.09);
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title {
+  display: flex;
+  align-items: center;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 700;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title strong svg {
+  flex: 0 0 auto;
+  color: #1767b1;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+  gap: 0.55rem;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid #d7e5f2;
+  border-radius: 8px;
+  background: #fff;
+  color: #245b91;
+  font-weight: 700;
+}
+.crew-bank-account-toolbar .finance-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  border-radius: 11px;
+}
+.crew-bank-account-toolbar .finance-button-secondary svg {
+  color: #1767b1;
+  flex: 0 0 auto;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  min-height: 44px;
+  border-radius: 11px;
+  box-shadow: 0 1px 2px rgba(0, 110, 100, 0.08);
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle:hover {
+  box-shadow: 0 3px 9px rgba(0, 110, 100, 0.12);
+  transform: translateY(-1px);
+}
+@media (max-width: 760px) {
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+    min-width: 0;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* Uniform bank-account action buttons: consistent dimensions, spacing and hierarchy. */
+.crew-bank-account-toolbar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) repeat(3, minmax(170px, 190px)) !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle,
+.crew-bank-account-toolbar .crew-bank-account-actions > button,
+.crew-bank-account-toolbar > button,
+.crew-bank-account-toolbar .finance-dialog-actions > button {
+  box-sizing: border-box !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 12px !important;
+  border-radius: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  grid-column: auto;
+  border: 1px solid #bcd2e8 !important;
+  background: #f1f7ff !important;
+  color: #244d76 !important;
+  box-shadow: 0 2px 5px rgba(28, 69, 110, 0.07) !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-start !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+  flex: 0 0 auto;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px !important;
+  white-space: nowrap;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+  height: 34px !important;
+  min-height: 34px !important;
+  width: auto !important;
+  padding: 0 10px !important;
+  border: 1px solid #c7d9ed !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #145da2 !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  border: 1px solid #8dcfc6 !important;
+  background: #eaf8f5 !important;
+  color: #087d73 !important;
+  box-shadow: 0 2px 5px rgba(0, 112, 101, 0.08) !important;
+}
+.crew-bank-account-toolbar .crew-bank-account-actions > button,
+.crew-bank-account-toolbar .crew-bank-account-actions button {
+  border: 1px solid #f2b9b9 !important;
+  background: #fff3f3 !important;
+  color: #c62828 !important;
+}
+.crew-bank-account-toolbar .finance-dialog-actions {
+  display: flex !important;
+  gap: 12px !important;
+}
+.crew-bank-account-toolbar .finance-dialog-actions > button {
+  flex: 1 1 0;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle:hover,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle:hover,
+.crew-bank-account-toolbar .crew-bank-account-actions > button:hover {
+  filter: brightness(0.98);
+  box-shadow: 0 4px 10px rgba(25, 60, 95, 0.12) !important;
+  transform: translateY(-1px);
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle svg,
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+@media (max-width: 1100px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: minmax(0, 1fr) repeat(2, minmax(155px, 1fr)) !important;
+  }
+  .crew-bank-account-toolbar .crew-bank-account-actions {
+    grid-column: 2 / -1;
+  }
+}
+@media (max-width: 760px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+  .crew-bank-account-toolbar .crew-bank-evidence-upload-toggle,
+  .crew-bank-account-toolbar .crew-bank-account-actions,
+  .crew-bank-account-toolbar .crew-bank-account-actions > button,
+  .crew-bank-account-toolbar .finance-dialog-actions,
+  .crew-bank-account-toolbar .finance-dialog-actions > button {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+    min-height: 52px !important;
+    height: auto !important;
+    flex-wrap: wrap;
+    justify-content: space-between !important;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* Final clean account-card layout: details on row one, aligned actions on row two. */
+.crew-bank-account-toolbar {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+}
+.crew-bank-account-toolbar > .crew-bank-account-main {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list {
+  grid-column: span 2 !important;
+  min-width: 0 !important;
+  display: block !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-section {
+  grid-column: span 1 !important;
+  min-width: 0 !important;
+  display: block !important;
+}
+.crew-bank-account-toolbar > .crew-bank-account-actions {
+  grid-column: span 1 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+}
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar > button.finance-button {
+  grid-column: span 1 !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle,
+.crew-bank-account-toolbar .crew-bank-account-actions > button,
+.crew-bank-account-toolbar > .finance-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  padding: 0 10px !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  justify-content: flex-start !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title > span {
+  display: none !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title strong {
+  white-space: nowrap !important;
+  font-size: 13px !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+  flex: 0 0 auto !important;
+  gap: 5px !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-count {
+  white-space: nowrap !important;
+  font-size: 11px !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 8px !important;
+  white-space: nowrap !important;
+}
+.crew-bank-account-toolbar .crew-bank-account-actions > small {
+  align-self: center;
+  text-align: center;
+  line-height: 1.35;
+}
+@media (max-width: 1050px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .crew-bank-account-toolbar > .crew-bank-evidence-list {
+    grid-column: span 1 !important;
+  }
+  .crew-bank-account-toolbar > .crew-bank-evidence-section,
+  .crew-bank-account-toolbar > .crew-bank-account-actions,
+  .crew-bank-account-toolbar > .finance-button {
+    grid-column: span 1 !important;
+  }
+}
+@media (max-width: 640px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-main,
+  .crew-bank-account-toolbar > .crew-bank-evidence-list,
+  .crew-bank-account-toolbar > .crew-bank-evidence-section,
+  .crew-bank-account-toolbar > .crew-bank-account-actions,
+  .crew-bank-account-toolbar > .finance-button {
+    grid-column: 1 / -1 !important;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+    height: auto !important;
+    min-height: 48px !important;
+  }
+}
+
+/* Stronger button affordance and edge contrast for bank-account actions. */
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  border: 1.5px solid #8fb5dc !important;
+  background: #eaf3ff !important;
+  color: #173f68 !important;
+  box-shadow:
+    0 2px 0 rgba(30, 78, 125, 0.12),
+    0 2px 7px rgba(30, 78, 125, 0.08) !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle:hover {
+  border-color: #4e8bc7 !important;
+  background: #e1efff !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+  border: 1.5px solid #7da9d6 !important;
+  background: #ffffff !important;
+  color: #075ca8 !important;
+  box-shadow: 0 1px 2px rgba(25, 75, 125, 0.1) !important;
+  font-weight: 700 !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle:hover {
+  border-color: #286eaf !important;
+  background: #f2f8ff !important;
+}
+.crew-bank-account-toolbar .finance-button-secondary,
+.crew-bank-account-toolbar button.finance-button-secondary {
+  border: 1.5px solid #7899bc !important;
+  background: #ffffff !important;
+  color: #294b6b !important;
+  box-shadow:
+    0 2px 0 rgba(38, 72, 108, 0.12),
+    0 2px 6px rgba(38, 72, 108, 0.07) !important;
+  font-weight: 700 !important;
+}
+.crew-bank-account-toolbar .finance-button-secondary:hover,
+.crew-bank-account-toolbar button.finance-button-secondary:hover {
+  border-color: #4779a9 !important;
+  background: #f3f8fd !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  border: 1.5px solid #63b8ad !important;
+  background: #e6f7f4 !important;
+  color: #08786e !important;
+  box-shadow:
+    0 2px 0 rgba(0, 112, 101, 0.12),
+    0 2px 7px rgba(0, 112, 101, 0.08) !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle:hover {
+  border-color: #24988c !important;
+  background: #d9f2ee !important;
+}
+.crew-bank-account-toolbar .crew-bank-account-actions > button {
+  border: 1.5px solid #edaaaa !important;
+  box-shadow:
+    0 2px 0 rgba(180, 45, 45, 0.1),
+    0 2px 6px rgba(180, 45, 45, 0.06) !important;
+}
+
+/* Unified bank-account action system: one surface per action, no nested wrappers. */
+.crew-bank-account-toolbar {
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
+/* Remove the decorative/dotted wrapper around the upload action. */
+.crew-bank-account-toolbar > .crew-bank-evidence-section,
+.crew-bank-account-toolbar .crew-bank-evidence-section {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Shared button geometry and typography. */
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle,
+.crew-bank-account-toolbar .finance-button-secondary,
+.crew-bank-account-toolbar .crew-bank-account-actions > button {
+  box-sizing: border-box !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  box-shadow: 0 1px 2px rgba(20, 45, 75, 0.08) !important;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* Uploaded documents is one unified blue action; the count and View control sit inside it. */
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  border-color: #8eb6e2 !important;
+  background: #edf5ff !important;
+  color: #214d78 !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title strong {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-title > span {
+  display: none !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-count {
+  padding: 5px 8px !important;
+  border: 1px solid #c8dbef !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #45647f !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-collapse-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  width: auto !important;
+  padding: 0 9px !important;
+  border: 1px solid #8eb6e2 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  color: #075ca8 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+/* Upload: a single teal button, with no dotted container. */
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border-color: #69bdb2 !important;
+  background: #e8f7f4 !important;
+  color: #08796f !important;
+}
+
+/* Make primary: same geometry, solid neutral-blue edge. */
+.crew-bank-account-toolbar .finance-button-secondary,
+.crew-bank-account-toolbar button.finance-button-secondary {
+  border-color: #8caacb !important;
+  background: #f7faff !important;
+  color: #294f75 !important;
+}
+
+/* Delete remains red, but uses the same dimensions and visual weight. */
+.crew-bank-account-toolbar .crew-bank-account-actions > button {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 12px !important;
+  border-color: #efaead !important;
+  background: #fff1f1 !important;
+  color: #bd2929 !important;
+}
+
+/* Unified hover/focus treatment. */
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle:hover,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle:hover,
+.crew-bank-account-toolbar .finance-button-secondary:hover,
+.crew-bank-account-toolbar .crew-bank-account-actions > button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(25, 55, 90, 0.12) !important;
+}
+.crew-bank-account-toolbar .crew-bank-evidence-panel-toggle:focus-visible,
+.crew-bank-account-toolbar .crew-bank-evidence-upload-toggle:focus-visible,
+.crew-bank-account-toolbar .finance-button-secondary:focus-visible,
+.crew-bank-account-toolbar .crew-bank-account-actions > button:focus-visible {
+  outline: 3px solid rgba(40, 120, 190, 0.22) !important;
+  outline-offset: 2px !important;
+}
+@media (max-width: 640px) {
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-toggle {
+    min-height: 50px !important;
+    height: auto !important;
+    flex-wrap: wrap;
+  }
+  .crew-bank-account-toolbar .crew-bank-evidence-panel-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* Equal-width, equal-height action row across every bank account card. */
+.crew-bank-account-toolbar {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+}
+.crew-bank-account-toolbar > .crew-bank-account-main {
+  grid-column: 1 / -1 !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list,
+.crew-bank-account-toolbar > .crew-bank-evidence-section,
+.crew-bank-account-toolbar > .crew-bank-account-actions,
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar > button.finance-button {
+  grid-column: span 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  box-sizing: border-box !important;
+  align-self: stretch !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list {
+  display: block !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-section {
+  display: block !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list > .crew-bank-evidence-panel-toggle,
+.crew-bank-account-toolbar > .crew-bank-evidence-section .crew-bank-evidence-upload-toggle,
+.crew-bank-account-toolbar > .crew-bank-account-actions > button,
+.crew-bank-account-toolbar > .finance-button,
+.crew-bank-account-toolbar > button.finance-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list > .crew-bank-evidence-panel-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  padding: 0 9px !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-section .crew-bank-evidence-upload-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+}
+.crew-bank-account-toolbar > .crew-bank-account-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: stretch !important;
+  min-width: 0 !important;
+}
+.crew-bank-account-toolbar > .crew-bank-account-actions > button {
+  flex: 1 1 auto !important;
+}
+.crew-bank-account-toolbar > .crew-bank-account-actions > small {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 0 8px !important;
+  line-height: 1.3 !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list .crew-bank-evidence-panel-title {
+  min-width: 0 !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list .crew-bank-evidence-panel-title strong {
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list .crew-bank-evidence-panel-actions {
+  min-width: 0 !important;
+  gap: 4px !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list .crew-bank-evidence-count {
+  font-size: 10px !important;
+  padding: 4px 6px !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-list .crew-bank-evidence-collapse-toggle {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 7px !important;
+  font-size: 10px !important;
+  white-space: nowrap !important;
+}
+@media (max-width: 900px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-main {
+    grid-column: 1 / -1 !important;
+  }
+  .crew-bank-account-toolbar > .crew-bank-evidence-list,
+  .crew-bank-account-toolbar > .crew-bank-evidence-section,
+  .crew-bank-account-toolbar > .crew-bank-account-actions,
+  .crew-bank-account-toolbar > .finance-button,
+  .crew-bank-account-toolbar > button.finance-button {
+    grid-column: span 1 !important;
+  }
+}
+@media (max-width: 600px) {
+  .crew-bank-account-toolbar {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+  .crew-bank-account-toolbar > .crew-bank-account-main,
+  .crew-bank-account-toolbar > .crew-bank-evidence-list,
+  .crew-bank-account-toolbar > .crew-bank-evidence-section,
+  .crew-bank-account-toolbar > .crew-bank-account-actions,
+  .crew-bank-account-toolbar > .finance-button,
+  .crew-bank-account-toolbar > button.finance-button {
+    grid-column: 1 / -1 !important;
+  }
+  .crew-bank-account-toolbar > .crew-bank-evidence-list > .crew-bank-evidence-panel-toggle {
+    height: auto !important;
+    min-height: 48px !important;
+    max-height: none !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Expanded evidence/upload panels must leave the action grid and take a full row. */
+.crew-bank-account-toolbar > .crew-bank-evidence-list.is-expanded,
+.crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded {
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  align-self: stretch !important;
+  overflow: visible !important;
+  display: block !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+.crew-bank-account-toolbar
+  > .crew-bank-evidence-list.is-expanded
+  > .crew-bank-evidence-panel-toggle {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 48px !important;
+  max-height: none !important;
+}
+.crew-bank-account-toolbar
+  > .crew-bank-evidence-list.is-expanded
+  > div[id^="crew-evidence-documents-"],
+.crew-bank-account-toolbar
+  > .crew-bank-evidence-section.is-expanded
+  > .crew-bank-evidence-section-heading,
+.crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded > .crew-bank-account-form,
+.crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded > form,
+.crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded > button {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+.crew-bank-account-toolbar
+  > .crew-bank-evidence-list.is-expanded
+  > div[id^="crew-evidence-documents-"] {
+  display: block !important;
+  margin-top: 10px !important;
+  padding: 12px !important;
+  border: 1px solid #d8e4f0 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  overflow: visible !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  padding: 14px !important;
+  border: 1px solid #d8e4f0 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+}
+.crew-bank-account-toolbar
+  > .crew-bank-evidence-section.is-expanded
+  > .crew-bank-evidence-section-heading {
+  grid-column: 1 / 2 !important;
+  min-width: 0 !important;
+}
+.crew-bank-account-toolbar
+  > .crew-bank-evidence-section.is-expanded
+  > button.crew-bank-evidence-upload-toggle {
+  grid-column: 2 / 3 !important;
+  width: auto !important;
+  min-width: 130px !important;
+  align-self: start !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded > form {
+  grid-column: 1 / -1 !important;
+}
+.crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded .crew-bank-evidence-dropzone {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 600px) {
+  .crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .crew-bank-account-toolbar
+    > .crew-bank-evidence-section.is-expanded
+    > .crew-bank-evidence-section-heading,
+  .crew-bank-account-toolbar
+    > .crew-bank-evidence-section.is-expanded
+    > button.crew-bank-evidence-upload-toggle,
+  .crew-bank-account-toolbar > .crew-bank-evidence-section.is-expanded > form {
+    grid-column: 1 / -1 !important;
+  }
+  .crew-bank-account-toolbar
+    > .crew-bank-evidence-section.is-expanded
+    > button.crew-bank-evidence-upload-toggle {
+    width: 100% !important;
+  }
+}
+
+/* Finance verification cards: details, evidence and decisions get distinct rows. */
+.finance-bank-account-row .crew-bank-account-toolbar {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  overflow: visible !important;
+}
+.finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-account-main {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+}
+.finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-evidence-list {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+.finance-bank-account-row .crew-bank-account-toolbar > .finance-dialog-actions {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+.finance-bank-account-row .finance-dialog-actions > button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  justify-content: center !important;
+  border-radius: 10px !important;
+}
+.finance-bank-account-row .crew-bank-evidence-panel-toggle {
+  width: 100% !important;
+  min-height: 48px !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 8px 12px !important;
+  border: 1px solid #b7cfe8 !important;
+  border-radius: 10px !important;
+  background: #f0f6fd !important;
+  color: #244b72 !important;
+  box-shadow: 0 1px 3px rgba(25, 60, 95, 0.08) !important;
+}
+.finance-bank-account-row .crew-bank-evidence-panel-title {
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.finance-bank-account-row .crew-bank-evidence-panel-title strong {
+  font-size: 13px !important;
+  white-space: nowrap !important;
+}
+.finance-bank-account-row .crew-bank-evidence-panel-title > span {
+  display: none !important;
+}
+.finance-bank-account-row .crew-bank-evidence-panel-actions {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 7px !important;
+}
+.finance-bank-account-row .crew-bank-evidence-count {
+  white-space: nowrap !important;
+  border: 1px solid #d2e1ef !important;
+  border-radius: 999px !important;
+  padding: 4px 8px !important;
+  background: #fff !important;
+  font-size: 11px !important;
+}
+.finance-bank-account-row .crew-bank-evidence-collapse-toggle {
+  min-height: 34px !important;
+  height: 34px !important;
+  width: auto !important;
+  padding: 0 10px !important;
+  border: 1px solid #9abce0 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #075ca8 !important;
+  white-space: nowrap !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+.finance-bank-account-row .crew-bank-evidence-list.is-expanded {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  display: block !important;
+  overflow: visible !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+.finance-bank-account-row
+  .crew-bank-evidence-list.is-expanded
+  > div[id^="finance-evidence-documents-"] {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin-top: 10px !important;
+  padding: 12px !important;
+  border: 1px solid #d8e4f0 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  overflow: visible !important;
+}
+.finance-bank-account-row .crew-bank-evidence-list.is-expanded ul {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 9px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+.finance-bank-account-row .crew-bank-evidence-item {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding: 12px !important;
+  border: 1px solid #e0e8f1 !important;
+  border-radius: 10px !important;
+  background: #f9fbfe !important;
+}
+.finance-bank-account-row .crew-bank-evidence-file-info {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+.finance-bank-account-row .crew-bank-evidence-file-info strong {
+  display: block !important;
+  overflow-wrap: anywhere !important;
+  font-size: 13px !important;
+}
+.finance-bank-account-row .crew-bank-evidence-file-info span {
+  color: #647b92 !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+}
+.finance-bank-account-row .crew-bank-evidence-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+.finance-bank-account-row .crew-bank-evidence-action {
+  min-height: 40px !important;
+  height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 12px !important;
+  border: 1px solid #cbd9e8 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #31516f !important;
+  text-decoration: none !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+.finance-bank-account-row .crew-bank-evidence-action-view {
+  border-color: #07877f !important;
+  background: #07877f !important;
+  color: #fff !important;
+}
+.finance-bank-account-row .crew-bank-evidence-empty,
+.finance-bank-account-row .crew-bank-evidence-error {
+  margin: 0 !important;
+  padding: 14px !important;
+  border-radius: 8px !important;
+  background: #f7f9fc !important;
+  color: #5f7489 !important;
+  font-size: 13px !important;
+}
+@media (max-width: 680px) {
+  .finance-bank-account-row .crew-bank-account-toolbar {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-account-main,
+  .finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-evidence-list,
+  .finance-bank-account-row .crew-bank-account-toolbar > .finance-dialog-actions,
+  .finance-bank-account-row .crew-bank-evidence-list.is-expanded {
+    grid-column: 1 / -1 !important;
+  }
+  .finance-bank-account-row .crew-bank-evidence-item {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+  }
+  .finance-bank-account-row .crew-bank-evidence-actions {
+    grid-column: 1 / -1 !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* Finance review: compact decision buttons instead of oversized half-width bars. */
+.finance-bank-account-row .crew-bank-account-toolbar > .finance-dialog-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+.finance-bank-account-row .finance-dialog-actions > button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 124px !important;
+  max-width: 180px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 18px !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+.finance-bank-account-row .finance-dialog-actions > button.finance-button-primary {
+  min-width: 150px !important;
+}
+.finance-bank-account-row .crew-bank-account-toolbar {
+  row-gap: 10px !important;
+}
+@media (max-width: 600px) {
+  .finance-bank-account-row .crew-bank-account-toolbar > .finance-dialog-actions {
+    justify-content: stretch !important;
+  }
+  .finance-bank-account-row .finance-dialog-actions > button {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 10px !important;
+  }
+}
+
+/* Mobile Finance cards: put decision actions before the documents control. */
+@media (max-width: 680px) {
+  .finance-bank-account-row .crew-bank-account-toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-account-main {
+    order: 1 !important;
+    width: 100% !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar > .finance-dialog-actions {
+    order: 2 !important;
+    width: 100% !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-evidence-list {
+    order: 3 !important;
+    width: 100% !important;
+  }
+  .finance-bank-account-row .crew-bank-evidence-list.is-expanded {
+    order: 3 !important;
+  }
+  .finance-bank-account-row .finance-dialog-actions > button {
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+}
+
+/* Remove mobile flex growth that stretches the account-details block and creates blank space. */
+@media (max-width: 680px) {
+  .finance-bank-account-row {
+    height: auto !important;
+    min-height: 0 !important;
+    align-self: start !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-account-main {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding-bottom: 10px !important;
+    order: 1 !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar > .finance-dialog-actions {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    order: 2 !important;
+    margin: 0 !important;
+  }
+  .finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-evidence-list,
+  .finance-bank-account-row .crew-bank-account-toolbar > .crew-bank-evidence-list.is-expanded {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    order: 3 !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+  .finance-bank-account-row
+    .crew-bank-evidence-list.is-expanded
+    > div[id^="finance-evidence-documents-"] {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin-top: 8px !important;
+  }
+}
+
+/* Finance list pagination, search and mobile card presentation */
+.finance-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e7edf4;
+}
+.finance-list-search {
+  flex: 1;
+  min-width: 180px;
+  max-width: 440px;
+}
+.finance-list-search input,
+.finance-page-size select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #d5e0ed;
+  border-radius: 10px;
+  background: #fff;
+  color: #243b53;
+  padding: 8px 12px;
+  font: inherit;
+}
+.finance-page-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #60758d;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.finance-page-size select {
+  width: 76px;
+}
+.finance-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  color: #647991;
+  font-size: 0.84rem;
+}
+.finance-pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.finance-pagination .finance-button {
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+}
+@media (max-width: 700px) {
+  .finance-list-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px;
+  }
+  .finance-list-search {
+    max-width: none;
+  }
+  .finance-page-size {
+    justify-content: space-between;
+  }
+  .finance-pagination {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px;
+  }
+  .finance-pagination > div {
+    justify-content: space-between;
+  }
+  .finance-table-wrap {
+    overflow: visible;
+  }
+  .finance-table {
+    display: block;
+    width: 100%;
+  }
+  .finance-table thead {
+    display: none;
+  }
+  .finance-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+  .finance-table tbody tr:not(.finance-claim-detail-row) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 12px;
+    padding: 13px;
+    border: 1px solid #dce6f1;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(25, 55, 85, 0.045);
+  }
+  .finance-table tbody tr:not(.finance-claim-detail-row) td {
+    display: block;
+    min-width: 0;
+    border: 0;
+    padding: 3px 0;
+    overflow-wrap: anywhere;
+  }
+  .finance-table tbody tr:not(.finance-claim-detail-row) td:first-child {
+    grid-column: 1 / -1;
+  }
+  .finance-table tbody tr:not(.finance-claim-detail-row) td strong {
+    display: block;
+  }
+  .finance-table tbody tr:not(.finance-claim-detail-row) td small {
+    display: block;
+    margin-top: 3px;
+  }
+  .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(2)::before,
+  .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(3)::before,
+  .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(4)::before,
+  .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(5)::before,
+  .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(6)::before,
+  .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(7)::before {
+    display: block;
+    margin-bottom: 3px;
+    color: #8192a6;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  #approved .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(2)::before {
+    content: "Crew member";
+  }
+  #approved .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(3)::before {
+    content: "Flight";
+  }
+  #approved .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(4)::before {
+    content: "Claim";
+  }
+  #approved .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(5)::before {
+    content: "Approved amount";
+  }
+  #approved .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(6)::before {
+    content: "Payment state";
+  }
+  #approved .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(7)::before {
+    content: "Details";
+  }
+  #payments .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(2)::before {
+    content: "Method";
+  }
+  #payments .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(3)::before {
+    content: "Amount";
+  }
+  #payments .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(4)::before {
+    content: "Claims";
+  }
+  #payments .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(5)::before {
+    content: "Status";
+  }
+  #payments .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(6)::before {
+    content: "Reference";
+  }
+  #payments .finance-table tbody tr:not(.finance-claim-detail-row) td:nth-child(7)::before {
+    content: "Date";
+  }
+  .finance-table tbody tr.finance-claim-detail-row {
+    display: block;
+    margin-top: -12px;
+  }
+  .finance-table tbody tr.finance-claim-detail-row td {
+    display: block;
+    padding: 0 8px 10px;
+    border: 0;
+  }
+  .finance-table tbody tr:has(+ .finance-claim-detail-row) {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  .finance-table tbody tr:not(.finance-claim-detail-row) td.finance-empty {
+    grid-column: 1 / -1;
+  }
+}

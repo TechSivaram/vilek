@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, like, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   airlines,
@@ -48,7 +48,40 @@ export function getFinanceOverview() {
   return { approvedClaims, paidPayments, processingPayments, failedPayments };
 }
 
-export function getApprovedFinanceClaims() {
+export type FinanceListOptions = {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  claimIds?: string[];
+  status?: string;
+};
+
+export function getApprovedFinanceClaims(options: FinanceListOptions = {}) {
+  const page = Math.max(1, Math.floor(options.page ?? 1));
+  const pageSize = Math.min(100, Math.max(1, Math.floor(options.pageSize ?? 10)));
+  const offset = (page - 1) * pageSize;
+  const search = options.search?.trim();
+  const searchFilter = search
+    ? or(
+        like(users.firstName, `%${search}%`),
+        like(users.lastName, `%${search}%`),
+        like(users.email, `%${search}%`),
+        like(flights.flightNumber, `%${search}%`),
+        like(claims.id, `%${search}%`),
+      )
+    : undefined;
+  const claimIdFilter = options.claimIds?.length ? inArray(claims.id, options.claimIds) : undefined;
+  const baseFilter = and(eq(claims.status, "APPROVED"), searchFilter, claimIdFilter);
+  const countQuery =
+    db
+      .select({ value: sql<number>`count(*)` })
+      .from(claims)
+      .innerJoin(flightCrew, eq(claims.flightCrewId, flightCrew.id))
+      .innerJoin(crewMembers, eq(flightCrew.crewMemberId, crewMembers.id))
+      .innerJoin(users, eq(crewMembers.userId, users.id))
+      .innerJoin(flights, eq(flightCrew.flightId, flights.id))
+      .where(baseFilter)
+      .get()?.value ?? 0;
   const rows = db
     .select({
       claimId: claims.id,
@@ -66,11 +99,13 @@ export function getApprovedFinanceClaims() {
     .innerJoin(users, eq(crewMembers.userId, users.id))
     .innerJoin(flights, eq(flightCrew.flightId, flights.id))
     .innerJoin(airlines, eq(flights.airlineId, airlines.id))
-    .where(eq(claims.status, "APPROVED"))
+    .where(baseFilter)
     .orderBy(desc(claims.updatedAt))
+    .limit(pageSize)
+    .offset(offset)
     .all();
 
-  return rows.map((claim) => {
+  const items = rows.map((claim) => {
     const items = db
       .select({
         amount: expenses.amount,
@@ -196,10 +231,41 @@ export function getApprovedFinanceClaims() {
       activePayment: activePayment ?? null,
     };
   });
+  return {
+    items,
+    page,
+    pageSize,
+    total: countQuery,
+    totalPages: Math.max(1, Math.ceil(countQuery / pageSize)),
+  };
 }
 
-export function getFinancePayments() {
-  return db
+export function getFinancePayments(options: FinanceListOptions = {}) {
+  const page = Math.max(1, Math.floor(options.page ?? 1));
+  const pageSize = Math.min(100, Math.max(1, Math.floor(options.pageSize ?? 10)));
+  const offset = (page - 1) * pageSize;
+  const search = options.search?.trim();
+  const searchFilter = search
+    ? or(
+        like(payments.paymentNumber, `%${search}%`),
+        like(payments.paymentReference, `%${search}%`),
+        like(payments.providerReference, `%${search}%`),
+        like(users.email, `%${search}%`),
+      )
+    : undefined;
+  const statusFilter =
+    options.status && ["PROCESSING", "PAID", "FAILED"].includes(options.status)
+      ? eq(payments.status, options.status as "PROCESSING" | "PAID" | "FAILED")
+      : undefined;
+  const filter = and(searchFilter, statusFilter);
+  const total =
+    db
+      .select({ value: sql<number>`count(*)` })
+      .from(payments)
+      .leftJoin(users, eq(payments.initiatedByUserId, users.id))
+      .where(filter)
+      .get()?.value ?? 0;
+  const items = db
     .select({
       id: payments.id,
       paymentNumber: payments.paymentNumber,
@@ -216,8 +282,10 @@ export function getFinancePayments() {
     })
     .from(payments)
     .leftJoin(users, eq(payments.initiatedByUserId, users.id))
+    .where(filter)
     .orderBy(desc(payments.createdAt))
-    .limit(100)
+    .limit(pageSize)
+    .offset(offset)
     .all()
     .map((payment) => ({
       ...payment,
@@ -227,6 +295,7 @@ export function getFinancePayments() {
         .where(eq(paymentClaims.paymentId, payment.id))
         .all(),
     }));
+  return { items, page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
 export function recordPaymentAudit(

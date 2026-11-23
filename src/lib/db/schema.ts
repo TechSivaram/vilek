@@ -539,6 +539,36 @@ export const crewBankAccountAuditEvents = sqliteTable(
   (t) => [index("crew_bank_account_audit_date_idx").on(t.bankAccountId, t.createdAt)],
 );
 
+export const crewBankAccountEvidence = sqliteTable(
+  "Crew_Bank_Account_Evidence",
+  {
+    id: text("id").primaryKey(),
+    bankAccountId: text("bank_account_id")
+      .notNull()
+      .references(() => crewBankAccounts.id, { onDelete: "restrict" }),
+    storageKey: text("storage_key").notNull().unique(),
+    fileName: text("file_name").notNull(),
+    contentType: text("content_type").notNull(),
+    fileSizeBytes: integer("file_size_bytes").notNull(),
+    evidenceType: text("evidence_type").notNull(),
+    uploadedByUserId: text("uploaded_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    uploadedAt: createdAt("uploaded_at"),
+  },
+  (t) => [
+    index("crew_bank_account_evidence_account_idx").on(t.bankAccountId, t.uploadedAt),
+    check(
+      "crew_bank_account_evidence_type_ck",
+      sql`${t.evidenceType} IN ('CANCELLED_CHEQUE','BANK_PASSBOOK','BANK_STATEMENT')`,
+    ),
+    check(
+      "crew_bank_account_evidence_size_ck",
+      sql`${t.fileSizeBytes} > 0 AND ${t.fileSizeBytes} <= 10485760`,
+    ),
+  ],
+);
+
 export const currencies = sqliteTable(
   "Currency",
   {
@@ -915,6 +945,7 @@ export const schema = {
   paymentAuditEvents,
   crewBankAccounts,
   crewBankAccountAuditEvents,
+  crewBankAccountEvidence,
   deploymentSetup,
   systemSettings,
   allowedFileTypes,

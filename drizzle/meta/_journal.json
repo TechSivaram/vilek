@@ -64,6 +64,20 @@
       "when": 1795410000000,
       "tag": "0008_claim_currency_resolution",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1795420000000,
+      "tag": "0009_crew_bank_account_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1795430000000,
+      "tag": "0010_repair_currency_resolution_audit_fk",
+      "breakpoints": true
     }
   ]
 }

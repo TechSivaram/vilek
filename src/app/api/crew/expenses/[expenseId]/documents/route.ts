@@ -54,8 +54,11 @@ export const POST = withRouteGuard<Context>({ roles: ["CREW"] }, async (request,
   const id = randomUUID();
   const root = path.resolve(
     /*turbopackIgnore: true*/
-    process.env.VILEK_DOCUMENT_STORAGE_PATH ||
-      path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "expense-documents"),
+    path.join(
+      /*turbopackIgnore: true*/
+      process.env.VILEK_DOCUMENT_STORAGE_PATH || path.join(process.cwd(), "data"),
+      "expense-documents",
+    ),
   );
   const storageKey = `${id}${extension}`;
   await mkdir(root, { recursive: true });

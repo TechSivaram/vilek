@@ -31,7 +31,7 @@ export const POST = withRouteGuard(
     } catch {
       return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
     }
-    const claim = getApprovedFinanceClaims().find((item) => item.claimId === claimId);
+    const claim = getApprovedFinanceClaims({ page: 1, pageSize: 1, claimIds: [claimId] }).items[0];
     if (!claim) return NextResponse.json({ error: "Approved claim not found." }, { status: 404 });
     if (claim.hasInvalidAmounts || claim.currencyTotals.length < 1)
       return NextResponse.json(

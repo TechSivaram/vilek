@@ -15,8 +15,11 @@ export const GET = withRouteGuard<Context>(
 
     const root = path.resolve(
       /*turbopackIgnore: true*/
-      process.env.VILEK_DOCUMENT_STORAGE_PATH ||
-        path.join(process.cwd(), "data", "expense-documents"),
+      path.join(
+        /*turbopackIgnore: true*/
+        process.env.VILEK_DOCUMENT_STORAGE_PATH || path.join(process.cwd(), "data"),
+        "expense-documents",
+      ),
     );
     if (path.basename(document.storageKey) !== document.storageKey)
       return NextResponse.json({ error: "Receipt not found." }, { status: 404 });

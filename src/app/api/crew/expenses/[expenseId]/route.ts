@@ -54,8 +54,11 @@ export const DELETE = withRouteGuard<Context>(
       const documents = crewExpensesService.getExpenseDocuments(auth.user.id, expenseId);
       const root = path.resolve(
         /*turbopackIgnore: true*/
-        process.env.VILEK_DOCUMENT_STORAGE_PATH ||
-          path.join(/*turbopackIgnore: true*/ process.cwd(), "data", "expense-documents"),
+        path.join(
+          /*turbopackIgnore: true*/
+          process.env.VILEK_DOCUMENT_STORAGE_PATH || path.join(process.cwd(), "data"),
+          "expense-documents",
+        ),
       );
       // Remove files before deleting the expense/metadata. ENOENT is safe to ignore,
       // making a partially completed cleanup safely retryable.

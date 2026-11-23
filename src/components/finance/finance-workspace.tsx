@@ -71,8 +71,20 @@ type FinanceData = {
     processingPayments: number;
     failedPayments: number;
   };
-  approvedClaims: FinanceClaim[];
-  payments: FinancePayment[];
+  approvedClaims: {
+    items: FinanceClaim[];
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+  payments: {
+    items: FinancePayment[];
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
 };
 
 const money = (amount: number | string, currency: string) =>
@@ -98,6 +110,7 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
+  const [selectedClaimCache, setSelectedClaimCache] = useState<Record<string, FinanceClaim>>({});
   const [expandedClaims, setExpandedClaims] = useState<string[]>([]);
   const [mode, setMode] = useState<"MANUAL" | "BANK">("MANUAL");
   const [submitting, setSubmitting] = useState(false);
@@ -108,34 +121,60 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
   const [confirmingPaymentId, setConfirmingPaymentId] = useState("");
   const [confirmationReference, setConfirmationReference] = useState("");
   const [confirmationDate, setConfirmationDate] = useState(localDateTimeInputValue());
+  const [listPage, setListPage] = useState(1);
+  const [listPageSize, setListPageSize] = useState(10);
+  const [listSearch, setListSearch] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("ALL");
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/finance/payments", { cache: "no-store" });
+      const params = new URLSearchParams({
+        page: String(listPage),
+        pageSize: String(listPageSize),
+        search: listSearch,
+        status: paymentStatus === "ALL" ? "" : paymentStatus,
+      });
+      const response = await fetch(`/api/finance/payments?${params.toString()}`, {
+        cache: "no-store",
+      });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "Unable to load Finance data.");
       setData(result as FinanceData);
+      setSelectedClaimCache((current) => {
+        const next = { ...current };
+        for (const claim of result.approvedClaims.items as FinanceClaim[]) {
+          if (claim.canPay) next[claim.claimId] = claim;
+          else delete next[claim.claimId];
+        }
+        return next;
+      });
       setSelected((current) =>
-        current.filter((id) =>
-          result.approvedClaims.some((claim: FinanceClaim) => claim.claimId === id && claim.canPay),
-        ),
+        current.filter((id) => {
+          const visible = (result.approvedClaims.items as FinanceClaim[]).find(
+            (claim) => claim.claimId === id,
+          );
+          return visible ? visible.canPay : true;
+        }),
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load Finance data.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [listPage, listPageSize, listSearch, paymentStatus]);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
   const selectedClaims = useMemo(
-    () => data?.approvedClaims.filter((claim) => selected.includes(claim.claimId)) ?? [],
-    [data, selected],
+    () =>
+      selected
+        .map((id) => selectedClaimCache[id])
+        .filter((claim): claim is FinanceClaim => Boolean(claim)),
+    [selected, selectedClaimCache],
   );
   const batchCurrencies = new Set(
     selectedClaims
@@ -149,12 +188,19 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
     batchCurrencies.size === 1 &&
     (mode === "BANK" || selectedClaims.length === 1);
 
-  const toggleClaim = (id: string, checked: boolean) =>
+  const toggleClaim = (id: string, checked: boolean) => {
     setSelected((current) =>
       checked
         ? [...current.filter((item) => item !== id), id]
         : current.filter((item) => item !== id),
     );
+    if (!checked)
+      setSelectedClaimCache((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+  };
 
   const toggleClaimDetails = (id: string) =>
     setExpandedClaims((current) =>
@@ -181,6 +227,7 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
       }
       setNotice(result.warning ?? `${result.paymentNumber} created with status ${result.status}.`);
       setSelected([]);
+      setSelectedClaimCache({});
       setConfirmOpen(false);
       await refresh();
     } catch (err) {
@@ -358,6 +405,37 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
             </button>
           </div>
 
+          <div className="finance-list-toolbar">
+            <label className="finance-list-search">
+              <span className="sr-only">Search approved claims</span>
+              <input
+                value={listSearch}
+                onChange={(event) => {
+                  setListSearch(event.target.value);
+                  setListPage(1);
+                  setSelected([]);
+                  setSelectedClaimCache({});
+                }}
+                placeholder="Search claim, crew or flight…"
+              />
+            </label>
+            <label className="finance-page-size">
+              Rows per page
+              <select
+                value={listPageSize}
+                onChange={(event) => {
+                  setListPageSize(Number(event.target.value));
+                  setListPage(1);
+                  setSelected([]);
+                  setSelectedClaimCache({});
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+            </label>
+          </div>
           <div className="finance-table-wrap">
             <table className="finance-table">
               <thead>
@@ -379,14 +457,14 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                     </td>
                   </tr>
                 )}
-                {!loading && data?.approvedClaims.length === 0 && (
+                {!loading && data?.approvedClaims.items.length === 0 && (
                   <tr>
                     <td colSpan={7} className="finance-empty">
                       No approved claims are awaiting payment.
                     </td>
                   </tr>
                 )}
-                {data?.approvedClaims.map((claim) => {
+                {data?.approvedClaims.items.map((claim) => {
                   const total =
                     claim.payableCurrencyCode && claim.payableAmount !== null
                       ? { currencyCode: claim.payableCurrencyCode, amount: claim.payableAmount }
@@ -414,6 +492,13 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
               </tbody>
             </table>
           </div>
+          <FinancePagination
+            page={data?.approvedClaims.page ?? listPage}
+            totalPages={data?.approvedClaims.totalPages ?? 1}
+            total={data?.approvedClaims.total ?? 0}
+            pageSize={listPageSize}
+            onPage={setListPage}
+          />
 
           {selectedClaims.length > 0 && (
             <div className="finance-payment-composer">
@@ -507,6 +592,48 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
               {loading ? "Refreshing…" : "Refresh"}
             </button>
           </div>
+          <div className="finance-list-toolbar">
+            <label className="finance-list-search">
+              <span className="sr-only">Search payment history</span>
+              <input
+                value={listSearch}
+                onChange={(event) => {
+                  setListSearch(event.target.value);
+                  setListPage(1);
+                }}
+                placeholder="Search payment, reference or user…"
+              />
+            </label>
+            <label className="finance-page-size">
+              Status
+              <select
+                value={paymentStatus}
+                onChange={(event) => {
+                  setPaymentStatus(event.target.value);
+                  setListPage(1);
+                }}
+              >
+                <option value="ALL">All</option>
+                <option value="PROCESSING">Processing</option>
+                <option value="PAID">Paid</option>
+                <option value="FAILED">Failed</option>
+              </select>
+            </label>
+            <label className="finance-page-size">
+              Rows per page
+              <select
+                value={listPageSize}
+                onChange={(event) => {
+                  setListPageSize(Number(event.target.value));
+                  setListPage(1);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+            </label>
+          </div>
           <div className="finance-table-wrap">
             <table className="finance-table">
               <thead>
@@ -528,14 +655,14 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
                     </td>
                   </tr>
                 )}
-                {!loading && data?.payments.length === 0 && (
+                {!loading && data?.payments.items.length === 0 && (
                   <tr>
                     <td colSpan={7} className="finance-empty">
                       No payments have been recorded yet.
                     </td>
                   </tr>
                 )}
-                {data?.payments.map((payment) => (
+                {data?.payments.items.map((payment) => (
                   <tr key={payment.id}>
                     <td>
                       <strong>{payment.paymentNumber}</strong>
@@ -602,6 +729,13 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
               </tbody>
             </table>
           </div>
+          <FinancePagination
+            page={data?.payments.page ?? listPage}
+            totalPages={data?.payments.totalPages ?? 1}
+            total={data?.payments.total ?? 0}
+            pageSize={listPageSize}
+            onPage={setListPage}
+          />
         </section>
       )}
 
@@ -674,6 +808,51 @@ export function FinanceWorkspace({ view = "overview" }: { view?: FinanceView }) 
         </div>
       )}
     </div>
+  );
+}
+
+function FinancePagination({
+  page,
+  totalPages,
+  total,
+  pageSize,
+  onPage,
+}: {
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize: number;
+  onPage: (page: number) => void;
+}) {
+  const start = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, total);
+  return (
+    <nav className="finance-pagination" aria-label="List pagination">
+      <span>
+        Showing {start}–{end} of {total}
+      </span>
+      <div>
+        <button
+          type="button"
+          className="finance-button finance-button-secondary"
+          onClick={() => onPage(Math.max(1, page - 1))}
+          disabled={page <= 1}
+        >
+          Previous
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          type="button"
+          className="finance-button finance-button-secondary"
+          onClick={() => onPage(Math.min(totalPages, page + 1))}
+          disabled={page >= totalPages}
+        >
+          Next
+        </button>
+      </div>
+    </nav>
   );
 }
 
@@ -1243,3 +1422,5 @@ function FragmentRow({
     </>
   );
 }
+
+/* Finance list density and responsive record cards */
