@@ -74,24 +74,35 @@ export default async function LoginPage({ searchParams }: Props) {
           <br className={styles["desktop-break"]} /> streamline claims — all in one place.
         </p>
 
-        <div className={styles["login-journey"]} aria-label="Flights, Expenses, Receipts and Claims">
+        <div
+          className={styles["login-journey"]}
+          aria-label="Flights, Expenses, Receipts and Claims"
+        >
           <div className={styles["login-journey-step"]}>
-            <span className={styles["login-icon"]}><FlightIcon /></span>
+            <span className={styles["login-icon"]}>
+              <FlightIcon />
+            </span>
             <span>Flights</span>
           </div>
           <i aria-hidden="true" />
           <div className={styles["login-journey-step"]}>
-            <span className={styles["login-icon"]}><ExpenseIcon /></span>
+            <span className={styles["login-icon"]}>
+              <ExpenseIcon />
+            </span>
             <span>Expenses</span>
           </div>
           <i aria-hidden="true" />
           <div className={styles["login-journey-step"]}>
-            <span className={styles["login-icon"]}><ReceiptIcon /></span>
+            <span className={styles["login-icon"]}>
+              <ReceiptIcon />
+            </span>
             <span>Receipts</span>
           </div>
           <i aria-hidden="true" />
           <div className={styles["login-journey-step"]}>
-            <span className={styles["login-icon"]}><ClaimIcon /></span>
+            <span className={styles["login-icon"]}>
+              <ClaimIcon />
+            </span>
             <span>Claims</span>
           </div>
         </div>
@@ -112,12 +123,18 @@ export default async function LoginPage({ searchParams }: Props) {
           </p>
 
           {loggedOut === "1" ? (
-            <p role="status" className={`${styles["login-notice"]} ${styles["login-notice--success"]}`}>
+            <p
+              role="status"
+              className={`${styles["login-notice"]} ${styles["login-notice--success"]}`}
+            >
               You have been signed out of ViLek.
             </p>
           ) : null}
           {error ? (
-            <p role="alert" className={`${styles["login-notice"]} ${styles["login-notice--error"]}`}>
+            <p
+              role="alert"
+              className={`${styles["login-notice"]} ${styles["login-notice--error"]}`}
+            >
               {error}
             </p>
           ) : null}
@@ -134,7 +151,10 @@ export default async function LoginPage({ searchParams }: Props) {
               <rect x="4" y="10" width="16" height="11" rx="2" />
               <path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3" />
             </svg>
-            <p>Access is available to authorized users<br className={styles["card-desktop-break"]} /> provisioned in ViLek.</p>
+            <p>
+              Access is available to authorized users
+              <br className={styles["card-desktop-break"]} /> provisioned in ViLek.
+            </p>
           </div>
         </div>
       </section>

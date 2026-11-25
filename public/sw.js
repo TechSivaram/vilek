@@ -12,21 +12,21 @@ const PRECACHE_URLS = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)),
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)));
   // Do not call skipWaiting automatically. Let the user choose when to apply updates.
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
-          .map((key) => caches.delete(key)),
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
       ),
-    ),
   );
   self.clients.claim();
 });
@@ -50,7 +50,8 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/auth/") ||
     url.pathname.startsWith("/documents/") ||
     url.pathname.startsWith("/uploads/")
-  ) return;
+  )
+    return;
 
   // Next.js build assets are content-hashed and safe to cache.
   if (url.pathname.startsWith("/_next/static/")) {

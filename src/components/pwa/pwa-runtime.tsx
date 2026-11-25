@@ -62,10 +62,7 @@ export function PwaRuntime() {
             const installing = result.installing;
             if (!installing) return;
             installing.addEventListener("statechange", () => {
-              if (
-                installing.state === "installed" &&
-                navigator.serviceWorker.controller
-              ) {
+              if (installing.state === "installed" && navigator.serviceWorker.controller) {
                 waitingWorker.current = result.waiting;
                 setUpdateReady(Boolean(result.waiting));
               }
