@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -8,6 +9,8 @@ type BeforeInstallPromptEvent = Event & {
 };
 
 export function PwaRuntime() {
+  const pathname = usePathname();
+  const showInstallUi = pathname === "/login";
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
@@ -132,7 +135,7 @@ export function PwaRuntime() {
         </div>
       ) : null}
 
-      {installPrompt ? (
+      {showInstallUi && installPrompt ? (
         <div className="pwa-install-card" role="region" aria-label="Install ViLek">
           <div className="pwa-install-copy">
             <strong>Install ViLek</strong>
@@ -150,7 +153,7 @@ export function PwaRuntime() {
             ×
           </button>
         </div>
-      ) : isIos && !hideIosInstall ? (
+      ) : showInstallUi && isIos && !hideIosInstall ? (
         <div className="pwa-install-card pwa-install-card--ios">
           <div className="pwa-install-copy">
             <strong>Install ViLek</strong>
