@@ -1,0 +1,20 @@
+IMPORTANT: Your uploaded src/app/login/page.tsx imports "./login.css". Replace that exact file:
+  src/app/login/login.css
+
+Do NOT replace login.module.css; the uploaded source does not use a CSS Module.
+No page.tsx or authentication changes are required.
+
+This is a complete clean stylesheet replacement, not an appended override. It:
+- retains the approved desktop artwork and two-column composition
+- uses a compact desktop/tablet layout between 761px and 1100px
+- switches to a true stacked single-column layout at 760px and below
+- removes the desktop SSO button width expansion and negative margins
+- ensures mobile content can scroll naturally without clipping
+- keeps the original logo at its natural aspect ratio
+
+After replacing:
+  Remove-Item -Recurse -Force .next
+  npm run typecheck
+  npm run dev -- -p 3001
+
+Test widths 390px, 430px, 768px, 1024px and desktop. The new file is based on the uploaded src.zip where page.tsx imports ./login.css.
